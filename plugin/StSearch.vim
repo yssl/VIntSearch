@@ -1,10 +1,10 @@
 """""""""""""""""""""""""""""""""""""""""""""
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
-if exists("g:loaded_stackedsearch") || &cp
+if exists("g:loaded_stsearch") || &cp
   finish
 endif
-let g:loaded_stackedsearch	= 1
+let g:loaded_stsearch	= 1
 let s:keepcpo           = &cpo
 set cpo&vim
  
@@ -12,11 +12,11 @@ set cpo&vim
 "" my code
 
 "" global variables
-if !exists('g:stacked_codeexts')
-	let g:stacked_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
+if !exists('g:stsearch_codeexts')
+	let g:stsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
 endif
-if !exists('g:stacked_searchresults')
-	let g:stacked_searchresults = []
+if !exists('g:stsearch_searchresults')
+	let g:stsearch_searchresults = []
 endif
 "if !exists('g:wdmgr_defaultwd')
 	"let g:wdmgr_defaultwd = getcwd()
@@ -35,9 +35,9 @@ endif
 "endif
 "
 " commands 
-command! StackedBuildTag call s:BuildTag()
-command! -complete=tag -nargs=1 StackedSearchCtag call s:SearchCtag(<f-args>)
-command! -complete=tag -nargs=1 StackedSearchGrep call s:SearchGrep(<f-args>)
+command! StSearchBuildTag call s:BuildTag()
+command! -complete=tag -nargs=1 StSearchFindCtag call s:FindCtag(<f-args>)
+command! -complete=tag -nargs=1 StSearchFindGrep call s:FindGrep(<f-args>)
 
 "" autocmd
 "augroup WDManagerAutoCmds
@@ -47,11 +47,11 @@ command! -complete=tag -nargs=1 StackedSearchGrep call s:SearchGrep(<f-args>)
 
 let s:grepopt = "--include=*.{"
 let s:findopt = ""
-for i in range(len(g:stacked_codeexts))
-	let ext = g:stacked_codeexts[i]
+for i in range(len(g:stsearch_codeexts))
+	let ext = g:stsearch_codeexts[i]
 	let s:grepopt = s:grepopt.ext
 	let s:findopt = s:findopt."-iname *.".ext
-	if i<len(g:stacked_codeexts)-1
+	if i<len(g:stsearch_codeexts)-1
 		let s:grepopt = s:grepopt.","
 		let s:findopt = s:findopt." -o "
 	endif
@@ -70,7 +70,7 @@ endfunction
 "endfunction
 "command! SaveCurBufName call SaveCurBufName()
 
-function! s:SearchGrep(name)
+function! s:FindGrep(name)
 	call feedkeys("\<Esc>")
 	"grep! prevents grep from opening first result
 	echo "\:grep! -r ".s:grepopt." ".a:name." *\<CR>")
@@ -87,7 +87,7 @@ endfunction
 " ctags list to quickfix
 "http://andrewradev.com/2011/06/08/vim-and-ctags/
 "http://andrewradev.com/2011/10/15/vim-and-ctags-finding-tag-definitions/
-function! s:SearchCtag(name)
+function! s:FindCtag(name)
 	""""""""""""""""""""""""""""""""
 	" using taglint()
 	"""""""""""""""""""""""""""""""
