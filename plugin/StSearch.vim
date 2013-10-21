@@ -2,48 +2,48 @@
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_stsearch") || &cp
-  finish
+	finish
 endif
 let g:loaded_stsearch	= 1
 let s:keepcpo           = &cpo
 set cpo&vim
  
-""""""""""""""""""""""""""""""""""""""""""""""
-"" my code
+"""""""""""""""""""""""""""""""""""""""""""""
+" my code
 
 "" global variables
 if !exists('g:stsearch_codeexts')
 	let g:stsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
 endif
-if !exists('g:stsearch_searchresults')
-	let g:stsearch_searchresults = []
-endif
-"if !exists('g:wdmgr_defaultwd')
-	"let g:wdmgr_defaultwd = getcwd()
-"endif
-"if !exists('g:wdmgr_patternwd')
-	"let g:wdmgr_patternwd = {}
-"endif
-"if !exists('g:wdmgr_width_file')
-	"let g:wdmgr_width_file = 60
-"endif
-"if !exists('g:wdmgr_width_pattern')
-	"let g:wdmgr_width_pattern = 10
-"endif
-"if !exists('g:wdmgr_width_wd')
-	"let g:wdmgr_width_wd = 60
-"endif
-"
-" commands 
+
+"" commands 
 command! StSearchBuildTag call s:BuildTag()
-command! -complete=tag -nargs=1 StSearchFindCtag call s:FindCtag(<f-args>)
-command! -complete=tag -nargs=1 StSearchFindGrep call s:FindGrep(<f-args>)
+"command! -complete=tag -nargs=1 StSearchCtag call s:FindCtags(<f-args>)
+"command! -complete=tag -nargs=1 StSearchGrep call s:FindGrep(<f-args>)
+
+command! StSearchJumpCtagCursor call s:FindCtags(expand('<cword>'),1,0,'botright')
+command! StSearchJumpGrepCursor call s:FindGrep(expand('<cword>'),1,0,'botright')
+
+command! StSearchListCtagCursor call s:FindCtags(expand('<cword>'),0,1,'botright')
+command! StSearchListGrepCursor call s:FindGrep(expand('<cword>'),0,1,'botright')
+
+command! StSearchPrintStack call s:PrintStack()
+command! StSearchClearStack call s:ClearStack()
 
 "" autocmd
 "augroup WDManagerAutoCmds
 	"autocmd!
 	"autocmd BufEnter * call s:ChangeToWDof(expand('<afile>')) 
 "augroup END
+
+
+"" script variable
+if !exists('s:searchstack')
+	let s:searchstack = []
+endif
+if !exists('s:stacklevel')
+	let s:stacklevel = 0
+endif
 
 let s:grepopt = "--include=*.{"
 let s:findopt = ""
@@ -58,63 +58,111 @@ for i in range(len(g:stsearch_codeexts))
 endfor
 let s:grepopt = s:grepopt."}"
 
+
 "" functions
 function! s:BuildTag()
 	call feedkeys(":!find ".s:findopt.">tf.tmp ; ctags -L tf.tmp --fields=+n ; rm tf.tmp\<CR>")
 endfunction
 
+function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	if a:jump_to_firstitem
+		execute '1cc'
+	endif
+	if a:open_quickfix
+		execute a:quickfix_splitcmd.' copen'
+	endif
+endfunction
 
-"let g:origbufname = ''
-"function! SaveCurBufName()
-	"let g:origbufname = bufname('%')
-"endfunction
-"command! SaveCurBufName call SaveCurBufName()
+function! s:SetToCurStackLevel(keyword, file, line, text)
+	if s:stacklevel < len(s:searchstack)
+		unlet s:searchstack[s:stacklevel : ]
+	endif
+	call add(s:searchstack, {'keyword':a:keyword, 'file':a:file, 'line':a:line, 'text':a:text})
+	"todo - increase stack level only when jump to one of the result list
+	"todo - map decrease & increase function
+	"todo - shortname version of stsearchprint
+	"todo - autoload file split
+endfunction
 
-function! s:FindGrep(name)
-	call feedkeys("\<Esc>")
+function! s:IncreaseStackLevel()
+	let s:stacklevel = s:stacklevel+1
+	if s:stacklevel > len(s:searchstack)
+		let s:stacklevel = len(s:searchstack)
+	endif
+	" todo - change buffer & quickfix to current level
+endfunction
+
+function! s:DecreaseStackLevel()
+	let s:stacklevel = s:stacklevel-1
+	if s:stacklevel < 0
+		let s:stacklevel = 0
+	endif
+	" todo - change buffer & quickfix to current level
+endfunction
+
+function! s:ClearStack()
+	unlet s:searchstack
+	let s:searchstack = []
+	let s:stacklevel = 1
+	echo 'StSearch: Search stack is cleared'
+endfunction
+
+function! s:PrintStack()
+	"todo - print type (grep or ctags)
+	for i in range(len(s:searchstack))
+		if s:stacklevel==i
+			echo '> '.(i+1).' '.s:searchstack[i].keyword.' '.s:searchstack[i].file.' '.s:searchstack[i].line.' '.s:searchstack[i].text
+		else
+			echo (i+1).' '.s:searchstack[i].keyword.' '.s:searchstack[i].file.' '.s:searchstack[i].line.' '.s:searchstack[i].text
+		endif
+	endfor
+endfunction
+
+function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	"grep! prevents grep from opening first result
-	echo "\:grep! -r ".s:grepopt." ".a:name." *\<CR>")
-	call feedkeys("\:grep! -r ".s:grepopt." ".a:name." *\<CR>")
-	call s:QuickfixOpen()
-endfunction
+	execute "\:grep! -r ".s:grepopt." ".a:keyword." *"
 
-function! s:QuickfixOpen()
-	botright copen
-	execute 'wincmd p'
-endfunction
+	let numresults = len(getqflist())
+ 	if numresults>0
+		call s:SetToCurStackLevel(a:keyword, expand('<afile>'), line('.'), getline(line('.')))
+		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+	endif
 
+	redraw
+	echo 'StSearch (by grep): '.numresults.' results are found for: '.a:keyword
+endfunction
 
 " ctags list to quickfix
 "http://andrewradev.com/2011/06/08/vim-and-ctags/
 "http://andrewradev.com/2011/10/15/vim-and-ctags-finding-tag-definitions/
-function! s:FindCtag(name)
-	""""""""""""""""""""""""""""""""
-	" using taglint()
-	"""""""""""""""""""""""""""""""
-	"call SaveCurBufName()
-	"let tags = taglist('^'.a:name.'$')
-	"for entry in tags
-		"let text = substitute(entry['cmd'], '/^', '', '')
-		"let text = substitute(text, '$/', '', '')
-		""echo text
-		"let entry.text = text
-	"endfor
-
-	""""""""""""""""""""""""""""""""
-	" using :ts
-	  "# pri kind tag               파일
-	  "1 FS  m    mObjectList       ./Samples/sample5_limbIK/TestWin.cpp
-				   "line:51 class:TestWin_impl 
-				   "ObjectList mObjectList;
-	  "2 FS  m    mObjectList       /home/yoonsang/Data/Research/2013_4_newQP/Code/taesooLib_yslee/Samples/sample5_limbIK/TestWin.cpp
-				   "line:51 class:TestWin_impl 
-				   "ObjectList mObjectList;
-	"숫자 입력후 <엔터> (숫자없으면 취소): 
-	"""""""""""""""""""""""""""""""
-	redir => output
-	silent execute 'ts '.a:name
-	redir END
-	let tags = []
+function! s:FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	if 1
+		""""""""""""""""""""""""""""""""
+		" using taglist()
+		"""""""""""""""""""""""""""""""
+		let tags = taglist('^'.a:keyword.'$')
+		for entry in tags
+			let text = substitute(entry['cmd'], '/^', '', '')
+			let text = substitute(text, '$/', '', '')
+			"echo text
+			let entry.text = text
+		endfor
+	else
+		""""""""""""""""""""""""""""""""
+		" using :ts
+		  "# pri kind tag               파일
+		  "1 FS  m    mObjectList       ./Samples/sample5_limbIK/TestWin.cpp
+					   "line:51 class:TestWin_impl 
+					   "ObjectList mObjectList;
+		  "2 FS  m    mObjectList       /home/yoonsang/Data/Research/2013_4_newQP/Code/taesooLib_yslee/Samples/sample5_limbIK/TestWin.cpp
+					   "line:51 class:TestWin_impl 
+					   "ObjectList mObjectList;
+		"숫자 입력후 <엔터> (숫자없으면 취소): 
+		"""""""""""""""""""""""""""""""
+		redir => output
+		silent execute 'ts '.a:keyword
+		redir END
+		let tags = []
 
 python << EOF
 import vim
@@ -173,8 +221,9 @@ if not lines[2].startswith('E426'):
 			else:
 				continue
 EOF
+	endif
+
 	"echo tags
-	"return
 
 	" Retrieve tags of the 'f' kind
 	"let tags = filter(tags, 'v:val["kind"] == "f"')
@@ -200,54 +249,26 @@ EOF
 		call add(qf_taglist, qfitem)
 	endfor
 
-  " Place the tags in the quickfix window, if possible
-  if len(qf_taglist) > 0
-    call setqflist(qf_taglist)
-	call QuickfixOpen()
-  else
-    echo "No tags found for ".a:name
-  endif
+  "" Place the tags in the quickfix window, if possible
+  "if len(qf_taglist) > 0
+    "call setqflist(qf_taglist)
+	"call QuickfixOpen()
+  "else
+    "echo "No tags found for ".a:name
+  "endif
+
+
+	let numresults = len(qf_taglist)
+ 	if numresults>0
+    	call setqflist(qf_taglist)
+		call s:SetToCurStackLevel(a:keyword, expand('<afile>'), line('.'), getline(line('.')))
+		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+	endif
+
+	redraw
+	echo 'StSearch (by ctags): '.numresults.' results are found for: '.a:keyword
+
 endfunction
-command! -nargs=1 FindTags call s:FindTags(<f-args>)
-
-
-
-"function! s:Chdir(dir)
-	"execute 'cd' a:dir 
-	"call s:SetCWDasDefaultWD()
-"endfunction
-
-"function! s:SetCWDasDefaultWD()
-	"let g:wdmgr_defaultwd = getcwd()
-	"echo 'WDManager: CWD and Default WD: '.g:wdmgr_defaultwd
-"endfunction
-
-"function! s:ChangeToWDof(bufname)
-	"if len(a:bufname)==0
-		"return
-	"endif
-	"let l:wd = s:GetWDof(a:bufname)
-	"execute 'cd' l:wd
-	""echo 'WDManager: CWD is '.l:wd
-"endfunction
-
-"function! s:GetWDof(bufname)
-"python << EOF
-"import vim
-"import fnmatch
-"bufname = vim.eval('a:bufname')
-"patternwd = vim.eval('g:wdmgr_patternwd')
-"inpatternwd = False
-"for pattern, wd in patternwd.items():
-	"#print fnmatch.fnmatch(bufname, pattern), pattern, bufname
-	"if fnmatch.fnmatch(bufname, pattern):
-		"inpatternwd = True
-		"vim.command('return expand(\'%s\')'%wd)
-		"break
-"if inpatternwd==False:
-	"vim.command('return expand(g:wdmgr_defaultwd)')
-"EOF
-"endfunction
 
 
 """""""""""""""""""""""""""""""""""""""""""""
