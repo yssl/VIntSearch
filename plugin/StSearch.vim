@@ -2,7 +2,7 @@
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_stsearch") || &cp
-	"finish
+	finish
 endif
 let g:loaded_stsearch	= 1
 let s:keepcpo           = &cpo
@@ -15,20 +15,38 @@ set cpo&vim
 if !exists('g:stsearch_codeexts')
 	let g:stsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
 endif
+if !exists('g:stsearch_width_keyword')
+	let g:stsearch_width_keyword = 25
+endif
+if !exists('g:stsearch_width_file')
+	let g:stsearch_width_file = 40 
+endif
+if !exists('g:stsearch_width_text')
+	let g:stsearch_width_text = 40
+endif
 
 "" commands 
 command! StSearchBuildTag call StSearch#BuildTag()
-"command! -complete=tag -nargs=1 StSearchCtag call s:FindCtags(<f-args>)
-"command! -complete=tag -nargs=1 StSearchGrep call s:FindGrep(<f-args>)
-
 command! StSearchJumpCtagCursor call StSearch#FindCtags(expand('<cword>'),1,0,'botright')
 command! StSearchJumpGrepCursor call StSearch#FindGrep(expand('<cword>'),1,0,'botright')
 
 command! StSearchListCtagCursor call StSearch#FindCtags(expand('<cword>'),0,1,'botright')
 command! StSearchListGrepCursor call StSearch#FindGrep(expand('<cword>'),0,1,'botright')
 
+command! -complete=tag -nargs=1 StSearchListCtag call StSearch#FindCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 SSctag call StSearch#FindCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 StSearchListGrep call StSearch#FindGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 SSgrep call StSearch#FindGrep(<f-args>,0,1,'botright')
+
+command! StSearchDecreaseStackLV call StSearch#DecreaseStackLevel()
+command! SSdec call StSearch#DecreaseStackLevel()
+command! StSearchIncreaseStackLV call StSearch#IncreaseStackLevel()
+command! SSinc call StSearch#IncreaseStackLevel()
+
 command! StSearchPrintStack call StSearch#PrintStack()
+command! SSprint call StSearch#PrintStack()
 command! StSearchClearStack call StSearch#ClearStack()
+command! SSclear call StSearch#ClearStack()
 
 "" autocmd
 "augroup WDManagerAutoCmds

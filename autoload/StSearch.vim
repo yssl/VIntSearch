@@ -19,6 +19,14 @@ function! StSearch#FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_
 	call s:FindGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
+function! StSearch#DecreaseStackLevel()
+	call s:DecreaseStackLevel()
+endfunction
+
+function! StSearch#IncreaseStackLevel()
+	call s:IncreaseStackLevel()
+endfunction
+
 "" script variable
 if !exists('s:searchstack')
 	let s:searchstack = []
@@ -50,15 +58,16 @@ function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitc
 	endif
 endfunction
 
-function! s:SetToCurStackLevel(keyword, file, line, text)
+function! s:SetToCurStackLevel(keyword, type, file, line, text)
 	if s:stacklevel < len(s:searchstack)
 		unlet s:searchstack[s:stacklevel : ]
 	endif
-	call add(s:searchstack, {'keyword':a:keyword, 'file':a:file, 'line':a:line, 'text':a:text})
+	call add(s:searchstack, 
+			\{'keyword':a:keyword, 'type':a:type, 
+			\'file':a:file, 'line':a:line, 'text':a:text})
+
 	"todo - increase stack level only when jump to one of the result list
-	"todo - map decrease & increase function
-	"todo - shortname version of stsearchprint
-	"todo - autoload file split
+	let s:stacklevel = s:stacklevel + 1
 endfunction
 
 function! s:BuildTag()
@@ -67,9 +76,11 @@ endfunction
 
 function! s:IncreaseStackLevel()
 	let s:stacklevel = s:stacklevel+1
-	if s:stacklevel > len(s:searchstack)
-		let s:stacklevel = len(s:searchstack)
+	if s:stacklevel > len(s:searchstack)-1
+		let s:stacklevel = len(s:searchstack)-1
 	endif
+	let ss = s:searchstack[s:stacklevel]
+	execute 'buffer '.ss.file
 	" todo - change buffer & quickfix to current level
 endfunction
 
@@ -78,25 +89,77 @@ function! s:DecreaseStackLevel()
 	if s:stacklevel < 0
 		let s:stacklevel = 0
 	endif
+	let ss = s:searchstack[s:stacklevel]
+	execute 'buffer '.ss.file
 	" todo - change buffer & quickfix to current level
 endfunction
 
 function! s:ClearStack()
 	unlet s:searchstack
 	let s:searchstack = []
-	let s:stacklevel = 1
+	let s:stacklevel = 0
 	echo 'StSearch: The search stack is cleared.'
 endfunction
 
 function! s:PrintStack()
-	"todo - print type (grep or ctags)
-	for i in range(len(s:searchstack))
-		if s:stacklevel==i
-			echo '> '.(i+1).' '.s:searchstack[i].keyword.' '.s:searchstack[i].file.' '.s:searchstack[i].line.' '.s:searchstack[i].text
-		else
-			echo (i+1).' '.s:searchstack[i].keyword.' '.s:searchstack[i].file.' '.s:searchstack[i].line.' '.s:searchstack[i].text
-		endif
-	endfor
+python << EOF
+import vim
+def ltrunc(s, width, prefix=''):
+    if width >= len(s): prefix = ''
+    return prefix+s[-width+len(prefix):]
+def rtrunc(s, width, postfix=''):
+    if width >= len(s): postfix = ''
+    return s[:width-len(postfix)]+postfix
+
+# stack level, keyword, search type, file, line, text
+width_stacklevel = 2
+width_searchtype = 5
+width_line = 6
+widths = {'lv':width_stacklevel,
+		'keyword':int(vim.eval('g:stsearch_width_keyword')), 
+		'type':width_searchtype, 
+		'file':int(vim.eval('g:stsearch_width_file')), 
+		'line':width_line, 
+		'text':int(vim.eval('g:stsearch_width_text'))}
+prefix = '..'
+
+print '  %s  %s  %s  %s  %s  %s'%('LV'.ljust(widths['lv']),
+								'Keyword'.ljust(widths['keyword']), 
+								'Type'.ljust(widths['type']), 
+								'Text'.ljust(widths['text']),
+								'Line'.ljust(widths['line']), 
+								'File'.ljust(widths['file']))
+
+searchstack = vim.eval('s:searchstack')
+stacklevel = int(vim.eval('s:stacklevel'))
+#print stacklevel
+for i in range(len(searchstack)+1):
+	if i==stacklevel: mark = '> '
+	else:				mark = '  '
+
+	if i<len(searchstack):
+		ss = searchstack[i]
+		itemsd = {'lv':str(i+1), 'keyword':ss['keyword'],
+				'type':ss['type'], 'text':ss['text'].lstrip().replace('\t',' '), 
+				'line':ss['line'], 'file':ss['file']}
+		for k in itemsd:
+			if len(itemsd[k])<widths[k]:	itemsd[k] = itemsd[k].ljust(widths[k])
+			else:
+				if k=='file':
+					itemsd[k] = ltrunc(itemsd[k], widths[k], prefix)
+				else:
+					itemsd[k] = rtrunc(itemsd[k], widths[k], prefix)
+
+		print '%s%s  %s  %s  %s  %s  %s'%(mark,
+										itemsd['lv'],
+										itemsd['keyword'], 
+										itemsd['type'],
+										itemsd['text'], 
+										itemsd['line'], 
+										itemsd['file'])
+	else:
+		print '%s'%mark
+EOF
 endfunction
 
 function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
@@ -105,7 +168,7 @@ function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcm
 
 	let numresults = len(getqflist())
  	if numresults>0
-		call s:SetToCurStackLevel(a:keyword, expand('<afile>'), line('.'), getline(line('.')))
+		call s:SetToCurStackLevel(a:keyword, 'grep', expand('%'), line('.'), getline(line('.')))
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 	endif
 
@@ -242,7 +305,7 @@ EOF
 	let numresults = len(qf_taglist)
  	if numresults>0
     	call setqflist(qf_taglist)
-		call s:SetToCurStackLevel(a:keyword, expand('<afile>'), line('.'), getline(line('.')))
+		call s:SetToCurStackLevel(a:keyword, 'ctags', expand('%'), line('.'), getline(line('.')))
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 	endif
 
