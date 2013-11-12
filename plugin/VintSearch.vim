@@ -1,10 +1,10 @@
 """""""""""""""""""""""""""""""""""""""""""""
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
-if exists("g:loaded_stsearch") || &cp
+if exists("g:loaded_vintsearch") || &cp
 	finish
 endif
-let g:loaded_stsearch	= 1
+let g:loaded_vintsearch	= 1
 let s:keepcpo           = &cpo
 set cpo&vim
  
@@ -12,46 +12,45 @@ set cpo&vim
 " my code
 
 "" global variables
-if !exists('g:stsearch_codeexts')
-	let g:stsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
+if !exists('g:vintsearch_codeexts')
+	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
 endif
-if !exists('g:stsearch_width_keyword')
-	let g:stsearch_width_keyword = 25
+if !exists('g:vintsearch_width_keyword')
+	let g:vintsearch_width_keyword = 25
 endif
-if !exists('g:stsearch_width_file')
-	let g:stsearch_width_file = 40 
+if !exists('g:vintsearch_width_file')
+	let g:vintsearch_width_file = 40 
 endif
-if !exists('g:stsearch_width_text')
-	let g:stsearch_width_text = 40
+if !exists('g:vintsearch_width_text')
+	let g:vintsearch_width_text = 40
 endif
 
 "" commands 
-command! StSearchBuildTag call StSearch#BuildTag()
-command! StSearchJumpCtagCursor call StSearch#FindCtags(expand('<cword>'),1,0,'botright')
-command! StSearchJumpGrepCursor call StSearch#FindGrep(expand('<cword>'),1,0,'botright')
+command! VintSearchBuildTag call VintSearch#BuildTag()
+command! VintSearchJumpCtagCursor call VintSearch#FindCtags(expand('<cword>'),1,0,'botright')
+command! VintSearchJumpGrepCursor call VintSearch#FindGrep(expand('<cword>'),1,0,'botright')
 
-command! StSearchListCtagCursor call StSearch#FindCtags(expand('<cword>'),0,1,'botright')
-command! StSearchListGrepCursor call StSearch#FindGrep(expand('<cword>'),0,1,'botright')
+command! VintSearchListCtagCursor call VintSearch#FindCtags(expand('<cword>'),0,1,'botright')
+command! VintSearchListGrepCursor call VintSearch#FindGrep(expand('<cword>'),0,1,'botright')
 
-command! -complete=tag -nargs=1 StSearchListCtag call StSearch#FindCtags(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 SSctag call StSearch#FindCtags(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 StSearchListGrep call StSearch#FindGrep(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 SSgrep call StSearch#FindGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VintSearchListCtag call VintSearch#FindCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 SSctag call VintSearch#FindCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VintSearchListGrep call VintSearch#FindGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 SSgrep call VintSearch#FindGrep(<f-args>,0,1,'botright')
 
-command! StSearchDecreaseStackLV call StSearch#DecreaseStackLevel()
-command! SSdec call StSearch#DecreaseStackLevel()
-command! StSearchIncreaseStackLV call StSearch#IncreaseStackLevel()
-command! SSinc call StSearch#IncreaseStackLevel()
+command! VintSearchDecreaseStackLV call VintSearch#DecreaseStackLevel()
+command! VSdec call VintSearch#DecreaseStackLevel()
+command! VintSearchIncreaseStackLV call VintSearch#IncreaseStackLevel()
+command! VSinc call VintSearch#IncreaseStackLevel()
 
-command! StSearchPrintStack call StSearch#PrintStack()
-command! SSprint call StSearch#PrintStack()
-command! StSearchClearStack call StSearch#ClearStack()
-command! SSclear call StSearch#ClearStack()
+command! VintSearchPrintStack call VintSearch#PrintStack()
+command! VSprint call VintSearch#PrintStack()
+command! VintSearchClearStack call VintSearch#ClearStack()
+command! VSclear call VintSearch#ClearStack()
 
 "" autocmd
-"augroup WDManagerAutoCmds
+"augroup VintSearchAutoCmds
 	"autocmd!
-	"autocmd BufEnter * call s:ChangeToWDof(expand('<afile>')) 
 "augroup END
 
 

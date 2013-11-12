@@ -1,29 +1,29 @@
 " wrappers
-function! StSearch#BuildTag()
+function! VintSearch#BuildTag()
 	call s:BuildTag()
 endfunction
 
-function! StSearch#PrintStack()
+function! VintSearch#PrintStack()
 	call s:PrintStack()
 endfunction
 
-function! StSearch#ClearStack()
+function! VintSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! StSearch#FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! VintSearch#FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	call s:FindCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! StSearch#FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! VintSearch#FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	call s:FindGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! StSearch#DecreaseStackLevel()
+function! VintSearch#DecreaseStackLevel()
 	call s:DecreaseStackLevel()
 endfunction
 
-function! StSearch#IncreaseStackLevel()
+function! VintSearch#IncreaseStackLevel()
 	call s:IncreaseStackLevel()
 endfunction
 
@@ -37,11 +37,11 @@ endif
 
 let s:grepopt = "--include=*.{"
 let s:findopt = ""
-for i in range(len(g:stsearch_codeexts))
-	let ext = g:stsearch_codeexts[i]
+for i in range(len(g:vintsearch_codeexts))
+	let ext = g:vintsearch_codeexts[i]
 	let s:grepopt = s:grepopt.ext
 	let s:findopt = s:findopt."-iname *.".ext
-	if i<len(g:stsearch_codeexts)-1
+	if i<len(g:vintsearch_codeexts)-1
 		let s:grepopt = s:grepopt.","
 		let s:findopt = s:findopt." -o "
 	endif
@@ -98,7 +98,7 @@ function! s:ClearStack()
 	unlet s:searchstack
 	let s:searchstack = []
 	let s:stacklevel = 0
-	echo 'StSearch: The search stack is cleared.'
+	echo 'VintSearch: The search stack is cleared.'
 endfunction
 
 function! s:PrintStack()
@@ -116,11 +116,11 @@ width_stacklevel = 2
 width_searchtype = 5
 width_line = 6
 widths = {'lv':width_stacklevel,
-		'keyword':int(vim.eval('g:stsearch_width_keyword')), 
+		'keyword':int(vim.eval('g:vintsearch_width_keyword')), 
 		'type':width_searchtype, 
-		'file':int(vim.eval('g:stsearch_width_file')), 
+		'file':int(vim.eval('g:vintsearch_width_file')), 
 		'line':width_line, 
-		'text':int(vim.eval('g:stsearch_width_text'))}
+		'text':int(vim.eval('g:vintsearch_width_text'))}
 prefix = '..'
 
 print '  %s  %s  %s  %s  %s  %s'%('LV'.ljust(widths['lv']),
@@ -173,7 +173,7 @@ function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcm
 	endif
 
 	redraw
-	echo 'StSearch (by grep): '.numresults.' results are found for: '.a:keyword
+	echo 'VintSearch (by grep): '.numresults.' results are found for: '.a:keyword
 endfunction
 
 " ctags list to quickfix
@@ -310,6 +310,6 @@ EOF
 	endif
 
 	redraw
-	echo 'StSearch (by ctags): '.numresults.' results are found for: '.a:keyword
+	echo 'VintSearch (by ctags): '.numresults.' results are found for: '.a:keyword
 
 endfunction
