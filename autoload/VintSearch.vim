@@ -35,19 +35,6 @@ if !exists('s:stacklevel')
 	let s:stacklevel = 0
 endif
 
-let s:grepopt = "--include=*.{"
-let s:findopt = ""
-for i in range(len(g:vintsearch_codeexts))
-	let ext = g:vintsearch_codeexts[i]
-	let s:grepopt = s:grepopt.ext
-	let s:findopt = s:findopt."-iname *.".ext
-	if i<len(g:vintsearch_codeexts)-1
-		let s:grepopt = s:grepopt.","
-		let s:findopt = s:findopt." -o "
-	endif
-endfor
-let s:grepopt = s:grepopt."}"
-
 "" functions
 function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	if a:jump_to_firstitem
@@ -68,10 +55,6 @@ function! s:SetToCurStackLevel(keyword, type, file, line, text)
 
 	"todo - increase stack level only when jump to one of the result list
 	let s:stacklevel = s:stacklevel + 1
-endfunction
-
-function! s:BuildTag()
-	call feedkeys(":!find ".s:findopt.">tf.tmp ; ctags -L tf.tmp --fields=+n ; rm tf.tmp\<CR>")
 endfunction
 
 function! s:IncreaseStackLevel()
@@ -162,9 +145,112 @@ for i in range(len(searchstack)+1):
 EOF
 endfunction
 
+function! s:MakeFindOpt()
+	let findopt = ""
+	for i in range(len(g:vintsearch_codeexts))
+		let ext = g:vintsearch_codeexts[i]
+		let findopt = findopt."-iname \'*.".ext."\'"
+		if i<len(g:vintsearch_codeexts)-1
+			let findopt = findopt." -o "
+		endif
+	endfor
+	return findopt
+endfunction
+
+function! s:MakeGrepOpt()
+	let grepopt = "--include=*.{"
+	for i in range(len(g:vintsearch_codeexts))
+		let ext = g:vintsearch_codeexts[i]
+		let grepopt = grepopt.ext
+		if i<len(g:vintsearch_codeexts)-1
+			let grepopt = grepopt.","
+		endif
+	endfor
+	let grepopt = grepopt."}"
+	return grepopt
+endfunction
+
+function! s:FindRepoDirFrom(dir)
+python << EOF
+import vim
+repodirs = vim.eval('g:repodirs')
+firstdir = vim.eval('a:dir')
+dir = firstdir
+while True:
+	prevdir = dir
+	dir = os.path.dirname(prevdir)
+	if dir==prevdir:
+		vim.command('return \'\'')
+		break
+	else:
+		exist = False
+		for repodir in repodirs:
+			if os.path.exists(os.path.join(dir, repodir)):
+				vim.command('return \'%s\''%dir)
+				exist = True
+				break
+		if exist:
+		   break	
+EOF
+endfunction
+
+function! s:GetWorkDir(mode)
+	if a:mode==#'rf'
+		let workdir = s:FindRepoDirFrom(expand("%:p"))
+		if workdir==#''
+			let workdir = expand("%:p")
+		endif
+		return workdir
+	elseif a:mode==#'rc'
+		let workdir = s:FindRepoDirFrom(expand("%:p"))
+		if workdir==#''
+			let workdir = getcwd()
+		endif
+		return workdir
+	else
+		echo "VintSearch: unknown workdir mode \'".a:mode."\'"
+		return ''
+	endif
+endfunction
+
+function! s:BuildTag()
+	let findopt = s:MakeFindOpt()
+	"echo findopt
+	"return
+	
+	let tagfilename = 'tags'
+	
+	let prevdir = getcwd()
+	let workdir = s:GetWorkDir(g:vintsearch_workdir_mode)
+	if workdir==#''
+		return
+	endif 
+	execute 'cd' workdir
+
+	execute ":!find ".findopt.">tf.tmp ; ctags -f ".tagfilename." -L tf.tmp --fields=+n ; rm tf.tmp"
+	
+	execute 'cd' prevdir
+	
+	redraw
+	echo "VintSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
+endfunction
+
 function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	let grepopt = s:MakeGrepOpt()
+	"echo grepopt
+	"return
+
+	let prevdir = getcwd()
+	let workdir = s:GetWorkDir(g:vintsearch_workdir_mode)
+	if workdir==#''
+		return
+	endif 
+	execute 'cd' workdir
+
 	"grep! prevents grep from opening first result
-	execute "\:grep! -r ".s:grepopt." ".a:keyword." *"
+	execute "\:grep! -r ".grepopt." ".a:keyword." *"
+
+	execute 'cd' prevdir
 
 	let numresults = len(getqflist())
  	if numresults>0
@@ -191,6 +277,7 @@ function! s:FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitc
 			"echo text
 			let entry.text = text
 		endfor
+
 	else
 		""""""""""""""""""""""""""""""""
 		" using :ts
@@ -209,65 +296,63 @@ function! s:FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitc
 		let tags = []
 
 python << EOF
-import vim
+	import vim
 
-def splitTaglineByIndexes(tagline, indexes):
-	tokens = []
-	for i in range(len(labelidxs)):
-		if i==0:					tokens.append(tagline[:labelidxs[i]+1])
-		elif i==len(labelidxs)-1:	tokens.append(tagline[labelidxs[i]:])
-		else:						tokens.append(tagline[labelidxs[i]:labelidxs[i+1]])
-	return tokens
+	def splitTaglineByIndexes(tagline, indexes):
+		tokens = []
+		for i in range(len(labelidxs)):
+			if i==0:					tokens.append(tagline[:labelidxs[i]+1])
+			elif i==len(labelidxs)-1:	tokens.append(tagline[labelidxs[i]:])
+			else:						tokens.append(tagline[labelidxs[i]:labelidxs[i+1]])
+		return tokens
 
-output = vim.eval('output')
-#print output
+	output = vim.eval('output')
+	#print output
 
-lines = output.split('\n')
-del lines[0]	# remove 'blank' line
+	lines = output.split('\n')
+	del lines[0]	# remove 'blank' line
 
-if not lines[2].startswith('E426'):
-	labels = lines[0].split()
-	labelidxs = [lines[0].find(label) for label in labels]
-	#print labels
-	#print splitLabelsByIndexes(lines[0], labelidxs)
-	del lines[0]	# remove first row 'label' line
+	if not lines[2].startswith('E426'):
+		labels = lines[0].split()
+		labelidxs = [lines[0].find(label) for label in labels]
+		#print labels
+		#print splitLabelsByIndexes(lines[0], labelidxs)
+		del lines[0]	# remove first row 'label' line
 
-	lineinitem = -1
-	for line in lines:
-		firstToken = line.lstrip().split()[0]
-		#print firstToken
-		#print line
-
-		if firstToken.isdigit():	# lineinitem 0
-			num, pri, kind, tag, filename =  splitTaglineByIndexes(line, labelidxs)
-			#print num, pri, kind, tag, filename
+		lineinitem = -1
+		for line in lines:
+			firstToken = line.lstrip().split()[0]
+			#print firstToken
 			#print line
-			lineinitem = 0
-			tokens = line.split()
-			vim.command('call add(tags, {})') 
-			vim.command('let tags[-1].num = '+num)
-			vim.command('let tags[-1].pri = '+repr(pri))
-			vim.command('let tags[-1].kind = '+repr(kind))
-			vim.command('let tags[-1].tag = '+repr(tag))
-			vim.command('let tags[-1].filename = '+repr(filename))
-			lineinitem += 1
-		else:
-			if lineinitem==1:
+
+			if firstToken.isdigit():	# lineinitem 0
+				num, pri, kind, tag, filename =  splitTaglineByIndexes(line, labelidxs)
+				#print num, pri, kind, tag, filename
+				#print line
+				lineinitem = 0
 				tokens = line.split()
-				for token in tokens:
-					key, value = token.split(':', 1)
-					if value.isdigit():	value = int(value)
-					vim.command('let tags[-1].%s = %s'%(key, repr(value)))
-				lineinitem += 1
-			elif lineinitem==2:
-				vim.command('let tags[-1].text = '+repr(line))
+				vim.command('call add(tags, {})') 
+				vim.command('let tags[-1].num = '+num)
+				vim.command('let tags[-1].pri = '+repr(pri))
+				vim.command('let tags[-1].kind = '+repr(kind))
+				vim.command('let tags[-1].tag = '+repr(tag))
+				vim.command('let tags[-1].filename = '+repr(filename))
 				lineinitem += 1
 			else:
-				continue
+				if lineinitem==1:
+					tokens = line.split()
+					for token in tokens:
+						key, value = token.split(':', 1)
+						if value.isdigit():	value = int(value)
+						vim.command('let tags[-1].%s = %s'%(key, repr(value)))
+					lineinitem += 1
+				elif lineinitem==2:
+					vim.command('let tags[-1].text = '+repr(line))
+					lineinitem += 1
+				else:
+					continue
 EOF
 	endif
-
-	"echo tags
 
 	" Retrieve tags of the 'f' kind
 	"let tags = filter(tags, 'v:val["kind"] == "f"')
@@ -275,8 +360,6 @@ EOF
 	" Prepare them for inserting in the quickfix window
 	let qf_taglist = []
 	for entry in tags
-		"echo entry
-
 		" getqflist()
 		"[{'lnum': 124, 'bufnr': 59, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': -1,
 		"'type': '', 'pattern': '', 'text': 'FindTags generateClassificationBind()
@@ -292,15 +375,6 @@ EOF
 		  \ }
 		call add(qf_taglist, qfitem)
 	endfor
-
-  "" Place the tags in the quickfix window, if possible
-  "if len(qf_taglist) > 0
-    "call setqflist(qf_taglist)
-	"call QuickfixOpen()
-  "else
-    "echo "No tags found for ".a:name
-  "endif
-
 
 	let numresults = len(qf_taglist)
  	if numresults>0
