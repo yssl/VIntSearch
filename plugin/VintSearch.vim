@@ -34,32 +34,39 @@ endif
 
 "" commands 
 command! VintSearchBuildTag call VintSearch#BuildTag()
-command! VintSearchJumpCtagCursor call VintSearch#FindCtags(expand('<cword>'),1,0,'botright')
-command! VintSearchJumpGrepCursor call VintSearch#FindGrep(expand('<cword>'),1,0,'botright')
 
-command! VintSearchListCtagCursor call VintSearch#FindCtags(expand('<cword>'),0,1,'botright')
-command! VintSearchListGrepCursor call VintSearch#FindGrep(expand('<cword>'),0,1,'botright')
+command! VintSearchJumpCtagCursor call VintSearch#SearchCtags(expand('<cword>'),1,0,'botright')
+command! VintSearchJumpGrepCursor call VintSearch#SearchGrep(expand('<cword>'),1,0,'botright')
 
-command! -complete=tag -nargs=1 VintSearchListCtag call VintSearch#FindCtags(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 SSctag call VintSearch#FindCtags(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 VintSearchListGrep call VintSearch#FindGrep(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 SSgrep call VintSearch#FindGrep(<f-args>,0,1,'botright')
+command! VintSearchListCtagCursor call VintSearch#SearchCtags(expand('<cword>'),0,1,'botright')
+command! VintSearchListGrepCursor call VintSearch#SearchGrep(expand('<cword>'),0,1,'botright')
+
+command! -complete=tag -nargs=1 VintSearchListCtag call VintSearch#SearchCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VSctag call VintSearch#SearchCtags(<f-args>,0,1,'botright')
+
+command! -complete=tag -nargs=1 VintSearchListGrep call VintSearch#SearchGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VSgrep call VintSearch#SearchGrep(<f-args>,0,1,'botright')
 
 command! VintSearchDecreaseStackLV call VintSearch#DecreaseStackLevel()
 command! VSdec call VintSearch#DecreaseStackLevel()
+
 command! VintSearchIncreaseStackLV call VintSearch#IncreaseStackLevel()
 command! VSinc call VintSearch#IncreaseStackLevel()
 
 command! VintSearchPrintStack call VintSearch#PrintStack()
 command! VSprint call VintSearch#PrintStack()
+
 command! VintSearchClearStack call VintSearch#ClearStack()
 command! VSclear call VintSearch#ClearStack()
 
-"" autocmd
+command! -nargs=1 VScc call VintSearch#Cc(<args>)
+command! VScnext call VintSearch#Cnext()
+command! VScprev call VintSearch#Cprev()
+
+" autocmd
 "augroup VintSearchAutoCmds
 	"autocmd!
 "augroup END
-
 
 """""""""""""""""""""""""""""""""""""""""""""
 " template code

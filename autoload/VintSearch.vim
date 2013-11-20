@@ -1,4 +1,16 @@
 " wrappers
+function! VintSearch#Cc(linenum)
+	call s:Cc(a:linenum)
+endfunction
+
+function! VintSearch#Cnext()
+	call s:Cnext()
+endfunction
+
+function! VintSearch#Cprev()
+	call s:Cprev()
+endfunction
+
 function! VintSearch#BuildTag()
 	call s:BuildTag()
 endfunction
@@ -11,12 +23,12 @@ function! VintSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VintSearch#FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
-	call s:FindCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+function! VintSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! VintSearch#FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
-	call s:FindGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+function! VintSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
 function! VintSearch#DecreaseStackLevel()
@@ -34,11 +46,38 @@ endif
 if !exists('s:stacklevel')
 	let s:stacklevel = 0
 endif
+if !exists('s:cc_after_search')
+	let s:cc_after_search = 0
+endif
 
 "" functions
+function! s:Cc(linenum)
+	execute a:linenum.'cc'
+	if s:cc_after_search==0
+		let s:stacklevel = s:stacklevel + 1
+		let s:cc_after_search = 1
+	endif
+endfunction
+
+function! s:Cnext()
+	execute 'cnext'
+	if s:cc_after_search==0
+		let s:stacklevel = s:stacklevel + 1
+		let s:cc_after_search = 1
+	endif
+endfunction
+
+function! s:Cprev(linenum)
+	execute 'cprev'
+	if s:cc_after_search==0
+		let s:stacklevel = s:stacklevel + 1
+		let s:cc_after_search = 1
+	endif
+endfunction
+
 function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	if a:jump_to_firstitem
-		execute '1cc'
+		call s:Cc(1)
 	endif
 	if a:open_quickfix
 		execute a:quickfix_splitcmd.' copen'
@@ -52,9 +91,6 @@ function! s:SetToCurStackLevel(keyword, type, file, line, text)
 	call add(s:searchstack, 
 			\{'keyword':a:keyword, 'type':a:type, 
 			\'file':a:file, 'line':a:line, 'text':a:text})
-
-	"todo - increase stack level only when jump to one of the result list
-	let s:stacklevel = s:stacklevel + 1
 endfunction
 
 function! s:IncreaseStackLevel()
@@ -235,7 +271,7 @@ function! s:BuildTag()
 	echo "VintSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
 endfunction
 
-function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	let grepopt = s:MakeGrepOpt()
 	"echo grepopt
 	"return
@@ -255,6 +291,7 @@ function! s:FindGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcm
 	let numresults = len(getqflist())
  	if numresults>0
 		call s:SetToCurStackLevel(a:keyword, 'grep', expand('%'), line('.'), getline(line('.')))
+		let s:cc_after_search = 0
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 	endif
 
@@ -265,7 +302,7 @@ endfunction
 " ctags list to quickfix
 "http://andrewradev.com/2011/06/08/vim-and-ctags/
 "http://andrewradev.com/2011/10/15/vim-and-ctags-finding-tag-definitions/
-function! s:FindCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:SearchCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	if 1
 		""""""""""""""""""""""""""""""""
 		" using taglist()
@@ -380,6 +417,7 @@ EOF
  	if numresults>0
     	call setqflist(qf_taglist)
 		call s:SetToCurStackLevel(a:keyword, 'ctags', expand('%'), line('.'), getline(line('.')))
+		let s:cc_after_search = 0
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 	endif
 
