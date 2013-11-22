@@ -19,6 +19,10 @@ function! VintSearch#PrintStack()
 	call s:PrintStack()
 endfunction
 
+function! VintSearch#PrintSearchPath()
+	call s:PrintSearchPath()
+endfunction
+
 function! VintSearch#ClearStack()
 	call s:ClearStack()
 endfunction
@@ -31,12 +35,12 @@ function! VintSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quick
 	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! VintSearch#DecreaseStackLevel()
-	call s:DecreaseStackLevel()
+function! VintSearch#MoveBackward()
+	call s:MoveBackward()
 endfunction
 
-function! VintSearch#IncreaseStackLevel()
-	call s:IncreaseStackLevel()
+function! VintSearch#MoveForward()
+	call s:MoveForward()
 endfunction
 
 "" script variable
@@ -46,33 +50,36 @@ endif
 if !exists('s:stacklevel')
 	let s:stacklevel = 0
 endif
-if !exists('s:cc_after_search')
-	let s:cc_after_search = 0
+if !exists('s:jump_after_search')
+	let s:jump_after_search = 0
 endif
 
 "" functions
 function! s:Cc(linenum)
 	execute a:linenum.'cc'
-	if s:cc_after_search==0
-		let s:stacklevel = s:stacklevel + 1
-		let s:cc_after_search = 1
-	endif
+	call s:CheckJumpAfterSearch()
 endfunction
 
 function! s:Cnext()
 	execute 'cnext'
-	if s:cc_after_search==0
-		let s:stacklevel = s:stacklevel + 1
-		let s:cc_after_search = 1
-	endif
+	call s:CheckJumpAfterSearch()
 endfunction
 
 function! s:Cprev(linenum)
 	execute 'cprev'
-	if s:cc_after_search==0
-		let s:stacklevel = s:stacklevel + 1
-		let s:cc_after_search = 1
+	call s:CheckJumpAfterSearch()
 	endif
+endfunction
+
+function! s:CheckJumpAfterSearch()
+	if s:jump_after_search==0
+		let s:stacklevel = s:stacklevel + 1
+	endif
+	let s:jump_after_search = 1
+endfunction
+
+function! s:UncheckJumpAfterSearch()
+	let s:jump_after_search = 0
 endfunction
 
 function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitcmd)
@@ -84,40 +91,61 @@ function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitc
 	endif
 endfunction
 
-function! s:SetToCurStackLevel(keyword, type, file, line, text)
+function! s:SetToCurStackLevel(keyword, type, file, line, text, qflist)
 	if s:stacklevel < len(s:searchstack)
 		unlet s:searchstack[s:stacklevel : ]
 	endif
 	call add(s:searchstack, 
 			\{'keyword':a:keyword, 'type':a:type, 
-			\'file':a:file, 'line':a:line, 'text':a:text})
+			\'file':a:file, 'line':a:line, 'text':a:text,
+			\'qflist':a:qflist})
 endfunction
 
-function! s:IncreaseStackLevel()
+function! s:MoveForward()
 	let s:stacklevel = s:stacklevel+1
 	if s:stacklevel > len(s:searchstack)-1
 		let s:stacklevel = len(s:searchstack)-1
 	endif
+
+	let buftype = getbufvar(winbufnr(0), '&buftype')
+	if buftype==#'quickfix'
+		exec 'wincmd p'
+	endif
+
 	let ss = s:searchstack[s:stacklevel]
 	execute 'buffer '.ss.file
-	" todo - change buffer & quickfix to current level
+	call setqflist(ss.qflist)
+
+	call s:UncheckJumpAfterSearch()
+	redraw
+	echo 'VintSearch: MoveForward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
-function! s:DecreaseStackLevel()
+function! s:MoveBackward()
 	let s:stacklevel = s:stacklevel-1
 	if s:stacklevel < 0
 		let s:stacklevel = 0
 	endif
+
+	let buftype = getbufvar(winbufnr(0), '&buftype')
+	if buftype==#'quickfix'
+		exec 'wincmd p'
+	endif
+	
 	let ss = s:searchstack[s:stacklevel]
 	execute 'buffer '.ss.file
-	" todo - change buffer & quickfix to current level
+	call setqflist(ss.qflist)
+
+	call s:UncheckJumpAfterSearch()
+	redraw
+	echo 'VintSearch: MoveBackward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
 function! s:ClearStack()
 	unlet s:searchstack
 	let s:searchstack = []
 	let s:stacklevel = 0
-	echo 'VintSearch: The search stack is cleared.'
+	echo 'VintSearch: Search stack is cleared.'
 endfunction
 
 function! s:PrintStack()
@@ -249,6 +277,10 @@ function! s:GetWorkDir(mode)
 	endif
 endfunction
 
+function! s:PrintSearchPath()
+	echo 'VintSearch: Search path is: '.s:GetWorkDir(g:vintsearch_workdir_mode)
+endfunction
+
 function! s:BuildTag()
 	let findopt = s:MakeFindOpt()
 	"echo findopt
@@ -271,6 +303,23 @@ function! s:BuildTag()
 	echo "VintSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
 endfunction
 
+function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	let numresults = len(a:qflist)
+	let message = 'VintSearch (by '.a:type.'): '.numresults.' results are found for: '.a:keyword
+
+ 	if numresults>0
+		call insert(a:qflist, {'text':message}, 0)
+		call setqflist(a:qflist)
+
+		call s:SetToCurStackLevel(a:keyword, a:type, expand('%'), line('.'), getline(line('.')), a:qflist)
+		call s:UncheckJumpAfterSearch()
+		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+	endif
+
+	redraw
+	echo message
+endfunction
+
 function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	let grepopt = s:MakeGrepOpt()
 	"echo grepopt
@@ -288,15 +337,8 @@ function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_split
 
 	execute 'cd' prevdir
 
-	let numresults = len(getqflist())
- 	if numresults>0
-		call s:SetToCurStackLevel(a:keyword, 'grep', expand('%'), line('.'), getline(line('.')))
-		let s:cc_after_search = 0
-		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
-	endif
-
-	redraw
-	echo 'VintSearch (by grep): '.numresults.' results are found for: '.a:keyword
+	let qflist = getqflist()
+	call s:DoFinishingWork(qflist, 'grep', a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
 " ctags list to quickfix
@@ -395,7 +437,7 @@ EOF
 	"let tags = filter(tags, 'v:val["kind"] == "f"')
 
 	" Prepare them for inserting in the quickfix window
-	let qf_taglist = []
+	let qflist = []
 	for entry in tags
 		" getqflist()
 		"[{'lnum': 124, 'bufnr': 59, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': -1,
@@ -410,18 +452,8 @@ EOF
 		  \ 'lnum': entry.line, 
 		  \ 'text': entry.text,
 		  \ }
-		call add(qf_taglist, qfitem)
+		call add(qflist, qfitem)
 	endfor
 
-	let numresults = len(qf_taglist)
- 	if numresults>0
-    	call setqflist(qf_taglist)
-		call s:SetToCurStackLevel(a:keyword, 'ctags', expand('%'), line('.'), getline(line('.')))
-		let s:cc_after_search = 0
-		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
-	endif
-
-	redraw
-	echo 'VintSearch (by ctags): '.numresults.' results are found for: '.a:keyword
-
+	call s:DoFinishingWork(qflist, 'ctags', a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction

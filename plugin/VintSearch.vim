@@ -47,14 +47,17 @@ command! -complete=tag -nargs=1 VSctag call VintSearch#SearchCtags(<f-args>,0,1,
 command! -complete=tag -nargs=1 VintSearchListGrep call VintSearch#SearchGrep(<f-args>,0,1,'botright')
 command! -complete=tag -nargs=1 VSgrep call VintSearch#SearchGrep(<f-args>,0,1,'botright')
 
-command! VintSearchDecreaseStackLV call VintSearch#DecreaseStackLevel()
-command! VSdec call VintSearch#DecreaseStackLevel()
+command! VintSearchMoveBackward call VintSearch#MoveBackward()
+command! VSbwd call VintSearch#MoveBackward()
 
-command! VintSearchIncreaseStackLV call VintSearch#IncreaseStackLevel()
-command! VSinc call VintSearch#IncreaseStackLevel()
+command! VintSearchMoveForward call VintSearch#MoveForward()
+command! VSfwd call VintSearch#MoveForward()
 
 command! VintSearchPrintStack call VintSearch#PrintStack()
-command! VSprint call VintSearch#PrintStack()
+command! VSsprint call VintSearch#PrintStack()
+
+command! VintSearchPrintPath call VintSearch#PrintSearchPath()
+command! VSpprint call VintSearch#PrintSearchPath()
 
 command! VintSearchClearStack call VintSearch#ClearStack()
 command! VSclear call VintSearch#ClearStack()
