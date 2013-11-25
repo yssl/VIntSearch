@@ -1,45 +1,45 @@
 " wrappers
-function! VintSearch#Cc(linenum)
+function! VIntSearch#Cc(linenum)
 	call s:Cc(a:linenum)
 endfunction
 
-function! VintSearch#Cnext()
+function! VIntSearch#Cnext()
 	call s:Cnext()
 endfunction
 
-function! VintSearch#Cprev()
+function! VIntSearch#Cprev()
 	call s:Cprev()
 endfunction
 
-function! VintSearch#BuildTag()
+function! VIntSearch#BuildTag()
 	call s:BuildTag()
 endfunction
 
-function! VintSearch#PrintStack()
+function! VIntSearch#PrintStack()
 	call s:PrintStack()
 endfunction
 
-function! VintSearch#PrintSearchPath()
+function! VIntSearch#PrintSearchPath()
 	call s:PrintSearchPath()
 endfunction
 
-function! VintSearch#ClearStack()
+function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VintSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! VintSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! VintSearch#MoveBackward()
+function! VIntSearch#MoveBackward()
 	call s:MoveBackward()
 endfunction
 
-function! VintSearch#MoveForward()
+function! VIntSearch#MoveForward()
 	call s:MoveForward()
 endfunction
 
@@ -118,7 +118,7 @@ function! s:MoveForward()
 
 	call s:UncheckJumpAfterSearch()
 	redraw
-	echo 'VintSearch: MoveForward: Stack level is now: '.(s:stacklevel+1)
+	echo 'VIntSearch: MoveForward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
 function! s:MoveBackward()
@@ -138,14 +138,14 @@ function! s:MoveBackward()
 
 	call s:UncheckJumpAfterSearch()
 	redraw
-	echo 'VintSearch: MoveBackward: Stack level is now: '.(s:stacklevel+1)
+	echo 'VIntSearch: MoveBackward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
 function! s:ClearStack()
 	unlet s:searchstack
 	let s:searchstack = []
 	let s:stacklevel = 0
-	echo 'VintSearch: Search stack is cleared.'
+	echo 'VIntSearch: Search stack is cleared.'
 endfunction
 
 function! s:PrintStack()
@@ -272,13 +272,13 @@ function! s:GetWorkDir(mode)
 		endif
 		return workdir
 	else
-		echo "VintSearch: unknown workdir mode \'".a:mode."\'"
+		echo "VIntSearch: unknown workdir mode \'".a:mode."\'"
 		return ''
 	endif
 endfunction
 
 function! s:PrintSearchPath()
-	echo 'VintSearch: Search path is: '.s:GetWorkDir(g:vintsearch_workdir_mode)
+	echo 'VIntSearch: Search path is: '.s:GetWorkDir(g:vintsearch_workdir_mode)
 endfunction
 
 function! s:BuildTag()
@@ -300,12 +300,12 @@ function! s:BuildTag()
 	execute 'cd' prevdir
 	
 	redraw
-	echo "VintSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
+	echo "VIntSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
 endfunction
 
 function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	let numresults = len(a:qflist)
-	let message = 'VintSearch (by '.a:type.'): '.numresults.' results are found for: '.a:keyword
+	let message = 'VIntSearch (by '.a:type.'): '.numresults.' results are found for: '.a:keyword
 
  	if numresults>0
 		call insert(a:qflist, {'text':message}, 0)

@@ -33,43 +33,38 @@ if !exists('g:vintsearch_width_text')
 endif
 
 "" commands 
-command! VintSearchBuildTag call VintSearch#BuildTag()
+command! VIntSearchBuildTag call VIntSearch#BuildTag()
 
-command! VintSearchJumpCtagCursor call VintSearch#SearchCtags(expand('<cword>'),1,0,'botright')
-command! VintSearchJumpGrepCursor call VintSearch#SearchGrep(expand('<cword>'),1,0,'botright')
+command! VIntSearchJumpCtagCursor call VIntSearch#SearchCtags(expand('<cword>'),1,0,'botright')
+command! VIntSearchJumpGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),1,0,'botright')
 
-command! VintSearchListCtagCursor call VintSearch#SearchCtags(expand('<cword>'),0,1,'botright')
-command! VintSearchListGrepCursor call VintSearch#SearchGrep(expand('<cword>'),0,1,'botright')
+command! VIntSearchListCtagCursor call VIntSearch#SearchCtags(expand('<cword>'),0,1,'botright')
+command! VIntSearchListGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),0,1,'botright')
 
-command! -complete=tag -nargs=1 VintSearchListCtag call VintSearch#SearchCtags(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 VSctag call VintSearch#SearchCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VIntSearchListCtag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VSctag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 
-command! -complete=tag -nargs=1 VintSearchListGrep call VintSearch#SearchGrep(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 VSgrep call VintSearch#SearchGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright')
 
-command! VintSearchMoveBackward call VintSearch#MoveBackward()
-command! VSbwd call VintSearch#MoveBackward()
+command! VIntSearchMoveBackward call VIntSearch#MoveBackward()
+command! VSbwd call VIntSearch#MoveBackward()
 
-command! VintSearchMoveForward call VintSearch#MoveForward()
-command! VSfwd call VintSearch#MoveForward()
+command! VIntSearchMoveForward call VIntSearch#MoveForward()
+command! VSfwd call VIntSearch#MoveForward()
 
-command! VintSearchPrintStack call VintSearch#PrintStack()
-command! VSsprint call VintSearch#PrintStack()
+command! VIntSearchPrintStack call VIntSearch#PrintStack()
+command! VSsprint call VIntSearch#PrintStack()
 
-command! VintSearchPrintPath call VintSearch#PrintSearchPath()
-command! VSpprint call VintSearch#PrintSearchPath()
+command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
+command! VSpprint call VIntSearch#PrintSearchPath()
 
-command! VintSearchClearStack call VintSearch#ClearStack()
-command! VSclear call VintSearch#ClearStack()
+command! VIntSearchClearStack call VIntSearch#ClearStack()
+command! VSclear call VIntSearch#ClearStack()
 
-command! -nargs=1 VScc call VintSearch#Cc(<args>)
-command! VScnext call VintSearch#Cnext()
-command! VScprev call VintSearch#Cprev()
-
-" autocmd
-"augroup VintSearchAutoCmds
-	"autocmd!
-"augroup END
+command! -nargs=1 VScc call VIntSearch#Cc(<args>)
+command! VScnext call VIntSearch#Cnext()
+command! VScprev call VIntSearch#Cprev()
 
 """""""""""""""""""""""""""""""""""""""""""""
 " template code
