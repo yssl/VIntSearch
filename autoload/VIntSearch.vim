@@ -65,10 +65,9 @@ function! s:Cnext()
 	call s:CheckJumpAfterSearch()
 endfunction
 
-function! s:Cprev(linenum)
+function! s:Cprev()
 	execute 'cprev'
 	call s:CheckJumpAfterSearch()
-	endif
 endfunction
 
 function! s:CheckJumpAfterSearch()
@@ -84,7 +83,7 @@ endfunction
 
 function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	if a:jump_to_firstitem
-		call s:Cc(1)
+		call s:Cc(2)	|" because the first line is search result message
 	endif
 	if a:open_quickfix
 		execute a:quickfix_splitcmd.' copen'
