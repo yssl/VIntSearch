@@ -16,11 +16,11 @@ if !exists('g:vintsearch_codeexts')
 	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
 endif
 if !exists('g:vintsearch_workdir_mode')
-	" rf : nearest ancestor of current file dir that contain repo dir. 
-	" 		if no repo dir, current file dir
 	" rc : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current workig dir
-	let g:vintsearch_workdir_mode = 'rf'
+	" rf : nearest ancestor of current file dir that contain repo dir. 
+	" 		if no repo dir, current file dir
+	let g:vintsearch_workdir_mode = 'rc'
 endif
 if !exists('g:vintsearch_width_keyword')
 	let g:vintsearch_width_keyword = 25
