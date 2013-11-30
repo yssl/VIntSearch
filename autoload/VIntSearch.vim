@@ -233,16 +233,23 @@ function! s:MakeGrepOpt()
 	return grepopt
 endfunction
 
-function! s:FindRepoDirFrom(dir)
+"function! s:GetRepoDirFrom(filepath, buftype)
+function! s:GetRepoDirFrom(filepath)
+	"if a:buftype==#'nofile' || a:buftype==#'quickfix' || a:filepath=='None'
+		"return ''
+	"else
+	if a:filepath==#''
+		return ''
+	endif
 python << EOF
-import vim
-repodirs = vim.eval('g:repodirs')
-firstdir = vim.eval('a:dir')
-dir = firstdir
+repodirs = vim.eval('g:vintsearch_repodirs')
+filepath = vim.eval('a:filepath')
+dir = os.path.dirname(filepath)
 while True:
 	prevdir = dir
 	dir = os.path.dirname(prevdir)
 	if dir==prevdir:
+		# no repository found case
 		vim.command('return \'\'')
 		break
 	else:
@@ -255,17 +262,18 @@ while True:
 		if exist:
 		   break	
 EOF
+	endif
 endfunction
 
 function! s:GetWorkDir(mode)
 	if a:mode==#'rf'
-		let workdir = s:FindRepoDirFrom(expand("%:p"))
+		let workdir = s:GetRepoDirFrom(expand("%:p"))
 		if workdir==#''
 			let workdir = expand("%:p")
 		endif
 		return workdir
 	elseif a:mode==#'rc'
-		let workdir = s:FindRepoDirFrom(expand("%:p"))
+		let workdir = s:GetRepoDirFrom(expand("%:p"))
 		if workdir==#''
 			let workdir = getcwd()
 		endif

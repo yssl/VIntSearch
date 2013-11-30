@@ -2,7 +2,7 @@
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_vintsearch") || &cp
-	finish
+	"finish
 endif
 let g:loaded_vintsearch	= 1
 let s:keepcpo           = &cpo
@@ -12,9 +12,6 @@ set cpo&vim
 " my code
 
 "" global variables
-if !exists('g:vintsearch_codeexts')
-	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
-endif
 if !exists('g:vintsearch_workdir_mode')
 	" rc : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current workig dir
@@ -22,6 +19,13 @@ if !exists('g:vintsearch_workdir_mode')
 	" 		if no repo dir, current file dir
 	let g:vintsearch_workdir_mode = 'rc'
 endif
+if !exists('g:vintsearch_repodirs')
+	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']
+endif
+if !exists('g:vintsearch_codeexts')
+	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
+endif
+
 if !exists('g:vintsearch_width_keyword')
 	let g:vintsearch_width_keyword = 25
 endif
