@@ -71,6 +71,15 @@ function! s:Cprev()
 endfunction
 
 function! s:CheckJumpAfterSearch()
+	let qflist = getqflist()
+	if len(qflist) < 1
+		return
+	else
+		if match(qflist[0].text, 'VIntSearch') < 0
+			return 
+		endif
+	endif
+
 	if s:jump_after_search==0
 		let s:stacklevel = s:stacklevel + 1
 	endif
