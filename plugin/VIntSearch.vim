@@ -26,16 +26,6 @@ if !exists('g:vintsearch_codeexts')
 	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
 endif
 
-if !exists('g:vintsearch_width_keyword')
-	let g:vintsearch_width_keyword = 25
-endif
-if !exists('g:vintsearch_width_file')
-	let g:vintsearch_width_file = 40 
-endif
-if !exists('g:vintsearch_width_text')
-	let g:vintsearch_width_text = 40
-endif
-
 "" commands 
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
 

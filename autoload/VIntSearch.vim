@@ -156,55 +156,68 @@ def ltrunc(s, width, prefix=''):
 def rtrunc(s, width, postfix=''):
     if width >= len(s): postfix = ''
     return s[:width-len(postfix)]+postfix
+def toWidthColMat(rowMat):
+	colMat = [[None]*len(rowMat) for c in range(len(rowMat[0]))]
+	for r in range(len(rowMat)):
+		for c in range(len(rowMat[r])):
+			colMat[c][r] = len(rowMat[r][c])
+	return colMat
 
-# stack level, keyword, search type, file, line, text
-width_stacklevel = 2
-width_searchtype = 5
-width_line = 6
-widths = {'lv':width_stacklevel,
-		'keyword':int(vim.eval('g:vintsearch_width_keyword')), 
-		'type':width_searchtype, 
-		'file':int(vim.eval('g:vintsearch_width_file')), 
-		'line':width_line, 
-		'text':int(vim.eval('g:vintsearch_width_text'))}
-prefix = '..'
-
-print '  %s  %s  %s  %s  %s  %s'%('LV'.ljust(widths['lv']),
-								'Keyword'.ljust(widths['keyword']), 
-								'Type'.ljust(widths['type']), 
-								'Text'.ljust(widths['text']),
-								'Line'.ljust(widths['line']), 
-								'File'.ljust(widths['file']))
+# build property matrix
+propMat = []
+propMat.append(['', '#', 'TO Keyword', 'Type', 'FROM File', 'Line', 'Text'])
 
 searchstack = vim.eval('s:searchstack')
 stacklevel = int(vim.eval('s:stacklevel'))
-#print stacklevel
 for i in range(len(searchstack)+1):
-	if i==stacklevel: mark = '> '
+	if i==stacklevel:	mark = '> '
 	else:				mark = '  '
 
 	if i<len(searchstack):
 		ss = searchstack[i]
-		itemsd = {'lv':str(i+1), 'keyword':ss['keyword'],
-				'type':ss['type'], 'text':ss['text'].lstrip().replace('\t',' '), 
-				'line':ss['line'], 'file':ss['file']}
-		for k in itemsd:
-			if len(itemsd[k])<widths[k]:	itemsd[k] = itemsd[k].ljust(widths[k])
-			else:
-				if k=='file':
-					itemsd[k] = ltrunc(itemsd[k], widths[k], prefix)
-				else:
-					itemsd[k] = rtrunc(itemsd[k], widths[k], prefix)
-
-		print '%s%s  %s  %s  %s  %s  %s'%(mark,
-										itemsd['lv'],
-										itemsd['keyword'], 
-										itemsd['type'],
-										itemsd['text'], 
-										itemsd['line'], 
-										itemsd['file'])
+		propMat.append([mark, str(i+1), ss['keyword'], ss['type'],\
+						ss['file'], ss['line'], \
+	   					ss['text'].lstrip().replace('\t',' ')]) 
 	else:
-		print '%s'%mark
+		propMat.append([mark,'','','','','','']) 
+
+# build width info
+totalWidth = int(vim.eval('&columns'))
+widthColMat = toWidthColMat(propMat)
+
+widths = []
+len_labels = 7
+accWidth = 0
+for c in range(len_labels):
+	if c==0:	gapWidth = 0
+	else:		gapWidth = 2
+	maxColWidth = max(widthColMat[c])+gapWidth
+	widths.append(maxColWidth)
+	accWidth += maxColWidth
+
+reduceWidth = accWidth - totalWidth
+colFile = propMat[0].index('FROM File')
+colText = propMat[0].index('Text')
+if reduceWidth > 0:
+	widths[colText] -= reduceWidth
+
+# print
+prefix = '..'
+for r in range(len(propMat)):
+	if r==0:	vim.command('echohl Title')
+	s = ''
+	for c in range(len(propMat[r])):
+		if len(propMat[r][c])<widths[c]:
+			s += propMat[r][c].ljust(widths[c])
+		else:
+			if c==colFile:
+				s += ltrunc(propMat[r][c], widths[c]-2, prefix) +'  '
+			elif c==colText:
+				s += rtrunc(propMat[r][c], widths[c]-2, prefix) +'  '
+			else:
+				s += propMat[r][c]
+	vim.command('echo \'%s\''%s)
+	if r==0:	vim.command('echohl None')
 EOF
 endfunction
 
