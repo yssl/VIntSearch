@@ -35,6 +35,12 @@ command! VIntSearchJumpGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),1
 command! VIntSearchListCtagCursor call VIntSearch#SearchCtags(expand('<cword>'),0,1,'botright')
 command! VIntSearchListGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),0,1,'botright')
 
+command! VIntSearchJumpCtagSelection call VIntSearch#SearchCtags(s:get_visual_selection(),1,0,'botright')
+command! VIntSearchJumpGrepSelection call VIntSearch#SearchGrep(s:get_visual_selection(),1,0,'botright')
+
+command! VIntSearchListCtagSelection call VIntSearch#SearchCtags(s:get_visual_selection(),0,1,'botright')
+command! VIntSearchListGrepSelection call VIntSearch#SearchGrep(s:get_visual_selection(),0,1,'botright')
+
 command! -complete=tag -nargs=1 VIntSearchListCtag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 command! -complete=tag -nargs=1 VSctag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 
@@ -59,6 +65,17 @@ command! VSclear call VIntSearch#ClearStack()
 command! -nargs=1 VScc call VIntSearch#Cc(<args>)
 command! VScnext call VIntSearch#Cnext()
 command! VScprev call VIntSearch#Cprev()
+
+" thanks for xolox!
+function! s:get_visual_selection()
+  " Why is this not a built-in Vim script function?!
+  let [lnum1, col1] = getpos("'<")[1:2]
+  let [lnum2, col2] = getpos("'>")[1:2]
+  let lines = getline(lnum1, lnum2)
+  let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
+  let lines[0] = lines[0][col1 - 1:]
+  return join(lines, "\n")
+endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""
 " template code
