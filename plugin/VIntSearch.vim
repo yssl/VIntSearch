@@ -2,7 +2,7 @@
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_vintsearch") || &cp
-	"finish
+	finish
 endif
 let g:loaded_vintsearch	= 1
 let s:keepcpo           = &cpo
@@ -23,7 +23,7 @@ if !exists('g:vintsearch_repodirs')
 	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']
 endif
 if !exists('g:vintsearch_codeexts')
-	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua"]
+	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua","vim"]
 endif
 
 "" commands 

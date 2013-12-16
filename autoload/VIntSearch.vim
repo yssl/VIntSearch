@@ -191,7 +191,7 @@ for i in range(len(searchstack)+1):
 		propMat.append([mark,'','','','','','']) 
 
 # build width info
-totalWidth = int(vim.eval('&columns'))
+totalWidth = int(vim.eval('&columns'))-1
 widthColMat = toWidthColMat(propMat)
 
 widths = []
