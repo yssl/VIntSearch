@@ -255,6 +255,19 @@ function! s:MakeGrepOpt()
 	return grepopt
 endfunction
 
+function! s:MakeFindStrOpt()
+	let findstropt = ""
+	for i in range(len(g:vintsearch_codeexts))
+		let ext = '*.'.g:vintsearch_codeexts[i]
+		let findstropt = findstropt.ext
+		if i<len(g:vintsearch_codeexts)-1
+			let findstropt = findstropt." "
+		endif
+	endfor
+	echo findstropt
+	return findstropt
+endfunction
+
 "function! s:GetRepoDirFrom(filepath, buftype)
 function! s:GetRepoDirFrom(filepath)
 	"if a:buftype==#'nofile' || a:buftype==#'quickfix' || a:filepath=='None'
@@ -350,10 +363,6 @@ function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quick
 endfunction
 
 function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
-	let grepopt = s:MakeGrepOpt()
-	"echo grepopt
-	"return
-
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_workdir_mode)
 	if workdir==#''
@@ -362,7 +371,14 @@ function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_split
 	execute 'cd' workdir
 
 	"grep! prevents grep from opening first result
-	execute "\:grep! -r ".grepopt." ".a:keyword." *"
+	if has('win32')		|"findstr in windows
+		let findstropt = s:MakeFindStrOpt()
+		execute "\:grep! /s ".a:keyword." ".findstropt
+	else	|"grep in unix
+		let grepopt = s:MakeGrepOpt()
+		"echo grepopt
+		execute "\:grep! -r ".grepopt." ".a:keyword." *"
+	endif
 
 	execute 'cd' prevdir
 
