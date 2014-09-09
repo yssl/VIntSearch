@@ -12,12 +12,17 @@ set cpo&vim
 " my code
 
 "" global variables
-if !exists('g:vintsearch_workdir_mode')
+if !exists('g:vintsearch_workdirmode')
+	" workdir is the root dir of grep search path tree or the dir where tags
+	" file is created.
 	" rc : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current workig dir
 	" rf : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current file dir
-	let g:vintsearch_workdir_mode = 'rc'
+	let g:vintsearch_workdirmode = 'rc'
+endif
+if !exists('g:vintsearch_tagfilename')
+	let g:vintsearch_tagfilename = 'tags'
 endif
 if !exists('g:vintsearch_repodirs')
 	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']

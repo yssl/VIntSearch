@@ -320,7 +320,7 @@ function! s:GetWorkDir(mode)
 endfunction
 
 function! s:PrintSearchPath()
-	echo 'VIntSearch: Search path is: '.s:GetWorkDir(g:vintsearch_workdir_mode)
+	echo 'VIntSearch: Search path is: '.s:GetWorkDir(g:vintsearch_workdirmode)
 endfunction
 
 function! s:BuildTag()
@@ -328,10 +328,10 @@ function! s:BuildTag()
 	"echo findopt
 	"return
 	
-	let tagfilename = 'tags'
+	let tagfilename = g:vintsearch_tagfilename
 	
 	let prevdir = getcwd()
-	let workdir = s:GetWorkDir(g:vintsearch_workdir_mode)
+	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
 	if workdir==#''
 		return
 	endif 
@@ -364,7 +364,7 @@ endfunction
 
 function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	let prevdir = getcwd()
-	let workdir = s:GetWorkDir(g:vintsearch_workdir_mode)
+	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
 	if workdir==#''
 		return
 	endif 
