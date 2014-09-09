@@ -227,7 +227,10 @@ for r in range(len(propMat)):
 	s = ''
 	for c in range(len(propMat[r])):
 		if len(propMat[r][c])<widths[c]:
-			s += propMat[r][c].ljust(widths[c])
+			if c==5:  # Line
+				s += propMat[r][c].rjust(widths[c]-2) + '  '
+			else:
+				s += propMat[r][c].ljust(widths[c])
 		else:
 			if c==colFile:
 				s += ltrunc(propMat[r][c], widths[c]-2, prefix) +'  '
