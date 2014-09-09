@@ -39,19 +39,19 @@ endif
 " -i, --ignore-case
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
 
-command! VIntSearchJumpCtagCursor call VIntSearch#SearchCtags("\"".expand('<cword>')."\"",1,0,'botright')
-command! VIntSearchJumpGrepCursor call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",1,0,'botright')
+command! VIntSearchJumpCursorCtags call VIntSearch#SearchCtags("\"".expand('<cword>')."\"",1,0,'botright')
+command! VIntSearchJumpCursorGrep call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",1,0,'botright')
 
-command! VIntSearchListCtagCursor call VIntSearch#SearchCtags("\"".expand('<cword>')."\"",0,1,'botright')
-command! VIntSearchListGrepCursor call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",0,1,'botright')
+command! VIntSearchListCursorCtags call VIntSearch#SearchCtags("\"".expand('<cword>')."\"",0,1,'botright')
+command! VIntSearchListCursorGrep call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",0,1,'botright')
 
-command! VIntSearchJumpCtagSelection call VIntSearch#SearchCtags("\"".s:get_visual_selection()."\"",1,0,'botright')
-command! VIntSearchJumpGrepSelection call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",1,0,'botright')
+command! VIntSearchJumpSelectionCtags call VIntSearch#SearchCtags("\"".s:get_visual_selection()."\"",1,0,'botright')
+command! VIntSearchJumpSelectionGrep call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",1,0,'botright')
 
-command! VIntSearchListCtagSelection call VIntSearch#SearchCtags("\"".s:get_visual_selection()."\"",0,1,'botright')
-command! VIntSearchListGrepSelection call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",0,1,'botright')
+command! VIntSearchListSelectionCtags call VIntSearch#SearchCtags("\"".s:get_visual_selection()."\"",0,1,'botright')
+command! VIntSearchListSelectionGrep call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",0,1,'botright')
 
-command! -complete=tag -nargs=1 VIntSearchListCtag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 command! -complete=tag -nargs=1 VSctag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 
 " You can put grep options into <f-args>
