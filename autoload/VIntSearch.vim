@@ -27,12 +27,12 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
-	call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix)
+	call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
-function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
-	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix)
+	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
 function! VIntSearch#MoveBackward()
@@ -375,7 +375,7 @@ function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quick
 	echo message
 endfunction
 
-function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix)
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
 	if workdir==#''
@@ -396,13 +396,13 @@ function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_split
 	execute 'cd' prevdir
 
 	let qflist = getqflist()
-	call s:DoFinishingWork(qflist, 'grep', a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+	call s:DoFinishingWork(qflist, 'grep', a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
 endfunction
 
 " ctags list to quickfix
 "http://andrewradev.com/2011/06/08/vim-and-ctags/
 "http://andrewradev.com/2011/10/15/vim-and-ctags-finding-tag-definitions/
-function! s:SearchCtags(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:SearchCtags(keyword, jump_to_firstitem, open_quickfix)
 	if 1
 		""""""""""""""""""""""""""""""""
 		" using taglist()
@@ -513,5 +513,5 @@ EOF
 		call add(qflist, qfitem)
 	endfor
 
-	call s:DoFinishingWork(qflist, 'ctags', a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+	call s:DoFinishingWork(qflist, 'ctags', a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
 endfunction

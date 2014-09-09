@@ -28,7 +28,10 @@ if !exists('g:vintsearch_repodirs')
 	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']
 endif
 if !exists('g:vintsearch_codeexts')
-	let g:vintsearch_codeexts = ["m","c","cpp","h","hpp","inl","py","lua","vim"]
+	let g:vintsearch_codeexts = ["c","cpp","h","hpp","inl","py","lua","vim"]
+endif
+if !exists('g:vintsearch_qfsplitcmd')
+	let g:vintsearch_qfsplitcmd = 'botright'
 endif
 
 "" commands 
@@ -39,26 +42,26 @@ endif
 " -i, --ignore-case
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
 
-command! VIntSearchJumpCursorCtags call VIntSearch#SearchCtags(expand('<cword>'),1,0,'botright')
-command! VIntSearchJumpCursorGrep call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",1,0,'botright')
+command! VIntSearchJumpCursorCtags call VIntSearch#SearchCtags(expand('<cword>'),1,0)
+command! VIntSearchJumpCursorGrep call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",1,0)
 
-command! VIntSearchListCursorCtags call VIntSearch#SearchCtags(expand('<cword>'),0,1,'botright')
-command! VIntSearchListCursorGrep call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",0,1,'botright')
+command! VIntSearchListCursorCtags call VIntSearch#SearchCtags(expand('<cword>'),0,1)
+command! VIntSearchListCursorGrep call VIntSearch#SearchGrep("-w \"".expand('<cword>')."\"",0,1)
 
-command! VIntSearchJumpSelectionCtags call VIntSearch#SearchCtags(s:get_visual_selection(),1,0,'botright')
-command! VIntSearchJumpSelectionGrep call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",1,0,'botright')
+command! VIntSearchJumpSelectionCtags call VIntSearch#SearchCtags(s:get_visual_selection(),1,0)
+command! VIntSearchJumpSelectionGrep call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",1,0)
 
-command! VIntSearchListSelectionCtags call VIntSearch#SearchCtags(s:get_visual_selection(),0,1,'botright')
-command! VIntSearchListSelectionGrep call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",0,1,'botright')
+command! VIntSearchListSelectionCtags call VIntSearch#SearchCtags(s:get_visual_selection(),0,1)
+command! VIntSearchListSelectionGrep call VIntSearch#SearchGrep("-F \"".s:get_visual_selection()."\"",0,1)
 
-command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchCtags(<f-args>,0,1)
+command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchCtags(<f-args>,0,1)
 
 " You can put grep options into <f-args>
 " ex)	:Vsgrep -i tags
 " 		:Vsgrep -i "let tags"
-command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright')
+command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1)
+command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1)
 
 command! VIntSearchMoveBackward call VIntSearch#MoveBackward()
 command! VSbwd call VIntSearch#MoveBackward()
