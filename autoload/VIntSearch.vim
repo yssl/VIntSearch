@@ -110,6 +110,11 @@ function! s:SetToCurStackLevel(keyword, type, file, line, text, qflist)
 endfunction
 
 function! s:MoveForward()
+	if len(s:searchstack)==0
+		echo 'VIntSearch: MoveForward: Search stack is empty.'
+		return
+	endif
+
 	let s:stacklevel = s:stacklevel+1
 	if s:stacklevel > len(s:searchstack)-1
 		let s:stacklevel = len(s:searchstack)-1
@@ -130,6 +135,11 @@ function! s:MoveForward()
 endfunction
 
 function! s:MoveBackward()
+	if len(s:searchstack)==0
+		echo 'VIntSearch: MoveBackward: Search stack is empty.'
+		return
+	endif
+
 	let s:stacklevel = s:stacklevel-1
 	if s:stacklevel < 0
 		let s:stacklevel = 0
