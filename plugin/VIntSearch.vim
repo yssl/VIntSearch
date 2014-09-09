@@ -32,25 +32,33 @@ if !exists('g:vintsearch_codeexts')
 endif
 
 "" commands 
+
+" useful grep options
+" -w, --word-regexp
+" -F, --fixed-strings
+" -i, --ignore-case
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
 
 command! VIntSearchJumpCtagCursor call VIntSearch#SearchCtags(expand('<cword>'),1,0,'botright')
-command! VIntSearchJumpGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),1,0,'botright')
+command! VIntSearchJumpGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),1,0,'botright','-w')
 
 command! VIntSearchListCtagCursor call VIntSearch#SearchCtags(expand('<cword>'),0,1,'botright')
-command! VIntSearchListGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),0,1,'botright')
+command! VIntSearchListGrepCursor call VIntSearch#SearchGrep(expand('<cword>'),0,1,'botright','-w')
 
 command! VIntSearchJumpCtagSelection call VIntSearch#SearchCtags(s:get_visual_selection(),1,0,'botright')
-command! VIntSearchJumpGrepSelection call VIntSearch#SearchGrep(s:get_visual_selection(),1,0,'botright')
+command! VIntSearchJumpGrepSelection call VIntSearch#SearchGrep(s:get_visual_selection(),1,0,'botright','-F')
 
 command! VIntSearchListCtagSelection call VIntSearch#SearchCtags(s:get_visual_selection(),0,1,'botright')
-command! VIntSearchListGrepSelection call VIntSearch#SearchGrep(s:get_visual_selection(),0,1,'botright')
+command! VIntSearchListGrepSelection call VIntSearch#SearchGrep(s:get_visual_selection(),0,1,'botright','-F')
 
 command! -complete=tag -nargs=1 VIntSearchListCtag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 command! -complete=tag -nargs=1 VSctag call VIntSearch#SearchCtags(<f-args>,0,1,'botright')
 
-command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright')
-command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright')
+" You can put grep options into <f-args>
+" ex)	:Vsgrep -i tags
+" 		:Vsgrep -i "let tags"
+command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright','')
+command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1,'botright','')
 
 command! VIntSearchMoveBackward call VIntSearch#MoveBackward()
 command! VSbwd call VIntSearch#MoveBackward()
