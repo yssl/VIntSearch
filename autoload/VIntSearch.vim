@@ -31,8 +31,8 @@ function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix, quic
 	call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
-function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd, addi_option)
-	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd, a:addi_option)
+function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 endfunction
 
 function! VIntSearch#MoveBackward()
@@ -372,7 +372,7 @@ function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quick
 	echo message
 endfunction
 
-function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd, addi_option)
+function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
 	if workdir==#''
@@ -387,11 +387,7 @@ function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix, quickfix_split
 	else	|"grep in unix
 		let grepopt = s:MakeGrepOpt()
 		"echo grepopt
-		if a:addi_option!=#''
-			execute "\:grep! -r ".a:addi_option." ".grepopt." \"".a:keyword."\" *"
-		else
-			execute "\:grep! -r ".grepopt." ".a:keyword." *"
-		endif
+		execute "\:grep! -r ".grepopt." ".a:keyword." *"
 	endif
 
 	execute 'cd' prevdir
