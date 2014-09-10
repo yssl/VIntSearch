@@ -51,7 +51,7 @@ function! VIntSearch#Search(keyword, cmd, option, is_literal, jump_to_firstitem,
 		return
 	endif
 
-	call s:DoFinishingWork(qflist, a:cmd, a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
+	call s:DoFinishingWork(qflist, a:cmd, a:keyword, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
 function! VIntSearch#MoveBackward()
@@ -377,7 +377,7 @@ function! s:BuildTag()
 	echo "VIntSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
 endfunction
 
-function! s:DoFinishingWork(qflist, cmd, keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:DoFinishingWork(qflist, cmd, keyword, jump_to_firstitem, open_quickfix)
 	let numresults = len(a:qflist)
 	let message = 'VIntSearch (by '.a:cmd.'): '.numresults.' results are found for: '.a:keyword
 
@@ -387,7 +387,7 @@ function! s:DoFinishingWork(qflist, cmd, keyword, jump_to_firstitem, open_quickf
 
 		call s:SetToCurStackLevel(a:keyword, a:cmd, expand('%'), line('.'), getline(line('.')), a:qflist)
 		call s:UncheckJumpAfterSearch()
-		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
+		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
 	endif
 
 	redraw
