@@ -43,8 +43,6 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 		return
 	endif
 
-	"todo
-	"default grep option for commands
 	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
