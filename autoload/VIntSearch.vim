@@ -55,7 +55,9 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 	"print type -> cmd
 	"default grep option for commands
 	"combine Ctags func and Grep func. use param
-	call s:DoFinishingWork(qflist, a:keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
+	"
+	"call s:DoFinishingWork(qflist, a:keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
+	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
 function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_quickfix)
