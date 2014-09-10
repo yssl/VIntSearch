@@ -54,14 +54,13 @@ command! VIntSearchJumpSelectionGrep call VIntSearch#Search(s:get_visual_selecti
 command! VIntSearchListSelectionCtags call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,0,1)
 command! VIntSearchListSelectionGrep call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1)
 
-command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchCtags(<f-args>,0,1)
-command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchCtags(<f-args>,0,1)
+command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchRaw(<f-args>,'ctags',0,1)
+command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRaw(<f-args>,'ctags',0,1)
 
 " You can put grep options into <f-args>
 " ex)	:Vsgrep -i tags
 " 		:Vsgrep -i "let tags"
-command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1)
-"command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1)
+command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1)
 command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1)
 
 command! VIntSearchMoveBackward call VIntSearch#MoveBackward()
