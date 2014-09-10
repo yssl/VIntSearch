@@ -27,12 +27,31 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix)
-	call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix)
-endfunction
+"function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix)
+	"call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix)
+"endfunction
 
-function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix)
-	call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix)
+"function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix)
+	"call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix)
+"endfunction
+
+function! VIntSearch#Search(keyword, cmd, option, is_literal, jump_to_firstitem, open_quickfix)
+	if a:is_literal
+		let search_keyword = "\"".a:keyword."\""
+	else
+		let search_keyword = a:keyword
+	endif
+
+	if a:cmd==#'ctags'
+		let qflist = s:SearchCtags(search_keyword, a:jump_to_firstitem, a:open_quickfix)
+	elseif a:cmd==#'grep'
+		let qflist = s:GetGrepQFList(search_keyword, a:option)
+	else
+		echo 'VintSearch: '.a:cmd.': Unsupported command.'
+		return
+	endif
+
+	call s:DoFinishingWork(qflist, a:cmd, a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
 endfunction
 
 function! VIntSearch#MoveBackward()
@@ -358,15 +377,15 @@ function! s:BuildTag()
 	echo "VIntSearch: A tagfile for code files in \'".workdir."\' is created: ".workdir."/".tagfilename
 endfunction
 
-function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:DoFinishingWork(qflist, cmd, keyword, jump_to_firstitem, open_quickfix, quickfix_splitcmd)
 	let numresults = len(a:qflist)
-	let message = 'VIntSearch (by '.a:type.'): '.numresults.' results are found for: '.a:keyword
+	let message = 'VIntSearch (by '.a:cmd.'): '.numresults.' results are found for: '.a:keyword
 
  	if numresults>0
 		call insert(a:qflist, {'text':message}, 0)
 		call setqflist(a:qflist)
 
-		call s:SetToCurStackLevel(a:keyword, a:type, expand('%'), line('.'), getline(line('.')), a:qflist)
+		call s:SetToCurStackLevel(a:keyword, a:cmd, expand('%'), line('.'), getline(line('.')), a:qflist)
 		call s:UncheckJumpAfterSearch()
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, a:quickfix_splitcmd)
 	endif
@@ -375,7 +394,31 @@ function! s:DoFinishingWork(qflist, type, keyword, jump_to_firstitem, open_quick
 	echo message
 endfunction
 
-function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix)
+"function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix)
+	"let prevdir = getcwd()
+	"let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
+	"if workdir==#''
+		"return
+	"endif 
+	"execute 'cd' workdir
+
+	""grep! prevents grep from opening first result
+	"if has('win32')		|"findstr in windows
+		"let findstropt = s:MakeFindStrOpt()
+		"execute "\:grep! /s ".a:keyword." ".findstropt
+	"else	|"grep in unix
+		"let grepopt = s:MakeGrepOpt()
+		""echo grepopt
+		"execute "\:grep! -r ".grepopt." ".a:keyword." *"
+	"endif
+
+	"execute 'cd' prevdir
+
+	"let qflist = getqflist()
+	"call s:DoFinishingWork(qflist, 'grep', a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
+"endfunction
+
+function! s:GetGrepQFList(keyword, option)
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
 	if workdir==#''
@@ -390,13 +433,13 @@ function! s:SearchGrep(keyword, jump_to_firstitem, open_quickfix)
 	else	|"grep in unix
 		let grepopt = s:MakeGrepOpt()
 		"echo grepopt
-		execute "\:grep! -r ".grepopt." ".a:keyword." *"
+		execute "\:grep! -r ".grepopt." ".a:option." ".a:keyword." *"
 	endif
 
 	execute 'cd' prevdir
 
 	let qflist = getqflist()
-	call s:DoFinishingWork(qflist, 'grep', a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
+	return qflist
 endfunction
 
 " ctags list to quickfix
