@@ -27,14 +27,6 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-"function! VIntSearch#SearchCtags(keyword, jump_to_firstitem, open_quickfix)
-	"call s:SearchCtags(a:keyword, a:jump_to_firstitem, a:open_quickfix)
-"endfunction
-
-"function! VIntSearch#SearchGrep(keyword, jump_to_firstitem, open_quickfix)
-	"call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix)
-"endfunction
-
 function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_quickfix)
 	if a:is_literal
 		let search_keyword = "\"".a:keyword."\""
@@ -51,8 +43,7 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 		return
 	endif
 
-	"print type -> cmd
-	"add cmd add option
+	"todo
 	"default grep option for commands
 	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 endfunction
@@ -413,7 +404,7 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 		call insert(a:qflist, {'text':message}, 0)
 		call setqflist(a:qflist)
 
-		call s:SetToCurStackLevel(a:keyword, a:cmd, expand('%'), line('.'), getline(line('.')), a:qflist)
+		call s:SetToCurStackLevel(a:keyword, a:cmd.optionstr, expand('%'), line('.'), getline(line('.')), a:qflist)
 		call s:UncheckJumpAfterSearch()
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
 	endif
