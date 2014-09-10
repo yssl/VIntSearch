@@ -35,7 +35,7 @@ endfunction
 	"call s:SearchGrep(a:keyword, a:jump_to_firstitem, a:open_quickfix)
 "endfunction
 
-function! VIntSearch#Search(keyword, cmd, option, is_literal, jump_to_firstitem, open_quickfix)
+function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_quickfix)
 	if a:is_literal
 		let search_keyword = "\"".a:keyword."\""
 	else
@@ -45,14 +45,36 @@ function! VIntSearch#Search(keyword, cmd, option, is_literal, jump_to_firstitem,
 	if a:cmd==#'ctags'
 		let qflist = s:GetCtagsQFList(search_keyword)
 	elseif a:cmd==#'grep'
-		let qflist = s:GetGrepQFList(search_keyword, a:option)
+		let qflist = s:GetGrepQFList(search_keyword, a:options)
 	else
-		echo 'VintSearch: '.a:cmd.': Unsupported command.'
+		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
 		return
 	endif
 
+	"todo add below options
+	"print type -> cmd
 	call s:DoFinishingWork(qflist, a:cmd, a:keyword, a:jump_to_firstitem, a:open_quickfix)
 endfunction
+
+function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_quickfix)
+	let dblquota_tokens = split(a:keyword_and_options, '\"')
+	if len(dblquota_tokens) == 1
+		let space_tokens = split(dblquota_tokens[0])
+		let keyword = space_tokens[-1]
+		let is_literal = 0
+		let options = a:keyword_and_options[:-len(keyword)-1]
+	elseif len(dblquota_tokens) == 2
+		let keyword = dblquota_tokens[1]
+		let is_literal = 1
+		let options = dblquota_tokens[0]
+	else
+		echo 'VIntSearch: Unable to split \"'.keyword_and_options.'\" into keyword and options.'
+		return
+	endif
+	"echo dblquota_tokens
+	"echo keyword is_literal options 
+	call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_quickfix)
+endfunction 
 
 function! VIntSearch#MoveBackward()
 	call s:MoveBackward()
@@ -418,7 +440,7 @@ endfunction
 	"call s:DoFinishingWork(qflist, 'grep', a:keyword, a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
 "endfunction
 
-function! s:GetGrepQFList(keyword, option)
+function! s:GetGrepQFList(keyword, options)
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
 	if workdir==#''
@@ -433,7 +455,7 @@ function! s:GetGrepQFList(keyword, option)
 	else	|"grep in unix
 		let grepopt = s:MakeGrepOpt()
 		"echo grepopt
-		execute "\:grep! -r ".grepopt." ".a:option." ".a:keyword." *"
+		execute "\:grep! -r ".grepopt." ".a:options." ".a:keyword." *"
 	endif
 
 	execute 'cd' prevdir

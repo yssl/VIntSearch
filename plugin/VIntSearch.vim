@@ -61,7 +61,8 @@ command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchCtags(<f-args>,0,1
 " ex)	:Vsgrep -i tags
 " 		:Vsgrep -i "let tags"
 command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchGrep(<f-args>,0,1)
-command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1)
+"command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchGrep(<f-args>,0,1)
+command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1)
 
 command! VIntSearchMoveBackward call VIntSearch#MoveBackward()
 command! VSbwd call VIntSearch#MoveBackward()
