@@ -42,16 +42,16 @@ endif
 " -i, --ignore-case
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
 
-command! VIntSearchJumpCursorCtags call VIntSearch#SearchCtags(expand('<cword>'),1,0)
+command! VIntSearchJumpCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,1,0)
 command! VIntSearchJumpCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',1,1,0)
 
-command! VIntSearchListCursorCtags call VIntSearch#SearchCtags(expand('<cword>'),0,1)
+command! VIntSearchListCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,0,1)
 command! VIntSearchListCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',1,0,1)
 
-command! VIntSearchJumpSelectionCtags call VIntSearch#SearchCtags(s:get_visual_selection(),1,0)
+command! VIntSearchJumpSelectionCtags call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,1,0)
 command! VIntSearchJumpSelectionGrep call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,1,0)
 
-command! VIntSearchListSelectionCtags call VIntSearch#SearchCtags(s:get_visual_selection(),0,1)
+command! VIntSearchListSelectionCtags call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,0,1)
 command! VIntSearchListSelectionGrep call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1)
 
 command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchCtags(<f-args>,0,1)
