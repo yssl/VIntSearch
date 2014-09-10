@@ -51,12 +51,9 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 		return
 	endif
 
-	"todo add options to dofinishingwork param
 	"print type -> cmd
 	"add cmd add option
 	"default grep option for commands
-	"combine Ctags func and Grep func. use param
-	"
 	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
@@ -229,7 +226,7 @@ def toWidthColMat(rowMat):
 
 # build property matrix
 propMat = []
-propMat.append(['', '#', 'TO Keyword', 'Type', 'FROM File', 'Line', 'Text'])
+propMat.append(['', '#', 'TO Keyword', 'CMD', 'FROM File', 'Line', 'Text'])
 
 searchstack = vim.eval('s:searchstack')
 stacklevel = int(vim.eval('s:stacklevel'))
