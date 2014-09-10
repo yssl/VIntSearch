@@ -43,10 +43,10 @@ endif
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
 
 command! VIntSearchJumpCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,1,0)
-command! VIntSearchJumpCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',1,1,0)
+command! VIntSearchJumpCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',0,1,0)
 
 command! VIntSearchListCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,0,1)
-command! VIntSearchListCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',1,0,1)
+command! VIntSearchListCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',0,0,1)
 
 command! VIntSearchJumpSelectionCtags call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,1,0)
 command! VIntSearchJumpSelectionGrep call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,1,0)

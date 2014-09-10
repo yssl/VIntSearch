@@ -53,10 +53,10 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 
 	"todo add options to dofinishingwork param
 	"print type -> cmd
+	"add cmd add option
 	"default grep option for commands
 	"combine Ctags func and Grep func. use param
 	"
-	"call s:DoFinishingWork(qflist, a:keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
