@@ -46,21 +46,44 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
 endfunction
 
+function! s:SplitKeywordOptions(keyword_and_options)
+	let space_tokens = split(a:keyword_and_options)
+	let keyword = ''
+	let options = ''
+	for token in space_tokens
+		if token[0]==#'-'
+			if len(options)>0
+				let options = options.' '
+			endif
+			let options = options.token
+		else
+			let keyword = token
+		endif
+	endfor
+	return [keyword, options]
+endfunction
+
 function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_quickfix)
-	let dblquota_tokens = split(a:keyword_and_options, '\"')
-	if len(dblquota_tokens) == 1
-		let space_tokens = split(dblquota_tokens[0])
-		let keyword = space_tokens[-1]
+	let dblquota_indices = []
+	for i in range(len(a:keyword_and_options))
+		if a:keyword_and_options[i]==#'"'
+			call add(dblquota_indices, i)
+		endif
+	endfor
+
+	if len(dblquota_indices)==0
 		let is_literal = 0
-		let options = a:keyword_and_options[:-len(keyword)-1]
-	elseif len(dblquota_tokens) == 2
-		let keyword = dblquota_tokens[1]
+		let [keyword, options] = s:SplitKeywordOptions(a:keyword_and_options)
+	elseif len(dblquota_indices)==2
 		let is_literal = 1
-		let options = dblquota_tokens[0]
+		let keyword = a:keyword_and_options[dblquota_indices[0]+1:dblquota_indices[1]-1]
+		let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
+		let [non, options] = s:SplitKeywordOptions(options_raw)
 	else
-		echo 'VIntSearch: Unable to split \"'.keyword_and_options.'\" into keyword and options.'
+		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
 		return
 	endif
+
 	"echo dblquota_tokens
 	"echo keyword is_literal options 
 	call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_quickfix)
