@@ -1,11 +1,25 @@
 # VIntSearch
 
 ## Features
-- Integrated search stack for both grep and ctags.
-- Search results are listed in quickfix for both grep and ctags.
-- When moved to another entry in search stack, corresponding search results are updated in quickfix.
-- Search commands for word under the cursor, selected string in visual selection, or any string you type.
+- Integrated search stack (more general than vim's tag stack)
+- Quickfix-listed search results
+- Stacking not only search keywords and their position, but also search results in quickfix
+- Various search commands (for word under the cursor, visual-selected string, or any string you type)
 
 ## Commands
+**:VIntSearchListCursorGrep**  
+**:VIntSearchListCursorCtags**
+
+**:VIntSearchJumpCursorGrep**  
+**:VIntSearchJumpCursorCtags**
+
+**:VIntSearchListSelectionGrep**  
+**:VIntSearchListSelectionCtags**
+
+**:VIntSearchJumpSelectionGrep**  
+**:VIntSearchJumpSelectionCtags**
+
+**:VIntSearchListGrep** (==**:VSgrep**)  
+**:VIntSearchListCtags** (==**:VSctags**)
 
 ## Motivation
