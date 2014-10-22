@@ -19,6 +19,7 @@ if !exists('g:vintsearch_workdirmode')
 	" 		if no repo dir, current workig dir
 	" rf : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current file dir
+	" c : current working directory
 	let g:vintsearch_workdirmode = 'rc'
 endif
 if !exists('g:vintsearch_tagfilename')

@@ -380,6 +380,9 @@ function! s:GetWorkDir(mode)
 			let workdir = getcwd()
 		endif
 		return workdir
+	elseif a:mode==#'c'
+		let workdir = getcwd()
+		return workdir
 	else
 		echo "VIntSearch: unknown workdir mode \'".a:mode."\'"
 		return ''
