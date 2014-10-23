@@ -38,10 +38,10 @@ Search visually selected text in current search path recursively by grep or ctag
 
 **:VIntSearchListTypeGrep** [keyword] [options]  
 **:VSgrep** [keyword] [options]  
-Search [keyword] by grep with grep options [options]. Search results are updated in quickfix and the cursor jumps to the first result.
+Search [keyword] by grep with grep options [options]. Search results are updated in quickfix.
 
 **:VIntSearchListTypeCtags**  
 **:VSctags**  
-Search [keyword] by ctags. Search results are updated in quickfix and the cursor jumps to the first result.
+Search [keyword] by ctags. Search results are updated in quickfix.
 
 ## Motivation
