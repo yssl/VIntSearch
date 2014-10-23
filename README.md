@@ -1,16 +1,20 @@
 # VIntSearch
 
+(screenshot - grep)  
+(screenshot - ctags)  
+(screenshot - search stack)  
+
 ## Features
-- Unified search stack integrating results from ctags and grep (more general than vim's tag stack)
+- Unified search stack integrating results from grep and ctags (more general than vim's tag stack)
 - Quickfix-listed search results
 - Stacking not only search keywords and their position, but also search results in quickfix
 - Various search commands (for word under the cursor, visually selected text, or any text you type)
-- Unified search path for ctags and grep
+- Unified search path for grep and ctags
 
 ### Search Path
 The search path means,  
-- ctags - location of tag file including symbols in all subdirs
 - grep - root of all subdirs grep will look into
+- ctags - location of tag file including symbols in all subdirs
 
 ## Commands
 **:VIntSearchPrintPath**, **:VSpath**    
