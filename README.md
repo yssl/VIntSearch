@@ -5,7 +5,7 @@
 (screenshot - search stack)  
 
 ## Features
-- Unified search stack integrating results from grep and ctags (more general than vim's tag stack)
+- Unified search stack containing results from grep and ctags (more general than vim's tag stack)
 - Quickfix-listed search results
 - Stacking not only search keywords and their position, but also search results in quickfix
 - Various search commands (for word under the cursor, visually selected text, or any text you type)
