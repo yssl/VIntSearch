@@ -18,7 +18,7 @@ build tags
 
 ## Commands
 
-#### Search Directory
+### Search Directory
 The search path means,  
 - grep - root of all subdirs grep will look into
 - ctags - location of tag file including symbols in all subdirs
@@ -26,7 +26,7 @@ The search path means,
 **:VIntSearchPrintPath**, **:VSpath**    
 Print current search path.
 
-#### Searching
+### Searching
 
 **:VIntSearchListCursorGrep**  
 **:VIntSearchListCursorCtags**  
@@ -50,7 +50,7 @@ Search [keyword] by grep with grep options [options]. Search results are updated
 **:VIntSearchListTypeCtags**, **:VSctags**  
 Search [keyword] by ctags. Search results are updated in quickfix.
 
-#### Search Stack
+### Search Stack
 
 **:VIntSearchMoveBackward**, **:VSbwd**  
 
@@ -64,3 +64,5 @@ Search [keyword] by ctags. Search results are updated in quickfix.
 **:VScprev**
 
 ## Motivation
+
+## Key Mappings
