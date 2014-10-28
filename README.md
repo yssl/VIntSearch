@@ -18,37 +18,39 @@ build tags
 
 ## Commands
 
-### Search Directory
-The search path means,  
+### Search Path
+*Search path* means,  
 - grep - root of all subdirs grep will look into
 - ctags - location of tag file including symbols in all subdirs
 
 **:VIntSearchPrintPath**, **:VSpath**    
 Print current search path.
 
-### Searching
+### Search
+
+All search commands search the *search path* and its sub-directories and search results are updated in quickfix.
 
 **:VIntSearchListCursorGrep**  
 **:VIntSearchListCursorCtags**  
-Search a word under the cursor in current search path recursively by grep or ctags. Search results are updated in quickfix.
+Search a word under the cursor by grep or ctags.
 
 **:VIntSearchJumpCursorGrep**  
 **:VIntSearchJumpCursorCtags**  
-Search a word under the cursor in current search path recursively by grep or ctags. Search results are updated in quickfix and the cursor jumps to the first result.
+Search a word under the cursor by grep or ctags and the cursor jumps to the first result.
 
 **:VIntSearchListSelectionGrep**  
 **:VIntSearchListSelectionCtags**  
-Search visually selected text in current search path recursively by grep or ctags. Search results are updated in quickfix.
+Search visually selected text by grep or ctags.
 
 **:VIntSearchJumpSelectionGrep**  
 **:VIntSearchJumpSelectionCtags**  
-Search visually selected text in current search path recursively by grep or ctags. Search results are updated in quickfix and the cursor jumps to the first result.
+Search visually selected text by grep or ctags and the cursor jumps to the first result.
 
 **:VIntSearchListTypeGrep** [keyword] [options], **:VSgrep** [keyword] [options]  
-Search [keyword] by grep with grep options [options]. Search results are updated in quickfix.
+Search [keyword] by grep with grep options [options].
 
 **:VIntSearchListTypeCtags**, **:VSctags**  
-Search [keyword] by ctags. Search results are updated in quickfix.
+Search [keyword] by ctags.
 
 ### Search Stack
 
