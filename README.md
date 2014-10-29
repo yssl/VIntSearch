@@ -1,11 +1,16 @@
 # VIntSearch
 
-(screenshot - grep)  
-(screenshot - ctags)  
-(screenshot - search stack)  
+- Search results by ctags
+![byctags](https://cloud.githubusercontent.com/assets/5915359/4835401/e4ed8880-5fb6-11e4-9832-6ac4e72e6ec5.png)
+
+- Search results by grep
+![bygrep](https://cloud.githubusercontent.com/assets/5915359/4835402/e81a074a-5fb6-11e4-93ef-1c9b2456b0c5.png)
+
+- Integrated search stack
+![stack](https://cloud.githubusercontent.com/assets/5915359/4835403/e9c0bde6-5fb6-11e4-9176-5fe45093ed9f.png)
 
 ## Features
-- Unified search stack containing results from grep and ctags (similar usage, but more general than vim's tag stack)
+- Integrated search stack containing results from grep and ctags (similar usage, but more general than vim's tag stack)
 - Quickfix-listed search results from ctags (and grep also)
 - Various search commands (for word under the cursor, visually selected text, or any text you type)
 - Stacking not only search keywords and their position, but also search results in quickfix
