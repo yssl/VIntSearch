@@ -1,13 +1,13 @@
 # VIntSearch
 
 - Search results by ctags
-![byctags](https://cloud.githubusercontent.com/assets/5915359/4835401/e4ed8880-5fb6-11e4-9832-6ac4e72e6ec5.png)
+![byctags](https://cloud.githubusercontent.com/assets/5915359/4852495/903a342a-607c-11e4-8b01-a4dde78d9492.png)
 
 - Search results by grep
-![bygrep](https://cloud.githubusercontent.com/assets/5915359/4835402/e81a074a-5fb6-11e4-93ef-1c9b2456b0c5.png)
+![bygrep](https://cloud.githubusercontent.com/assets/5915359/4852496/907e4ea8-607c-11e4-9c50-e25a8770aad8.png)
 
 - Integrated search stack
-![stack](https://cloud.githubusercontent.com/assets/5915359/4835403/e9c0bde6-5fb6-11e4-9176-5fe45093ed9f.png)
+![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
 
 ## Features
 - Integrated search stack containing results from grep and ctags (similar usage, but more general than vim's tag stack)
