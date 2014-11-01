@@ -390,7 +390,7 @@ function! s:GetWorkDir(mode)
 endfunction
 
 function! s:PrintSearchPath()
-	echo 'VIntSearch: Search path is: '.s:GetWorkDir(g:vintsearch_workdirmode)
+	echo 'VIntSearch: Search path is: '.s:GetWorkDir(g:vintsearch_searchpathmode)
 endfunction
 
 function! s:BuildTag()
@@ -401,7 +401,7 @@ function! s:BuildTag()
 	let tagfilename = g:vintsearch_tagfilename
 	
 	let prevdir = getcwd()
-	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
+	let workdir = s:GetWorkDir(g:vintsearch_searchpathmode)
 	if workdir==#''
 		return
 	endif 
@@ -439,7 +439,7 @@ endfunction
 
 function! s:GetGrepQFList(keyword, options)
 	let prevdir = getcwd()
-	let workdir = s:GetWorkDir(g:vintsearch_workdirmode)
+	let workdir = s:GetWorkDir(g:vintsearch_searchpathmode)
 	if workdir==#''
 		return
 	endif 

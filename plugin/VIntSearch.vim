@@ -12,7 +12,7 @@ set cpo&vim
 " my code
 
 "" global variables
-if !exists('g:vintsearch_workdirmode')
+if !exists('g:vintsearch_searchpathmode')
 	" workdir is the root dir of grep search path tree or the dir where tags
 	" file is created.
 	" rc : nearest ancestor of current file dir that contain repo dir. 
@@ -20,7 +20,7 @@ if !exists('g:vintsearch_workdirmode')
 	" rf : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current file dir
 	" c : current working directory
-	let g:vintsearch_workdirmode = 'rc'
+	let g:vintsearch_searchpathmode = 'rc'
 endif
 if !exists('g:vintsearch_tagfilename')
 	let g:vintsearch_tagfilename = 'tags'
@@ -55,13 +55,13 @@ command! VIntSearchJumpSelectionGrep call VIntSearch#Search(s:get_visual_selecti
 command! VIntSearchListSelectionCtags call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,0,1)
 command! VIntSearchListSelectionGrep call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1)
 
-command! -complete=tag -nargs=1 VIntSearchListCtags call VIntSearch#SearchRaw(<f-args>,'ctags',0,1)
+command! -complete=tag -nargs=1 VIntSearchListTypeCtags call VIntSearch#SearchRaw(<f-args>,'ctags',0,1)
 command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRaw(<f-args>,'ctags',0,1)
 
 " You can put grep options into <f-args>
 " ex)	:Vsgrep -i tags
 " 		:Vsgrep -i "let tags"
-command! -complete=tag -nargs=1 VIntSearchListGrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1)
+command! -complete=tag -nargs=1 VIntSearchListTypeGrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1)
 command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1)
 
 command! VIntSearchMoveBackward call VIntSearch#MoveBackward()
@@ -71,10 +71,10 @@ command! VIntSearchMoveForward call VIntSearch#MoveForward()
 command! VSfwd call VIntSearch#MoveForward()
 
 command! VIntSearchPrintStack call VIntSearch#PrintStack()
-command! VSsprint call VIntSearch#PrintStack()
+command! VSstack call VIntSearch#PrintStack()
 
 command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
-command! VSpprint call VIntSearch#PrintSearchPath()
+command! VSpath call VIntSearch#PrintSearchPath()
 
 command! VIntSearchClearStack call VIntSearch#ClearStack()
 command! VSclear call VIntSearch#ClearStack()
