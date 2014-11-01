@@ -88,6 +88,31 @@ Clear the *search stack*.
 **:VScprev**  
 Replacement of vim's ```:cc```, ```:cnext```, and ```:cprev``` commands for VIntSearch. Jumping to a new position from VIntSearch's Quickfix results can be reflected in the *search stack* ONLY using these commands. If you're using key mapings for ```:cnext``` or ```:cprev```, you can just replace them with these commands. To jump using ```enter``` or ```double-Click``` from the Quickfix results and reflect it in *search stack*, I recommend you to use [QFEnter](http://www.vim.org/scripts/script.php?script_id=4778) plugin and register ```:VScc``` commands by adding ```let g:qfenter_cc_cmd = 'VScc ##'``` in your .vimrc.
 
-## Motivation
-
 ## Key Mappings
+
+VIntSearch does not provide default key mappings to keep your key mappings clean. Instead, I suggest convenient one what I'm using now. You can add them to your .vimrc and modify them as you want.
+
+```
+function! s:nnoreicmap(option, shortcut, command)
+    execute 'nnoremap '.a:option.' '.a:shortcut.' '.a:command
+    execute 'imap '.a:option.' '.a:shortcut.' <Esc>'.a:shortcut
+    execute 'cmap '.a:option.' '.a:shortcut.' <Esc>'.a:shortcut
+endfunction
+
+" VIntSearch
+call s:nnoreicmap('','<A-b>',':VIntSearchBuildTag<CR><CR>')
+call s:nnoreicmap('','<A-]>',':VIntSearchJumpCursorCtags<CR>')
+call s:nnoreicmap('','<A-\>',':VIntSearchJumpCursorGrep<CR><CR>')
+call s:nnoreicmap('','<A-g>]',':VIntSearchListCursorCtags<CR>')
+call s:nnoreicmap('','<A-g>\',':VIntSearchListCursorGrep<CR><CR>')
+call s:nnoreicmap('','<A-t>',':VIntSearchMoveBackward<CR>')
+call s:nnoreicmap('','<A-T>',':VIntSearchMoveForward<CR>')
+vnoremap <A-]> :<C-u>VIntSearchJumpSelectionCtags<CR>
+vnoremap <A-\> :<C-u>VIntSearchJumpSelectionGrep<CR><CR>
+vnoremap <A-g>] :<C-u>VIntSearchListSelectionCtags<CR>
+vnoremap <A-g>\ :<C-u>VIntSearchListSelectionGrep<CR><CR>
+call s:nnoreicmap('','<F8>',':VScnext<CR>')
+call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
+```
+
+I've define the function `s:nnoreicmap()` to map for normal, insert and command-line modes simultaneously, and installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) plugin to use alt-key mappings. `<A-T>` means alt+shift+t.
