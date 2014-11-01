@@ -7,7 +7,7 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
 
 - Quickfix-listed results from ctags search
 - Easier commands for grep search
-- Unified search stack containing results from grep and ctags (similar usage to vim's tag stack, but more general one)
+- Unified search stack containing your search history by grep and ctags (similar usage to vim's tag stack, but more general one)
 - Various search commands (for word under the cursor, visually selected text, or any text you type)
 - Stacking not only search keywords and their position, but also search results in Quickfix
 - Unified search path for grep and ctags
@@ -37,9 +37,9 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
 *Search path* is a directory 1) that is recursively searched by grep, 2) that is recursively listed all source files to generate the tag file by **:VIntSearchBuildTag**, and 3) where the tag file is located.
 
 **:VIntSearchPrintPath**, **:VSpath**    
-Print current search path.
+Print current *search path*.
 
-You can check ```:help g:vintsearch_searchpathmode``` to see how the search path is determined.
+You can check ```:help g:vintsearch_searchpathmode``` to see how the *search path* is determined.
 
 ## Search Commands
 
@@ -62,23 +62,31 @@ Search for visually selected text by grep or ctags.
 Search for visually selected text by grep or ctags and jump to the first result.
 
 **:VIntSearchListTypeGrep** [keyword] [options], **:VSgrep** [keyword] [options]  
-Search for [keyword] by grep with [options] (See ```man grep``` for more details about [options]).
+Search for [keyword] by grep with [options]. (See ```man grep``` for more details about [options])
 
 **:VIntSearchListTypeCtags** [keyword], **:VSctags** [keyword]  
 Search for [keyword] by ctags.
 
 ### Stack Commands
 
-**:VIntSearchMoveBackward**, **:VSbwd**  
-
-**:VIntSearchMoveForward**, **:VSfwd**  
-
-**:VIntSearchClearStack**, **:VSclear**  
+*Search stack* contains your search history - search keywords you jumped to, from which file, and search results in Quickfix also. You can browse your source code more easily by moving forward and backward in the *search stack*.
 
 **:VIntSearchPrintStack**, **:VSstack**  
+Print current *search stack*.
 
-**:VScnext**
-**:VScprev**
+**:VIntSearchMoveBackward**, **:VSbwd**  
+Move backward in the *search stack*.
+
+**:VIntSearchMoveForward**, **:VSfwd**  
+Move forward in the *search stack*.
+
+**:VIntSearchClearStack**, **:VSclear**  
+Clear the *search stack*.
+
+**:VScc**  
+**:VScnext**  
+**:VScprev**  
+Replacement of vim's ```:cc```, ```:cnext```, and ```:cprev``` commands for VIntSearch. Jumping to a new position from VIntSearch's Quickfix results can be 
 
 ## Motivation
 
