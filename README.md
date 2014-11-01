@@ -1,5 +1,16 @@
 # VIntSearch
 
+VIntSearch provides a more intuitive and unified interface for symbols or text search in vim.
+It supports two search methods (i.e. ctags and grep) and shows search results in an integrated way as its name indicates (VIntSearch : Vi Integrated Search).
+
+## Features
+- Integrated search stack containing results from grep and ctags (similar usage, but more general than vim's tag stack)
+- Quickfix-listed search results from ctags (and grep also)
+- Various search commands (for word under the cursor, visually selected text, or any text you type)
+- Stacking not only search keywords and their position, but also search results in quickfix
+- Unified search path for grep and ctags
+
+## Screenshots
 - Search results by ctags
 ![byctags](https://cloud.githubusercontent.com/assets/5915359/4852495/903a342a-607c-11e4-8b01-a4dde78d9492.png)
 
@@ -8,13 +19,6 @@
 
 - Integrated search stack
 ![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
-
-## Features
-- Integrated search stack containing results from grep and ctags (similar usage, but more general than vim's tag stack)
-- Quickfix-listed search results from ctags (and grep also)
-- Various search commands (for word under the cursor, visually selected text, or any text you type)
-- Stacking not only search keywords and their position, but also search results in quickfix
-- Unified search path for grep and ctags
 
 ## Getting Started
 
