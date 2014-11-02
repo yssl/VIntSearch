@@ -3,9 +3,6 @@
 VIntSearch provides a unified interface for symbols or text search in vim.
 It supports two search methods (i.e. ctags and grep) and shows results in an integrated way as its name indicates (VIntSearch - Vi Integrated Search).
 
-This plugin requires a version of vim with python support.
-You can check your vim with `:echo has('python')`.
-
 ## Features
 
 - Quickfix-listed results from ctags search
@@ -37,6 +34,7 @@ You can check your vim with `:echo has('python')`.
 - Manual install (not recommended)
     - Download this plugin and extract it in `~/.vim/`
 
+This plugin requires a version of vim with python support. You can check your vim with `:echo has('python')`.
 If your vim doesn't support python, the easiest solution for me was installing a more featured version of vim.  
 `sudo apt-get install vim-nox`
 
