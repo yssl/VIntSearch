@@ -37,6 +37,11 @@ You can check your vim with `:echo has('python')`.
 - Manual install (not recommended)
     - Download this plugin and extract it in `~/.vim/`
 
+If your vim doesn't support python, the easiest solution for me was installing a more featured version of vim.
+```
+sudo apt-get install vim-nox
+```
+
 ## Getting Started
 
 1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first.
