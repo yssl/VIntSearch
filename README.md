@@ -37,10 +37,8 @@ You can check your vim with `:echo has('python')`.
 - Manual install (not recommended)
     - Download this plugin and extract it in `~/.vim/`
 
-If your vim doesn't support python, the easiest solution for me was installing a more featured version of vim.
-```
-sudo apt-get install vim-nox
-```
+If your vim doesn't support python, the easiest solution for me was installing a more featured version of vim.  
+`sudo apt-get install vim-nox`
 
 ## Getting Started
 
