@@ -26,6 +26,17 @@ You can check your vim with `:echo has('python')`.
 - Unified search stack
 ![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
 
+## Installation
+
+- Using one of plugin managers (recommended)
+    - [Vundle](https://github.com/gmarik/Vundle.vim) : Add `Bundle 'yssl/VIntSearch'` to .vimrc & `:BundleInstall`
+    - [NeoBundle](https://github.com/Shougo/neobundle.vim) : Add `NeoBundle 'yssl/VIntSearch'` to .vimrc & `:NeoBundleInstall`
+    - [vim-plug](https://github.com/junegunn/vim-plug) : Add `Plug 'yssl/VIntSearch'` to .vimrc & `:PlugInstall`
+- Using [Pathogen](https://github.com/tpope/vim-pathogen)
+    - `cd ~/.vim/bundle; git clone https://github.com/yssl/VIntSearch.git`
+- Manual install (not recommended)
+    - Download this plugin and extract it in `~/.vim/`
+
 ## Getting Started
 
 1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first.
