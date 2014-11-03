@@ -7,10 +7,10 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
 
 - Quickfix-listed results from ctags search
 - Easier commands for grep search
-- Unified search stack containing your search history by grep and ctags (similar usage to vim's tag stack, but more general one)
+- Unified search stack containing search history by grep and ctags (similar usage to vim's tag stack, but more general one)
+- Unified search path for grep and ctags
 - Various search commands (for word under the cursor, visually selected text, or any text you type)
 - Stacking not only search keywords and their position, but also search results in Quickfix
-- Unified search path for grep and ctags
 
 ## Screenshots
 
@@ -25,7 +25,7 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
 
 ## Installation
 
-- Using one of plugin managers (recommended)
+- Using plugin managers (recommended)
     - [Vundle](https://github.com/gmarik/Vundle.vim) : Add `Bundle 'yssl/VIntSearch'` to .vimrc & `:BundleInstall`
     - [NeoBundle](https://github.com/Shougo/neobundle.vim) : Add `NeoBundle 'yssl/VIntSearch'` to .vimrc & `:NeoBundleInstall`
     - [vim-plug](https://github.com/junegunn/vim-plug) : Add `Plug 'yssl/VIntSearch'` to .vimrc & `:PlugInstall`
@@ -35,8 +35,8 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
     - Download this plugin and extract it in `~/.vim/`
 
 This plugin requires a version of vim with python support. You can check your vim with `:echo has('python')`.
-If your vim doesn't support python, the easiest solution for me was installing a more featured version of vim.  
-`sudo apt-get install vim-nox`
+If your vim doesn't support python, one of the easiest solutions would be installing a more featured version of vim by:  
+`sudo apt-get install vim-nox`.
 
 ## Getting Started
 
