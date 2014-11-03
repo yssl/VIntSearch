@@ -26,7 +26,7 @@ if !exists('g:vintsearch_tagfilename')
 	let g:vintsearch_tagfilename = 'tags'
 endif
 if !exists('g:vintsearch_repodirs')
-	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']
+	let g:vintsearch_repodirs = ['.git', '.hg', '.svn', '.cvs', '.bzr']
 endif
 if !exists('g:vintsearch_codeexts')
 	let g:vintsearch_codeexts = ["c","cpp","h","hpp","inl","py","lua","vim"]
