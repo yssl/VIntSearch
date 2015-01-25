@@ -226,3 +226,5 @@ to use alt-key mappings.
 
 1.0.0                       2014/11/02
     - first version
+1.0.1                       2015/01/26
+    - Change repository directory finding behavior.
