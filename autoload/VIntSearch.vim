@@ -335,11 +335,7 @@ function! s:MakeFindStrOpt()
 	return findstropt
 endfunction
 
-"function! s:GetRepoDirFrom(filepath, buftype)
 function! s:GetRepoDirFrom(filepath)
-	"if a:buftype==#'nofile' || a:buftype==#'quickfix' || a:filepath=='None'
-		"return ''
-	"else
 	if a:filepath==#''
 		return ''
 	endif
@@ -348,21 +344,20 @@ repodirs = vim.eval('g:vintsearch_repodirs')
 filepath = vim.eval('a:filepath')
 dir = os.path.dirname(filepath)
 while True:
+	exist = False
+	for repodir in repodirs:
+		if os.path.exists(os.path.join(dir, repodir)):
+			vim.command('return \'%s\''%dir)
+			exist = True
+			break
+	if exist:
+	   break	
+
 	prevdir = dir
-	dir = os.path.dirname(prevdir)
+	dir = os.path.dirname(dir)
 	if dir==prevdir:
-		# no repository found case
+		#print 'no repo dir in ancestors of %s'%firstdir
 		vim.command('return \'\'')
-		break
-	else:
-		exist = False
-		for repodir in repodirs:
-			if os.path.exists(os.path.join(dir, repodir)):
-				vim.command('return \'%s\''%dir)
-				exist = True
-				break
-		if exist:
-		   break	
 EOF
 	endif
 endfunction
