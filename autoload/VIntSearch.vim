@@ -299,10 +299,10 @@ endfunction
 
 function! s:MakeFindOpt()
 	let findopt = ""
-	for i in range(len(g:vintsearch_codeexts))
-		let ext = g:vintsearch_codeexts[i]
-		let findopt = findopt."-iname \'*.".ext."\'"
-		if i<len(g:vintsearch_codeexts)-1
+	for i in range(len(g:vintsearch_ctags_include_patterns))
+		let ext = g:vintsearch_ctags_include_patterns[i]
+		let findopt = findopt."-iname \'".ext."\'"
+		if i<len(g:vintsearch_ctags_include_patterns)-1
 			let findopt = findopt." -o "
 		endif
 	endfor
@@ -310,15 +310,35 @@ function! s:MakeFindOpt()
 endfunction
 
 function! s:MakeGrepOpt()
-	let grepopt = "--include=*.{"
-	for i in range(len(g:vintsearch_codeexts))
-		let ext = g:vintsearch_codeexts[i]
-		let grepopt = grepopt.ext
-		if i<len(g:vintsearch_codeexts)-1
-			let grepopt = grepopt.","
-		endif
-	endfor
-	let grepopt = grepopt."}"
+	let grepopt = "-I --include="
+	if len(g:vintsearch_grep_include_patterns)==1
+		let grepopt = grepopt.g:vintsearch_grep_include_patterns[0]
+	else
+		let grepopt = grepopt."{"
+		for i in range(len(g:vintsearch_grep_include_patterns))
+			let ext = g:vintsearch_grep_include_patterns[i]
+			let grepopt = grepopt.ext
+			if i<len(g:vintsearch_grep_include_patterns)-1
+				let grepopt = grepopt.","
+			endif
+		endfor
+		let grepopt = grepopt."}"
+	endif
+	let grepopt = grepopt." --exclude="
+	if len(g:vintsearch_grep_exclude_patterns)==1
+		let grepopt = grepopt.g:vintsearch_grep_exclude_patterns[0]
+	else
+		let grepopt = grepopt."{"
+		for i in range(len(g:vintsearch_grep_exclude_patterns))
+			let ext = g:vintsearch_grep_exclude_patterns[i]
+			let grepopt = grepopt.ext
+			if i<len(g:vintsearch_grep_exclude_patterns)-1
+				let grepopt = grepopt.","
+			endif
+		endfor
+		let grepopt = grepopt."}"
+	endif
+	"echo grepopt
 	return grepopt
 endfunction
 
@@ -331,7 +351,7 @@ function! s:MakeFindStrOpt()
 			let findstropt = findstropt." "
 		endif
 	endfor
-	echo findstropt
+	"echo findstropt
 	return findstropt
 endfunction
 
@@ -429,6 +449,12 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 	endif
 
 	redraw
+	if exists('g:vintsearch_codeexts')
+		echo 'Notice: g:vintsearch_codeexts is deprecated. 
+			\Please use g:vintsearch_ctags_include_patterns, g:vintsearch_grep_include_patterns, or g:vintsearch_grep_exclude_patterns. 
+			\See :help VIntSearch-options for more details.'
+	endif
+
 	echo message
 endfunction
 
