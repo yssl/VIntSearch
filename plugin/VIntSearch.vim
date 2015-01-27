@@ -2,7 +2,7 @@
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_vintsearch") || &cp
-	"finish
+	finish
 endif
 let g:loaded_vintsearch	= 1
 let s:keepcpo           = &cpo
