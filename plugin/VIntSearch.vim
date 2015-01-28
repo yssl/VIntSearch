@@ -46,6 +46,24 @@ if !exists('g:vintsearch_qfsplitcmd')
 	let g:vintsearch_qfsplitcmd = 'botright'
 endif
 
+if !exists('g:vintsearch_enable_default_quickfix_enter')
+	let g:vintsearch_enable_default_quickfix_enter = 1
+endif
+
+"" autocmd
+augroup VIntSearchAutoCmds
+	autocmd!
+	if g:vintsearch_enable_default_quickfix_enter==1
+		autocmd FileType qf nnoremap <silent> <buffer> <CR> :call DefaultQuickFixEnter()<CR>
+		autocmd FileType qf nnoremap <silent> <buffer> <2-LeftMouse> :call DefaultQuickFixEnter()<CR>
+	endif
+augroup END
+
+function! DefaultQuickFixEnter()
+	let lnumqf = line('.')
+	execute 'silent! :VScc '.lnumqf
+endfunction
+
 "" commands 
 
 " useful grep options
