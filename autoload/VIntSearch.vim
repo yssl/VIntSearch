@@ -117,7 +117,7 @@ endfunction
 function! s:Cnext()
 	try
 		execute 'cnext'
-	catch
+	catch E553
 		echo 'VIntSearch: Cnext: No more items'
 	endtry
 	call s:CheckJumpAfterSearch()
@@ -126,7 +126,7 @@ endfunction
 function! s:Cprev()
 	try
 		execute 'cprev'
-	catch
+	catch E553
 		echo 'VIntSearch: Cprev: No more items'
 	endtry
 	call s:CheckJumpAfterSearch()
