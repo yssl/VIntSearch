@@ -115,12 +115,20 @@ function! s:Cc(linenum)
 endfunction
 
 function! s:Cnext()
-	execute 'cnext'
+	try
+		execute 'cnext'
+	catch
+		echo 'VIntSearch: Cnext: No more items'
+	endtry
 	call s:CheckJumpAfterSearch()
 endfunction
 
 function! s:Cprev()
-	execute 'cprev'
+	try
+		execute 'cprev'
+	catch
+		echo 'VIntSearch: Cprev: No more items'
+	endtry
 	call s:CheckJumpAfterSearch()
 endfunction
 
