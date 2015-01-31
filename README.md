@@ -101,9 +101,11 @@ Clear the *search stack*.
 **:VScc**  
 **:VScnext**  
 **:VScprev**  
-Replacement of vim's ```:cc```, ```:cnext```, and ```:cprev``` for VIntSearch. Jumping to a new QuickFix item can be reflected in the *search stack* ONLY using these commands. 
+Replacement of vim's ```:cc```, ```:cnext```, and ```:cprev```.
+Jumping to a new QuickFix item should be done ONLY using these commands. 
+If not, jumping to a new item will not be reflected in VIntSearch's search stack . 
 If you're using any key mapings for ```:cnext``` or ```:cprev```, you can just replace them with these commands. 
-When you ```Enter``` or ```Double-click``` on a Quickfix item, VIntSearch will automatically call **:VScc** instead of default ```:cc``` command, so the jumping will be reflected in the *search stack*.
+When you ```Enter``` or ```Double-click``` on a Quickfix item, VIntSearch will automatically call **:VScc** instead of vim's ```:cc``` command, so the item selection will be reflected in the *search stack*.
 
 ## Key Mappings
 
