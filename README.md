@@ -14,14 +14,14 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
 
 ## Screenshots
 
+- Unified search stack
+![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
+
 - Search results by ctags
 ![byctags](https://cloud.githubusercontent.com/assets/5915359/4852495/903a342a-607c-11e4-8b01-a4dde78d9492.png)
 
 - Search results by grep
 ![bygrep](https://cloud.githubusercontent.com/assets/5915359/4852496/907e4ea8-607c-11e4-9c50-e25a8770aad8.png)
-
-- Unified search stack
-![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
 
 ## Installation
 
