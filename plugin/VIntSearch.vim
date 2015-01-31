@@ -2,7 +2,7 @@
 " template code
 " Exit when your app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_vintsearch") || &cp
-	finish
+	"finish
 endif
 let g:loaded_vintsearch	= 1
 let s:keepcpo           = &cpo
@@ -28,20 +28,15 @@ endif
 if !exists('g:vintsearch_repodirs')
 	let g:vintsearch_repodirs = ['.git', '.hg', '.svn', '.cvs', '.bzr']
 endif
-
-if !exists('g:vintsearch_ctags_include_patterns')
-	let g:vintsearch_ctags_include_patterns =
-   		\ ['*.c','*.cpp','*.h','*.hpp','*.inl','*.py','*.lua','*.vim','*.js']
+if !exists('g:vintsearch_search_include_patterns')
+	let g:vintsearch_search_include_patterns =
+		\ ['*.c','*.cpp','*.h','*.hpp','*.inl','*.py','*.lua','*.vim','*.js',
+		\'*.md','*.txt','*.tex']
 endif
-if !exists('g:vintsearch_grep_include_patterns')
-	let g:vintsearch_grep_include_patterns = 
-		\ ['*']
+if !exists('g:vintsearch_search_exclude_patterns')
+	let g:vintsearch_search_exclude_patterns =
+		\ []
 endif
-if !exists('g:vintsearch_grep_exclude_patterns')
-	let g:vintsearch_grep_exclude_patterns =
-		\ ['*.html','*.htm','*.hhk','*.hhc','*.dot','*'.g:vintsearch_tagfilename]
-endif
-
 if !exists('g:vintsearch_qfsplitcmd')
 	let g:vintsearch_qfsplitcmd = 'botright'
 endif
