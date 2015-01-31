@@ -350,9 +350,9 @@ endfunction
 
 function! s:MakeFindStrOpt()
 	let findstropt = ""
-	for i in range(len(g:vintsearch_codeexts))
-		let ext = '*.'.g:vintsearch_codeexts[i]
-		let findstropt = findstropt.ext
+	for i in range(len(g:vintsearch_search_include_patterns))
+		let pattern = g:vintsearch_search_include_patterns[i]
+		let findstropt = findstropt.pattern
 		if i<len(g:vintsearch_codeexts)-1
 			let findstropt = findstropt." "
 		endif
