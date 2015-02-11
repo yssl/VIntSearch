@@ -384,6 +384,7 @@ while True:
 	if dir==prevdir:
 		#print 'no repo dir in ancestors of %s'%firstdir
 		vim.command('return \'\'')
+		break
 EOF
 	endif
 endfunction
