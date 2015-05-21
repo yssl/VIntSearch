@@ -1,13 +1,13 @@
 " wrappers
-function! VIntSearch#Cc(linenum)
-	call s:Cc(a:linenum)
+function! VIntSearch#Cc(linenum, use_quickfix)
+	call s:Cc(a:linenum, a:use_quickfix)
 endfunction
 
-function! VIntSearch#Cnext()
-	call s:Cnext()
+function! VIntSearch#Cnext(use_quickfix)
+	call s:Cnext(a:use_quickfix)
 endfunction
 
-function! VIntSearch#Cprev()
+function! VIntSearch#Cprev(use_quickfix)
 	call s:Cprev()
 endfunction
 
@@ -27,7 +27,7 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_quickfix)
+function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_result_win, use_quickfix)
 	if a:is_literal
 		let search_keyword = "\"".a:keyword."\""
 	else
@@ -37,13 +37,13 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 	if a:cmd==#'ctags'
 		let qflist = s:GetCtagsQFList(search_keyword)
 	elseif a:cmd==#'grep'
-		let qflist = s:GetGrepQFList(search_keyword, a:options)
+		let qflist = s:GetGrepQFList(search_keyword, a:options, a:use_quickfix)
 	else
 		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
 		return
 	endif
 
-	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_quickfix)
+	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
 endfunction
 
 function! s:SplitKeywordOptions(keyword_and_options)
@@ -63,7 +63,7 @@ function! s:SplitKeywordOptions(keyword_and_options)
 	return [keyword, options]
 endfunction
 
-function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_quickfix)
+function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_result_win, use_quickfix)
 	let dblquota_indices = []
 	for i in range(len(a:keyword_and_options))
 		if a:keyword_and_options[i]==#'"'
@@ -86,15 +86,15 @@ function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open
 
 	"echo dblquota_tokens
 	"echo keyword is_literal options 
-	call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_quickfix)
+	call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
 endfunction 
 
-function! VIntSearch#MoveBackward()
-	call s:MoveBackward()
+function! VIntSearch#MoveBackward(use_quickfix)
+	call s:MoveBackward(a:use_quickfix)
 endfunction
 
-function! VIntSearch#MoveForward()
-	call s:MoveForward()
+function! VIntSearch#MoveForward(use_quickfix)
+	call s:MoveForward(a:use_quickfix)
 endfunction
 
 "" script variable
@@ -109,31 +109,47 @@ if !exists('s:jump_after_search')
 endif
 
 "" functions
-function! s:Cc(linenum)
-	execute a:linenum.'cc'
-	call s:CheckJumpAfterSearch()
+function! s:Cc(linenum, use_quickfix)
+	if a:use_quickfix
+		exec a:linenum.'cc'
+	else
+		exec a:linenum.'ll'
+	endif
+	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
 function! s:Cnext()
 	try
-		execute 'cnext'
+		if a:use_quickfix
+			exec 'cnext'
+		else
+			exec 'lnext'
+		endif
 	catch E553
 		echo 'VIntSearch: Cnext: No more items'
 	endtry
-	call s:CheckJumpAfterSearch()
+	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
 function! s:Cprev()
 	try
-		execute 'cprev'
+		if a:use_quickfix
+			execute 'cprev'
+		else
+			execute 'lprev'
+		endif
 	catch E553
 		echo 'VIntSearch: Cprev: No more items'
 	endtry
-	call s:CheckJumpAfterSearch()
+	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
-function! s:CheckJumpAfterSearch()
-	let qflist = getqflist()
+function! s:CheckJumpAfterSearch(use_quickfix)
+	if a:use_quickfix
+		let qflist = getqflist()
+	else
+		let qflist = getloclist(0)
+	endif
 	if len(qflist) < 1
 		return
 	else
@@ -152,12 +168,16 @@ function! s:UncheckJumpAfterSearch()
 	let s:jump_after_search = 0
 endfunction
 
-function! s:ManipulateQFWindow(jump_to_firstitem, open_quickfix, quickfix_splitcmd)
+function! s:ManipulateQFWindow(jump_to_firstitem, open_result_win, quickfix_splitcmd, use_quickfix)
 	if a:jump_to_firstitem
-		call s:Cc(2)	|" because the first line is search result message
+		call s:Cc(2, a:use_quickfix)	|" because the first line is search result message
 	endif
-	if a:open_quickfix
-		execute a:quickfix_splitcmd.' copen'
+	if a:open_result_win
+		if a:use_quickfix
+			exec a:quickfix_splitcmd.' copen'
+		else
+			exec a:quickfix_splitcmd.' lopen'
+		endif
 	endif
 endfunction
 
@@ -171,7 +191,7 @@ function! s:SetToCurStackLevel(keyword, type, file, line, text, qflist)
 			\'qflist':a:qflist})
 endfunction
 
-function! s:MoveForward()
+function! s:MoveForward(use_quickfix)
 	if len(s:searchstack)==0
 		echo 'VIntSearch: MoveForward: Search stack is empty.'
 		return
@@ -189,14 +209,18 @@ function! s:MoveForward()
 
 	let ss = s:searchstack[s:stacklevel]
 	execute 'buffer '.ss.file
-	call setqflist(ss.qflist)
+	if a:use_quickfix
+		call setqflist(ss.qflist)
+	else
+		call setloclist(0, ss.qflist)
+	endif
 
 	call s:UncheckJumpAfterSearch()
 	redraw
 	echo 'VIntSearch: MoveForward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
-function! s:MoveBackward()
+function! s:MoveBackward(use_quickfix)
 	if len(s:searchstack)==0
 		echo 'VIntSearch: MoveBackward: Search stack is empty.'
 		return
@@ -214,7 +238,11 @@ function! s:MoveBackward()
 	
 	let ss = s:searchstack[s:stacklevel]
 	execute 'buffer '.ss.file
-	call setqflist(ss.qflist)
+	if a:use_quickfix
+		call setqflist(ss.qflist)
+	else
+		call setloclist(0, ss.qflist)
+	endif
 
 	call s:UncheckJumpAfterSearch()
 	redraw
@@ -437,7 +465,7 @@ function! s:BuildTag()
 	echo "VIntSearch: The tag file for all source files under \'".workdir."\' has been created: ".workdir."/".tagfilename
 endfunction
 
-function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, open_quickfix)
+function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, open_result_win, use_quickfix)
 	let numresults = len(a:qflist)
 	if len(a:options)>0
 		let optionstr = ' '.a:options
@@ -448,11 +476,15 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 
  	if numresults>0
 		call insert(a:qflist, {'text':message}, 0)
-		call setqflist(a:qflist)
+		if a:use_quickfix
+			call setqflist(a:qflist)
+		else
+			call setloclist(0, a:qflist)
+		endif
 
 		call s:SetToCurStackLevel(a:keyword, a:cmd.optionstr, expand('%'), line('.'), getline(line('.')), a:qflist)
 		call s:UncheckJumpAfterSearch()
-		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_quickfix, g:vintsearch_qfsplitcmd)
+		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_result_win, g:vintsearch_qfsplitcmd, a:use_quickfix)
 	endif
 
 	redraw
@@ -465,7 +497,7 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 	echo message
 endfunction
 
-function! s:GetGrepQFList(keyword, options)
+function! s:GetGrepQFList(keyword, options, use_quickfix)
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_searchpathmode)
 	if workdir==#''
@@ -473,18 +505,28 @@ function! s:GetGrepQFList(keyword, options)
 	endif 
 	execute 'cd' workdir
 
+	if a:use_quickfix
+		let grepcmd = 'grep'
+	else
+		let grepcmd = 'lgrep'
+	endif
+
 	"grep! prevents grep from opening first result
 	if has('win32')		|"findstr in windows
 		let findstropt = s:MakeFindStrOpt()
-		execute "\:grep! /s ".a:keyword." ".findstropt
+		exec "\:".grepcmd."! /s ".a:keyword." ".findstropt
 	else	|"grep in unix
 		let grepopt = s:MakeGrepOpt()
-		execute "\:grep! -r ".grepopt." ".a:options." ".a:keyword." *"
+		exec "\:".grepcmd."! -r ".grepopt." ".a:options." ".a:keyword." *"
 	endif
 
 	execute 'cd' prevdir
 
-	let qflist = getqflist()
+	if a:use_quickfix
+		let qflist = getqflist()
+	else
+		let qflist = getloclist(0)
+	endif
 	return qflist
 endfunction
 
