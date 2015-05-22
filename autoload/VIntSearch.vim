@@ -8,7 +8,7 @@ function! VIntSearch#Cnext(use_quickfix)
 endfunction
 
 function! VIntSearch#Cprev(use_quickfix)
-	call s:Cprev()
+	call s:Cprev(a:use_quickfix)
 endfunction
 
 function! VIntSearch#BuildTag()
@@ -118,7 +118,7 @@ function! s:Cc(linenum, use_quickfix)
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
-function! s:Cnext()
+function! s:Cnext(use_quickfix)
 	try
 		if a:use_quickfix
 			exec 'cnext'
@@ -131,7 +131,7 @@ function! s:Cnext()
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
-function! s:Cprev()
+function! s:Cprev(use_quickfix)
 	try
 		if a:use_quickfix
 			execute 'cprev'
