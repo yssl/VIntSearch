@@ -489,7 +489,7 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 	endif
 
 	if a:0 > 0
-		let message = 'VIntSearch [Local] (by '.a:cmd.optionstr.'): '.numresults.' results [in '.fnamemodify(a:1, ':t').'] are found for: '.a:keyword
+		let message = 'VIntSearch [Local: '.fnamemodify(a:1, ':t').'] (by '.a:cmd.optionstr.'): '.numresults.' results are found for: '.a:keyword
 	else
 		let message = 'VIntSearch (by '.a:cmd.optionstr.'): '.numresults.' results are found for: '.a:keyword 
 	endif
