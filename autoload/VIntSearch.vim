@@ -75,7 +75,10 @@ function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open
 	let dblquota_indices = []
 	for i in range(len(a:keyword_and_options))
 		if a:keyword_and_options[i]==#'"'
-			call add(dblquota_indices, i)
+			if i>0 && a:keyword_and_options[i-1]==#'\'
+			else
+				call add(dblquota_indices, i)
+			endif
 		endif
 	endfor
 
