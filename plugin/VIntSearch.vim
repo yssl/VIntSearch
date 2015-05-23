@@ -71,7 +71,6 @@ command! VIntSearchBuildTag call VIntSearch#BuildTag()
 """""""""""""""""
 " search commands
 
-" quickfix version
 command! VIntSearchJumpCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,1,0,1)
 command! VIntSearchJumpCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',0,1,0,1)
 
@@ -93,42 +92,14 @@ command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRaw(<f-args>,'ctag
 command! -complete=tag -nargs=1 VIntSearchListTypeGrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1)
 command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1)
 
-" location list version
-command! VIntSearchJumpCursorCtagsL call VIntSearch#Search(expand('<cword>'),'ctags','',0,1,0,0)
-command! VIntSearchJumpCursorGrepL call VIntSearch#Search(expand('<cword>'),'grep','-w',0,1,0,0)
-
-command! VIntSearchListCursorCtagsL call VIntSearch#Search(expand('<cword>'),'ctags','',0,0,1,0)
-command! VIntSearchListCursorGrepL call VIntSearch#Search(expand('<cword>'),'grep','-w',0,0,1,0)
-
-command! VIntSearchJumpSelectionCtagsL call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,1,0,0)
-command! VIntSearchJumpSelectionGrepL call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,1,0,0)
-
-command! VIntSearchListSelectionCtagsL call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,0,1,0)
-command! VIntSearchListSelectionGrepL call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1,0)
-
-command! -complete=tag -nargs=1 VIntSearchListTypeCtagsL call VIntSearch#SearchRaw(<f-args>,'ctags',0,1,0)
-command! -complete=tag -nargs=1 VSctagsL call VIntSearch#SearchRaw(<f-args>,'ctags',0,1,0)
-
-command! -complete=tag -nargs=1 VIntSearchListTypeGrepL call VIntSearch#SearchRaw(<f-args>,'grep',0,1,0)
-command! -complete=tag -nargs=1 VSgrepL call VIntSearch#SearchRaw(<f-args>,'grep',0,1,0)
-
 """""""""""""""""
 " stack commands
 
-" quickfix version
 command! VIntSearchMoveBackward call VIntSearch#MoveBackward(1)
 command! VSbwd call VIntSearch#MoveBackward(1)
 
 command! VIntSearchMoveForward call VIntSearch#MoveForward(1)
 command! VSfwd call VIntSearch#MoveForward(1)
-
-" location list version
-command! VIntSearchMoveBackwardL call VIntSearch#MoveBackward(0)
-command! VSbwdL call VIntSearch#MoveBackward(0)
-
-command! VIntSearchMoveForwardL call VIntSearch#MoveForward(0)
-command! VSfwdL call VIntSearch#MoveForward(0)
-
 
 command! VIntSearchClearStack call VIntSearch#ClearStack()
 command! VSclear call VIntSearch#ClearStack()
@@ -140,12 +111,17 @@ command! -nargs=1 VScc call VIntSearch#Cc(<args>, 1)
 command! VScnext call VIntSearch#Cnext(1)
 command! VScprev call VIntSearch#Cprev(1)
 
-command! -nargs=1 VSll call VIntSearch#Cc(<args>, 0)
-command! VSlnext call VIntSearch#Lnext(0)
-command! VSlprev call VIntSearch#Lprev(0)
-
 command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
 command! VSpath call VIntSearch#PrintSearchPath()
+
+"""""""""""""""""
+" search commands for a current file
+
+command! VIntSearchListCursorGrepLocal call VIntSearch#Search(expand('<cword>'),'grep','-w',0,0,1,1,expand('%:p'))
+command! VIntSearchListSelectionGrepLocal call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1,1,expand('%:p'))
+
+command! -complete=tag -nargs=1 VIntSearchListTypeGrepLocal call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1,expand('%:p'))
+command! -complete=tag -nargs=1 VSgrepL call VIntSearch#SearchRaw(<f-args>,'grep',0,1,q,expand('%:p'))
 
 
 " thanks for xolox!

@@ -27,7 +27,7 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_result_win, use_quickfix)
+function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_result_win, use_quickfix, ...)
 	if a:is_literal
 		let search_keyword = "\"".a:keyword."\""
 	else
@@ -37,13 +37,21 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 	if a:cmd==#'ctags'
 		let qflist = s:GetCtagsQFList(search_keyword)
 	elseif a:cmd==#'grep'
-		let qflist = s:GetGrepQFList(search_keyword, a:options, a:use_quickfix)
+		if a:0 > 0
+			let qflist = s:GetGrepQFList(search_keyword, a:options, a:use_quickfix, a:1)
+		else
+			let qflist = s:GetGrepQFList(search_keyword, a:options, a:use_quickfix)
+		endif
 	else
 		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
 		return
 	endif
 
-	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
+	if a:0 > 0
+		call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix, a:1)
+	else
+		call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
+	endif
 endfunction
 
 function! s:SplitKeywordOptions(keyword_and_options)
@@ -63,7 +71,7 @@ function! s:SplitKeywordOptions(keyword_and_options)
 	return [keyword, options]
 endfunction
 
-function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_result_win, use_quickfix)
+function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_result_win, use_quickfix, ...)
 	let dblquota_indices = []
 	for i in range(len(a:keyword_and_options))
 		if a:keyword_and_options[i]==#'"'
@@ -86,7 +94,11 @@ function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open
 
 	"echo dblquota_tokens
 	"echo keyword is_literal options 
-	call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
+	if a:0>0
+		call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix, a:1)
+	else
+		call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
+	endif
 endfunction 
 
 function! VIntSearch#MoveBackward(use_quickfix)
@@ -465,14 +477,19 @@ function! s:BuildTag()
 	echo "VIntSearch: The tag file for all source files under \'".workdir."\' has been created: ".workdir."/".tagfilename
 endfunction
 
-function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, open_result_win, use_quickfix)
+function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, open_result_win, use_quickfix, ...)
 	let numresults = len(a:qflist)
 	if len(a:options)>0
 		let optionstr = ' '.a:options
 	else
 		let optionstr = a:options
 	endif
-	let message = 'VIntSearch (by '.a:cmd.optionstr.'): '.numresults.' results are found for: '.a:keyword
+
+	if a:0 > 0
+		let message = 'VIntSearch [Local] (by '.a:cmd.optionstr.'): '.numresults.' results [in '.fnamemodify(a:1, ':t').'] are found for: '.a:keyword
+	else
+		let message = 'VIntSearch (by '.a:cmd.optionstr.'): '.numresults.' results are found for: '.a:keyword 
+	endif
 
  	if numresults>0
 		call insert(a:qflist, {'text':message}, 0)
@@ -497,7 +514,7 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 	echo message
 endfunction
 
-function! s:GetGrepQFList(keyword, options, use_quickfix)
+function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 	let prevdir = getcwd()
 	let workdir = s:GetWorkDir(g:vintsearch_searchpathmode)
 	if workdir==#''
@@ -516,8 +533,12 @@ function! s:GetGrepQFList(keyword, options, use_quickfix)
 		let findstropt = s:MakeFindStrOpt()
 		exec "\:".grepcmd."! /s ".a:keyword." ".findstropt
 	else	|"grep in unix
-		let grepopt = s:MakeGrepOpt()
-		exec "\:".grepcmd."! -r ".grepopt." ".a:options." ".a:keyword." *"
+		if a:0 > 0
+			exec "\:".grepcmd."! ".a:options." ".a:keyword." ".a:1
+		else
+			let grepopt = s:MakeGrepOpt()
+			exec "\:".grepcmd."! -r ".grepopt." ".a:options." ".a:keyword." *"
+		endif
 	endif
 
 	execute 'cd' prevdir
