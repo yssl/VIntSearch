@@ -435,30 +435,30 @@ EOF
 	endif
 endfunction
 
-function! s:GetWorkDir(mode)
+function! s:GetSearchPath(mode)
 	if a:mode==#'rf'
-		let workdir = s:GetRepoDirFrom(expand("%:p"))
-		if workdir==#''
-			let workdir = expand("%:p")
+		let searchpath = s:GetRepoDirFrom(expand("%:p"))
+		if searchpath==#''
+			let searchpath = expand("%:p")
 		endif
-		return workdir
+		return searchpath
 	elseif a:mode==#'rc'
-		let workdir = s:GetRepoDirFrom(expand("%:p"))
-		if workdir==#''
-			let workdir = getcwd()
+		let searchpath = s:GetRepoDirFrom(expand("%:p"))
+		if searchpath==#''
+			let searchpath = getcwd()
 		endif
-		return workdir
+		return searchpath
 	elseif a:mode==#'c'
-		let workdir = getcwd()
-		return workdir
+		let searchpath = getcwd()
+		return searchpath
 	else
-		echo "VIntSearch: unknown workdir mode \'".a:mode."\'"
+		echo "VIntSearch: unknown search path mode \'".a:mode."\'"
 		return ''
 	endif
 endfunction
 
 function! s:PrintSearchPath()
-	echo 'VIntSearch: Search path is: '.s:GetWorkDir(g:vintsearch_searchpathmode)
+	echo 'VIntSearch: Search path is: '.s:GetSearchPath(g:vintsearch_searchpathmode)
 endfunction
 
 function! s:BuildTag()
@@ -469,18 +469,18 @@ function! s:BuildTag()
 	let tagfilename = g:vintsearch_tagfilename
 	
 	let prevdir = getcwd()
-	let workdir = s:GetWorkDir(g:vintsearch_searchpathmode)
-	if workdir==#''
+	let searchpath = s:GetSearchPath(g:vintsearch_searchpathmode)
+	if searchpath==#''
 		return
 	endif 
-	execute 'cd' workdir
+	execute 'cd' searchpath
 
 	execute ":!find ".findopt.">tf.tmp ; ctags -f ".tagfilename." -L tf.tmp --fields=+n ; rm tf.tmp"
 	
 	execute 'cd' prevdir
 	
 	redraw
-	echo "VIntSearch: The tag file for all source files under \'".workdir."\' has been created: ".workdir."/".tagfilename
+	echo "VIntSearch: The tag file for all source files under \'".searchpath."\' has been created: ".searchpath."/".tagfilename
 endfunction
 
 function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, open_result_win, use_quickfix, ...)
@@ -522,11 +522,11 @@ endfunction
 
 function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 	let prevdir = getcwd()
-	let workdir = s:GetWorkDir(g:vintsearch_searchpathmode)
-	if workdir==#''
+	let searchpath = s:GetSearchPath(g:vintsearch_searchpathmode)
+	if searchpath==#''
 		return
 	endif 
-	execute 'cd' workdir
+	execute 'cd' searchpath
 
 	if a:use_quickfix
 		let grepcmd = 'grep'

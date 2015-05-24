@@ -13,7 +13,7 @@ set cpo&vim
 
 "" global variables
 if !exists('g:vintsearch_searchpathmode')
-	" workdir is the root dir of grep search path tree or the dir where tags
+	" search path is the root dir of grep search path tree or the dir where tags
 	" file is created.
 	" rc : nearest ancestor of current file dir that contain repo dir. 
 	" 		if no repo dir, current workig dir
