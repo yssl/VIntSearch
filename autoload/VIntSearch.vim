@@ -34,13 +34,16 @@ function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem
 		let search_keyword = a:keyword
 	endif
 
+	let real_keyword = substitute(search_keyword, '%', '\\%', 'g')
+	let real_keyword = substitute(real_keyword, '#', '\\#', 'g')
+
 	if a:cmd==#'ctags'
-		let qflist = s:GetCtagsQFList(search_keyword)
+		let qflist = s:GetCtagsQFList(real_keyword)
 	elseif a:cmd==#'grep'
 		if a:0 > 0
-			let qflist = s:GetGrepQFList(search_keyword, a:options, a:use_quickfix, a:1)
+			let qflist = s:GetGrepQFList(real_keyword, a:options, a:use_quickfix, a:1)
 		else
-			let qflist = s:GetGrepQFList(search_keyword, a:options, a:use_quickfix)
+			let qflist = s:GetGrepQFList(real_keyword, a:options, a:use_quickfix)
 		endif
 	else
 		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
