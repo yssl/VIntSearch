@@ -72,10 +72,10 @@ command! VIntSearchBuildTag call VIntSearch#BuildTag()
 " search commands
 
 command! VIntSearchJumpCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,1,0,1)
-command! VIntSearchJumpCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',0,1,0,1)
+command! VIntSearchJumpCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-wF',0,1,0,1)
 
 command! VIntSearchListCursorCtags call VIntSearch#Search(expand('<cword>'),'ctags','',0,0,1,1)
-command! VIntSearchListCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-w',0,0,1,1)
+command! VIntSearchListCursorGrep call VIntSearch#Search(expand('<cword>'),'grep','-wF',0,0,1,1)
 
 command! VIntSearchJumpSelectionCtags call VIntSearch#Search(s:get_visual_selection(),'ctags','',0,1,0,1)
 command! VIntSearchJumpSelectionGrep call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,1,0,1)
@@ -91,6 +91,15 @@ command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRaw(<f-args>,'ctag
 " 		:Vsgrep -i "let tags"
 command! -complete=tag -nargs=1 VIntSearchListTypeGrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1)
 command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1)
+
+"""""""""""""""""
+" search commands for a current file
+
+command! VIntSearchListCursorGrepLocal call VIntSearch#Search(expand('<cword>'),'grep','-wF',0,0,1,1,expand('%:p'))
+command! VIntSearchListSelectionGrepLocal call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1,1,expand('%:p'))
+
+command! -complete=tag -nargs=1 VIntSearchListTypeGrepLocal call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1,expand('%:p'))
+command! -complete=tag -nargs=1 VSgrepL call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1,expand('%:p'))
 
 """""""""""""""""
 " stack commands
@@ -113,15 +122,6 @@ command! VScprev call VIntSearch#Cprev(1)
 
 command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
 command! VSpath call VIntSearch#PrintSearchPath()
-
-"""""""""""""""""
-" search commands for a current file
-
-command! VIntSearchListCursorGrepLocal call VIntSearch#Search(expand('<cword>'),'grep','-w',0,0,1,1,expand('%:p'))
-command! VIntSearchListSelectionGrepLocal call VIntSearch#Search(s:get_visual_selection(),'grep','-F',1,0,1,1,expand('%:p'))
-
-command! -complete=tag -nargs=1 VIntSearchListTypeGrepLocal call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1,expand('%:p'))
-command! -complete=tag -nargs=1 VSgrepL call VIntSearch#SearchRaw(<f-args>,'grep',0,1,1,expand('%:p'))
 
 " thanks for xolox!
 function! s:get_visual_selection()
