@@ -540,10 +540,10 @@ function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 		exec "\:".grepcmd."! /s ".a:keyword." ".findstropt
 	else	|"grep in unix
 		if a:0 > 0
-			exec "\:".grepcmd."! ".a:options." ".a:keyword." ".a:1
+			exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
 		else
 			let grepopt = s:MakeGrepOpt()
-			exec "\:".grepcmd."! -r ".grepopt." ".a:options." ".a:keyword." *"
+			exec "\:".grepcmd."! -r ".grepopt." ".a:options." -e ".a:keyword." *"
 		endif
 	endif
 
