@@ -26,7 +26,7 @@ It supports two search methods (i.e. ctags and grep) and shows results in an int
 ## Installation
 
 - Using plugin managers (recommended)
-    - [Vundle](https://github.com/gmarik/Vundle.vim) : Add `Bundle 'yssl/VIntSearch'` to .vimrc & `:BundleInstall`
+    - [Vundle](https://github.com/gmarik/Vundle.vim) : Add `Plugin 'yssl/VIntSearch'` to .vimrc & `:PluginInstall`
     - [NeoBundle](https://github.com/Shougo/neobundle.vim) : Add `NeoBundle 'yssl/VIntSearch'` to .vimrc & `:NeoBundleInstall`
     - [vim-plug](https://github.com/junegunn/vim-plug) : Add `Plug 'yssl/VIntSearch'` to .vimrc & `:PlugInstall`
 - Using [Pathogen](https://github.com/tpope/vim-pathogen)
