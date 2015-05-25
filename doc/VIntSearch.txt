@@ -80,7 +80,7 @@ You can check `:help |g:vintsearch_searchpathmode|` to see how the search path i
 ==============================================================================
 4. Search Commands                                 *VIntSearch-searchcommands*
 
-All following commands search the search path recursively.
+All following commands search the *search path* recursively, except ~Local commands.
 Search results are updated in Quickfix.
 
 *:VIntSearchListCursorGrep*  
@@ -105,6 +105,15 @@ Search for [keyword] by grep with [options].
 
 *:VIntSearchListTypeCtags* [keyword], *:VSctags* [keyword]  
 Search for [keyword] by ctags.
+
+*:VIntSearchListCursorGrepLocal*  
+Search for a word under the cursor by grep in the current file.
+
+*:VIntSearchListSelectionGrepLocal*  
+Search for visually selected text by grep in the current file.
+
+*:VIntSearchListTypeGrepLocal* [keyword] [options], *:VSgrepL* [keyword] [options]  
+Search for [keyword] by grep with [options] in the current file.
 
 ==============================================================================
 5. Stack Commands                                   *VIntSearch-stackcommands*
