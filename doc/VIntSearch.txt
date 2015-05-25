@@ -260,6 +260,11 @@ to use alt-key mappings.
 ==============================================================================
 8. Changelog                                            *VIntSearch-changelog*
 
+1.1.2                       2015/05/26
+    - Add local search commands (search in current file)
+    - Escaping double quotation mark in search keyword
+    - Handle vim pattern character (%, #) in search keyword
+    - Change grep option a bit internally
 1.1.1                       2015/02/12
     - Fix the infinite loop bug when there is no vcs directory
 1.1.0                       2015/01/31
