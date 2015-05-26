@@ -129,16 +129,19 @@ endfunction
 
 " VIntSearch
 call s:nnoreicmap('','<A-b>',':VIntSearchBuildTag<CR><CR>')
-call s:nnoreicmap('','<A-]>',':VIntSearchJumpCursorCtags<CR>')
-call s:nnoreicmap('','<A-\>',':VIntSearchJumpCursorGrep<CR><CR>')
-call s:nnoreicmap('','<A-g>]',':VIntSearchListCursorCtags<CR>')
-call s:nnoreicmap('','<A-g>\',':VIntSearchListCursorGrep<CR><CR>')
 call s:nnoreicmap('','<A-t>',':VIntSearchMoveBackward<CR>')
 call s:nnoreicmap('','<A-T>',':VIntSearchMoveForward<CR>')
+
+call s:nnoreicmap('','<A-]>',':VIntSearchJumpCursorCtags<CR>')
+call s:nnoreicmap('','g]',':VIntSearchListCursorCtags<CR>')
+call s:nnoreicmap('','g\',':VIntSearchListCursorGrep<CR><CR>')
 vnoremap <A-]> :<C-u>VIntSearchJumpSelectionCtags<CR>
-vnoremap <A-\> :<C-u>VIntSearchJumpSelectionGrep<CR><CR>
-vnoremap <A-g>] :<C-u>VIntSearchListSelectionCtags<CR>
-vnoremap <A-g>\ :<C-u>VIntSearchListSelectionGrep<CR><CR>
+vnoremap g] :<C-u>VIntSearchListSelectionCtags<CR>
+vnoremap g\ :<C-u>VIntSearchListSelectionGrep<CR><CR>
+
+call s:nnoreicmap('','g\|',':VIntSearchListCursorGrepLocal<CR><CR>')
+vnoremap g\| :<C-u>VIntSearchListSelectionGrepLocal<CR><CR>
+
 call s:nnoreicmap('','<F8>',':VScnext<CR>')
 call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
 ```
