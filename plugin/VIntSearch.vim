@@ -66,7 +66,14 @@ endfunction
 " -F, --fixed-strings
 " -i, --ignore-case
 
+"""""""""""""""""
+" search path / tag commands
+
+command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
+command! VSpath call VIntSearch#PrintSearchPath()
+
 command! VIntSearchBuildTag call VIntSearch#BuildTag()
+command! VSbtag call VIntSearch#BuildTag()
 
 """""""""""""""""
 " search commands
@@ -119,9 +126,6 @@ command! VSstack call VIntSearch#PrintStack()
 command! -nargs=1 VScc call VIntSearch#Cc(<args>, 1)
 command! VScnext call VIntSearch#Cnext(1)
 command! VScprev call VIntSearch#Cprev(1)
-
-command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
-command! VSpath call VIntSearch#PrintSearchPath()
 
 " thanks for xolox!
 function! s:get_visual_selection()
