@@ -140,7 +140,6 @@ function! s:nnoreicmap(option, shortcut, command)
 endfunction
 
 " VIntSearch
-call s:nnoreicmap('','<A-b>',':VIntSearchBuildTag<CR><CR>')
 call s:nnoreicmap('','<A-t>',':VIntSearchMoveBackward<CR>')
 call s:nnoreicmap('','<A-T>',':VIntSearchMoveForward<CR>')
 
