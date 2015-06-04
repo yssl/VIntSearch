@@ -366,14 +366,16 @@ function! s:MakeFindOpt()
 	let findopt = ""
 	for i in range(len(g:vintsearch_search_exclude_patterns))
 		let pattern = g:vintsearch_search_exclude_patterns[i]
-		let findopt = findopt."-ipath \'".pattern."\'"
-		let findopt = findopt." -prune -o "
+		let findopt = findopt."-ipath \'".pattern."\' -prune"
+		if i<len(g::vintsearch_search_exclude_patterns)-1 
+				\or (i==len(g::vintsearch_search_exclude_patterns)-1 and len(g:vintsearch_search_include_patterns)>0)
+			let findopt = findopt." -o "
 	endfor
 	for i in range(len(g:vintsearch_search_include_patterns))
 		let pattern = g:vintsearch_search_include_patterns[i]
-		let findopt = findopt."-ipath \'".pattern."\'"
+		let findopt = findopt."-ipath \'".pattern."\' -print"
 		if i<len(g:vintsearch_search_include_patterns)-1
-			let findopt = findopt." -print -o "
+			let findopt = findopt." -o "
 		endif
 	endfor
 	"echo findopt
