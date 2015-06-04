@@ -27,34 +27,78 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
-function! VIntSearch#Search(keyword, cmd, options, is_literal, jump_to_firstitem, open_result_win, use_quickfix, ...)
-	if a:is_literal
-		let search_keyword = "\"".a:keyword."\""
+function! VIntSearch#SearchRaw(keyword_and_options, cmd)
+	let dblquota_indices = []
+	for i in range(len(a:keyword_and_options))
+		if a:keyword_and_options[i]==#'"'
+			if i>0 && a:keyword_and_options[i-1]==#'\'
+			else
+				call add(dblquota_indices, i)
+			endif
+		endif
+	endfor
+
+	if len(dblquota_indices)==0
+		let [keyword, options] = s:SplitKeywordOptions(a:keyword_and_options)
+	elseif len(dblquota_indices)==2
+		let keyword = a:keyword_and_options[dblquota_indices[0]:dblquota_indices[1]]
+		let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
+		let [non, options] = s:SplitKeywordOptions(options_raw)
 	else
-		let search_keyword = a:keyword
+		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
+		return
 	endif
 
+	"echo dblquota_tokens
+	"echo keyword is_literal options 
+	call s:Search(keyword, a:cmd, options, 0, 1)
+endfunction 
+
+" vimmode: 'n'(normal mode), 'v'(visual selection mode)
+" action: 'j'(jump), 'l'(list)
+function! VIntSearch#SearchCursor(cmd, vimmode, action)
+	if a:vimmode==#'n'
+		let keyword = expand('<cword>')
+		let options = '-wF'
+	elseif a:vimmode==#'v'
+		let keyword = '"'.s:get_visual_selection().'"'
+		let options = '-F'
+	else
+		echo 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
+		return
+	endif
+
+	if a:action==#'j'
+		let jump_to_firstitem = 1
+		let open_result_win = 0
+	elseif a:action==#'l'
+		let jump_to_firstitem = 0
+		let open_result_win = 1
+	else
+		echo 'VIntSearch: '.a:action.': Unsupported action.'
+		return
+	endif
+
+	call s:Search(keyword, a:cmd, options, jump_to_firstitem, open_result_win)
+endfunction
+
+function! s:Search(keyword, cmd, options, jump_to_firstitem, open_result_win)
+	let search_keyword = a:keyword
 	let real_keyword = substitute(search_keyword, '%', '\\%', 'g')
 	let real_keyword = substitute(real_keyword, '#', '\\#', 'g')
 
 	if a:cmd==#'ctags'
 		let qflist = s:GetCtagsQFList(real_keyword)
 	elseif a:cmd==#'grep'
-		if a:0 > 0
-			let qflist = s:GetGrepQFList(real_keyword, a:options, a:use_quickfix, a:1)
-		else
-			let qflist = s:GetGrepQFList(real_keyword, a:options, a:use_quickfix)
-		endif
+		let qflist = s:GetGrepQFList(real_keyword, a:options, 1)
+	elseif a:cmd==#'cfgrep'
+		let qflist = s:GetGrepQFList(real_keyword, a:options, 1, expand('%:p'))
 	else
 		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
 		return
 	endif
 
-	if a:0 > 0
-		call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix, a:1)
-	else
-		call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
-	endif
+	call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, 1)
 endfunction
 
 function! s:SplitKeywordOptions(keyword_and_options)
@@ -73,39 +117,6 @@ function! s:SplitKeywordOptions(keyword_and_options)
 	endfor
 	return [keyword, options]
 endfunction
-
-function! VIntSearch#SearchRaw(keyword_and_options, cmd, jump_to_firstitem, open_result_win, use_quickfix, ...)
-	let dblquota_indices = []
-	for i in range(len(a:keyword_and_options))
-		if a:keyword_and_options[i]==#'"'
-			if i>0 && a:keyword_and_options[i-1]==#'\'
-			else
-				call add(dblquota_indices, i)
-			endif
-		endif
-	endfor
-
-	if len(dblquota_indices)==0
-		let is_literal = 0
-		let [keyword, options] = s:SplitKeywordOptions(a:keyword_and_options)
-	elseif len(dblquota_indices)==2
-		let is_literal = 1
-		let keyword = a:keyword_and_options[dblquota_indices[0]+1:dblquota_indices[1]-1]
-		let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
-		let [non, options] = s:SplitKeywordOptions(options_raw)
-	else
-		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
-		return
-	endif
-
-	"echo dblquota_tokens
-	"echo keyword is_literal options 
-	if a:0>0
-		call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix, a:1)
-	else
-		call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
-	endif
-endfunction 
 
 function! VIntSearch#MoveBackward(use_quickfix)
 	call s:MoveBackward(a:use_quickfix)
@@ -475,7 +486,7 @@ function! s:BuildTag()
 	endif 
 	execute 'cd' searchpath
 
-	execute ":!find ".findopt.">tf.tmp ; ctags -f ".tagfilename." -L tf.tmp --fields=+n ; rm tf.tmp"
+	execute ":!find ".findopt.">tf.tmp ; ctags --c++-kinds=+p -f ".tagfilename." -L tf.tmp --fields=+n ; rm tf.tmp"
 	
 	execute 'cd' prevdir
 	
@@ -673,3 +684,118 @@ EOF
 
 	return qflist
 endfunction
+
+
+"""""""""""""""""
+" deprecated search commands
+
+function! VIntSearch#SearchDep(cmdname, keyword, cmd, options, is_literal, jump_to_firstitem, open_result_win, use_quickfix, ...)
+	if a:is_literal
+		let search_keyword = "\"".a:keyword."\""
+	else
+		let search_keyword = a:keyword
+	endif
+
+	let real_keyword = substitute(search_keyword, '%', '\\%', 'g')
+	let real_keyword = substitute(real_keyword, '#', '\\#', 'g')
+
+	if a:cmd==#'ctags'
+		let qflist = s:GetCtagsQFList(real_keyword)
+	elseif a:cmd==#'grep'
+		if a:0 > 0
+			let qflist = s:GetGrepQFList(real_keyword, a:options, a:use_quickfix, a:1)
+		else
+			let qflist = s:GetGrepQFList(real_keyword, a:options, a:use_quickfix)
+		endif
+	else
+		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
+		return
+	endif
+
+	if a:0 > 0
+		call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix, a:1)
+	else
+		call s:DoFinishingWork(qflist, search_keyword, a:cmd, a:options, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
+	endif
+
+	if a:cmdname==#'VIntSearchJumpCursorCtags'
+		let newname = 'VIntSearchCtagsCursor n j'
+
+	elseif a:cmdname==#'VIntSearchJumpCursorGrep'
+		let newname = 'VIntSearchGrepCursor n j'
+
+	elseif a:cmdname==#'VIntSearchListCursorCtags'
+		let newname = 'VIntSearchCtagsCursor n l'
+
+	elseif a:cmdname==#'VIntSearchListCursorGrep'
+		let newname = 'VIntSearchGrepCursor n l'
+
+	elseif a:cmdname==#'VIntSearchJumpSelectionCtags'
+		let newname = 'VIntSearchCtagsCursor v j'
+
+	elseif a:cmdname==#'VIntSearchJumpSelectionGrep'
+		let newname = 'VIntSearchGrepCursor v j'
+
+	elseif a:cmdname==#'VIntSearchListSelectionCtags'
+		let newname = 'VIntSearchCtagsCursor v l'
+
+	elseif a:cmdname==#'VIntSearchListSelectionGrep'
+		let newname = 'VIntSearchGrepCursor v l'
+
+	elseif a:cmdname==#'VIntSearchListCursorGrepLocal'
+		let newname = 'VIntSearchCFGrepCursor n l'
+
+	elseif a:cmdname==#'VIntSearchListSelectionGrepLocal'
+		let newname = 'VIntSearchCFGrepCursor v l'
+	endif
+	echohl Title
+	echom 'VIntSearch: '.a:cmdname.' is deprecated. Please use '.newname.' instead.'
+	echohl None
+endfunction
+
+function! VIntSearch#SearchRawDep(cmdname, keyword_and_options, cmd, jump_to_firstitem, open_result_win, use_quickfix, ...)
+	let dblquota_indices = []
+	for i in range(len(a:keyword_and_options))
+		if a:keyword_and_options[i]==#'"'
+			if i>0 && a:keyword_and_options[i-1]==#'\'
+			else
+				call add(dblquota_indices, i)
+			endif
+		endif
+	endfor
+
+	if len(dblquota_indices)==0
+		let is_literal = 0
+		let [keyword, options] = s:SplitKeywordOptions(a:keyword_and_options)
+	elseif len(dblquota_indices)==2
+		let is_literal = 1
+		let keyword = a:keyword_and_options[dblquota_indices[0]+1:dblquota_indices[1]-1]
+		let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
+		let [non, options] = s:SplitKeywordOptions(options_raw)
+	else
+		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
+		return
+	endif
+
+	"echo dblquota_tokens
+	"echo keyword is_literal options 
+	if a:0>0
+		call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix, a:1)
+	else
+		call VIntSearch#Search(keyword, a:cmd, options, is_literal, a:jump_to_firstitem, a:open_result_win, a:use_quickfix)
+	endif
+
+	if a:cmdname==#'VIntSearchListTypeCtags'
+		let newname = 'VIntSearchCtags'
+
+	elseif a:cmdname==#'VIntSearchListTypeGrep'
+		let newname = 'VIntSearchGrep'
+
+	elseif a:cmdname==#'VIntSearchListTypeGrepLocal'
+		let newname = 'VIntSearchCFGrep'
+	endif
+	echohl Title
+	echom 'VIntSearch: '.a:cmdname.' is deprecated. Please use '.newname.' instead.'
+	echohl None
+endfunction 
+
