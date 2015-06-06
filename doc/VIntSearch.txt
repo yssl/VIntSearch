@@ -18,50 +18,47 @@ Contents                                                 *VIntSearch-contents*
 ==============================================================================
 1. Introduction                                             *VIntSearch-intro*
 
-|VIntSearch| provides a unified interface for symbols or text search in vim.
-It supports two search methods (i.e. ctags and grep) and shows results 
-in an integrated way as its name indicates (VIntSearch - Vi Integrated Search).
+|VIntSearch| is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search (by ctags) and text search (by grep).
+Search results are given in the quickfix window and a user can conviniently move to previous or next search results via the integrated search stack.
+VIntSearch means Vim Integrated Search.
 
 ## Features
 
-- Quickfix-listed results from ctags search
+- Quickfix-listed search results for all types of searches
 
-- Easier commands for grep search
+- Integrated search stack containing search history for all types of searches 
+  (similar to vim's tag stack, but more general one)
 
-- Unified search stack containing your search history by grep and ctags 
-  (similar usage to vim's tag stack, but more general one)
-
-- Unified search path for grep and ctags
-
-- Various search commands (for word under the cursor, visually selected text
-  , or any text you type)
+- Unified search path for all search types
 
 - Stacking not only search keywords and their position, but also search results 
-  in Quickfix
+  in the quickfix
+
+- Search keyword can be from a word under the cursor, visually selected text,
+  or any string you type.
 
 ==============================================================================
 2. Getting Started                                 *VIntSearch-gettingstarted*
 
-1. You need Exuberant Ctags to fully use this plugin.
-   If you don't have it, please install it first.
+1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first: `sudo apt-get install exuberant-ctags`.
 
 2. Install this plugin.
 
 3. Open one of your source files with vim.
 
-4. Build a tag file by typing **:VIntSearchBuildTag**. The tag file will be c
+4. Build a tag file by typing |:VIntSearchBuildTag|. The tag file will be c
    reated in the nearest ancestor dir of the source file that contains 
    a repository dir such as `.git`,
    or in the current working dir if the source file is not managed by any 
    version control system. 
-   (Type `:help |g:vintsearch_searchpathmode|` for more detail) 
+   (Type `:help g:vintsearch_searchpathmode` for more detail) 
 
 5. Note that your `set tags=...` setting should have `./tags;,tags;` to use 
    the generated tag file. 
    (The name of the tag file can be changed by setting |g:vintsearch_tagfilename|)
 
 6. Move the cursor to one of the functions or variables. 
-   Typing |:VIntSearchListCursorGrep| or |:VIntSearchListCursorCtags| will 
+   Typing |:VIntSearchGrepCursor| n l or |:VIntSearchCtagsCursor| n l will 
    give search results in Quickfix. 
    Typing |:VIntSearchPrintStack| will show the search stack.
 
@@ -82,46 +79,37 @@ Build a tag file for the search path.
 ==============================================================================
 4. Search Commands                                 *VIntSearch-searchcommands*
 
-All following commands search the *search path* recursively, except ~Local commands.
-Search results are updated in Quickfix.
-
-*:VIntSearchListCursorGrep*  
-*:VIntSearchListCursorCtags*  
-Search for a word under the cursor by grep or ctags.
-
-*:VIntSearchJumpCursorGrep*  
-*:VIntSearchJumpCursorCtags*  
-Search for a word under the cursor by grep or ctags and jump to the first result.
-
-*:VIntSearchListSelectionGrep*  
-*:VIntSearchListSelectionCtags*  
-Search for visually selected text by grep or ctags.
-
-*:VIntSearchJumpSelectionGrep*  
-*:VIntSearchJumpSelectionCtags*  
-Search for visually selected text by grep or ctags and jump to the first result.
-
-*:VIntSearchListTypeGrep* [keyword] [options], *:VSgrep* [keyword] [options]  
-Search for [keyword] by grep with [options]. 
-(See `man grep` for more details about [options])
-
-*:VIntSearchListTypeCtags* [keyword], *:VSctags* [keyword]  
+*:VIntSearchCtags* [keyword], *:VSctags* [keyword]  
 Search for [keyword] by ctags.
 
-*:VIntSearchListCursorGrepLocal*  
-Search for a word under the cursor by grep in the current file.
+*:VIntSearchGrep* [keyword] [grep_options], *:VSgrep* [keyword] [grep_options]  
+Search for [keyword] by grep with [grep_options]. (See `man grep` for more details about [grep_options])
 
-*:VIntSearchListSelectionGrepLocal*  
-Search for visually selected text by grep in the current file.
+*:VIntSearchCFGrep* [keyword] [grep_options], *:VScfgrep* [keyword] [grep_options]  
+Search for [keyword] by grep with [grep_options] in the current file.
 
-*:VIntSearchListTypeGrepLocal* [keyword] [options], *:VSgrepL* [keyword] [options]  
-Search for [keyword] by grep with [options] in the current file.
+*:VIntSearchCtagsCursor* [vimmode] [action]  
+Search for keyword under the cursor by ctags.
+
+[vimmode] can be one of:  
+- 'n' : Use this if vim is in normal mode. Then keyword is the word under the cursor.  
+- 'v' : Use this if vim is in visual mode. Then keyword is the visually selected text.
+
+[action] can be one of:  
+- 'l' : List search result in the quickfix window and open the quickfix window.
+- 'j' : Jump to the first search result. The quickfix window is also updated but not opened.
+
+*:VIntSearchGrepCursor* [vimmode] [action]  
+Search for keyword under the cursor by grep.
+
+*:VIntSearchCFGrepCursor* [vimmode] [action]  
+Search for keyword under the cursor by grep in the current file.
 
 ==============================================================================
 5. Stack Commands                                   *VIntSearch-stackcommands*
 
 Search stack contains your search history - search keywords you jumped to,
-from which file, and search results in Quickfix also.
+from which file, and search results in the quickfix also.
 You can browse your source code more easily by moving forward and backward 
 in the search stack.
 
@@ -141,11 +129,11 @@ Clear the search stack.
 *:VScnext*  
 *:VScprev*  
 Replacement of vim's |:cc|, |:cnext|, and |:cprev| commands.
-Jumping to a new QuickFix item should be done ONLY using these commands. 
+Jumping to a new quickFix item should be done ONLY using these commands. 
 If not, the jump will not be reflected in VIntSearch's search stack . 
 - If you're using any key mapings for |:cnext| or |:cprev|, you can just replace them 
 with |:VScnext| and |:VScprev|. 
-- When you `Enter` or `Double-click on a Quickfix item, VIntSearch will automatically 
+- When you `Enter` or `Double-click on a quickfix item, VIntSearch will automatically 
 call |:VScc| instead of vim's |:cc| command.
 
 You can disable this VIntSearch's default `Enter` behavior 
@@ -222,9 +210,9 @@ Default: >
 
 *g:vintsearch_enable_default_quickfix_enter*
 You can enable / disable VIntSearch's default `Enter` behavior - calling 
-|:VScc| when `Enter' or 'Double-click' is invoked in QuickFix window.
+|:VScc| when `Enter' or 'Double-click' is invoked in the quickFix window.
 This is useful when you use other plugins that also override `Enter' or
-'Double-click' behavior of QuickFix, 
+'Double-click' behavior of the quickFix, 
 such as [QFEnter](http://www.vim.org/scripts/script.php?script_id=4778).
 (For example, if you want use `Enter` and `Double-click` behavior of QFEnter,
 you have to disable this option.)
@@ -247,17 +235,19 @@ function! s:nnoreicmap(option, shortcut, command)
 endfunction
 
 " VIntSearch
-call s:nnoreicmap('','<A-b>',':VIntSearchBuildTag<CR><CR>')
-call s:nnoreicmap('','<A-]>',':VIntSearchJumpCursorCtags<CR>')
-call s:nnoreicmap('','<A-\>',':VIntSearchJumpCursorGrep<CR><CR>')
-call s:nnoreicmap('','<A-g>]',':VIntSearchListCursorCtags<CR>')
-call s:nnoreicmap('','<A-g>\',':VIntSearchListCursorGrep<CR><CR>')
 call s:nnoreicmap('','<A-t>',':VIntSearchMoveBackward<CR>')
 call s:nnoreicmap('','<A-T>',':VIntSearchMoveForward<CR>')
-vnoremap <A-]> :<C-u>VIntSearchJumpSelectionCtags<CR>
-vnoremap <A-\> :<C-u>VIntSearchJumpSelectionGrep<CR><CR>
-vnoremap <A-g>] :<C-u>VIntSearchListSelectionCtags<CR>
-vnoremap <A-g>\ :<C-u>VIntSearchListSelectionGrep<CR><CR>
+
+call s:nnoreicmap('','<A-]>',':VIntSearchCtagsCursor n j<CR>')
+call s:nnoreicmap('','g]',':VIntSearchCtagsCursor n l<CR>')
+call s:nnoreicmap('','g\',':VIntSearchGrepCursor n l<CR><CR>')
+vnoremap <A-]> :<C-u>VIntSearchCtagsCursor v j<CR>
+vnoremap g] :<C-u>VIntSearchCtagsCursor v l<CR>
+vnoremap g\ :<C-u>VIntSearchGrepCursor v l<CR><CR>
+
+call s:nnoreicmap('','g\|',':VIntSearchCFGrepCursor n l<CR><CR>')
+vnoremap g\| :<C-u>VIntSearchCFGrepCursor v l<CR><CR>
+
 call s:nnoreicmap('','<F8>',':VScnext<CR>')
 call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
 ```
@@ -271,6 +261,16 @@ to use alt-key mappings.
 ==============================================================================
 8. Changelog                                            *VIntSearch-changelog*
 
+1.2.0                       2015/06/07
+    - Fix find option bug related to grep search
+    - Rename & refactor all commands and whole code.
+      The old commands (e.g. :VIntSearchListCursorGrep) are deprecated and will
+      be removed in 1.3.0 version.
+1.1.3                       2015/05/29
+    - Update key mapping example
+    - Update documents for Search Path / Tag Commands
+    - Add VSbtag command
+    - Fix :helptag build error
 1.1.2                       2015/05/26
     - Add local search commands (search in current file)
     - Escaping double quotation mark in search keyword
