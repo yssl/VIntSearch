@@ -41,12 +41,12 @@ If your vim doesn't support python, one of the easiest solutions would be instal
 
 ## Getting Started
 
-1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first.
+1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first: ```sudo apt-get install exuberant-ctags```.
 2. Install this plugin.
 3. Open one of your source files with vim.
 4. Build a tag file by typing **:VIntSearchBuildTag**. The tag file will be created in the nearest ancestor dir that contains a repository dir such as ```.git```, or in the current working dir if the source file is not managed by any version control system. (Type ```:help g:vintsearch_searchpathmode``` for more detail) 
 5. Note that your ```set tags=...``` setting should have ```./tags;,tags;``` to use the generated tag file. (The name of the tag file can be changed by setting ```g:vintsearch_tagfilename```)
-6. Move the cursor to one of the functions or variables. Typing **:VIntSearchListCursorGrep** or **:VIntSearchListCursorCtags** will give search results in Quickfix. Typing **:VIntSearchPrintStack** will show the search stack.
+6. Move the cursor to one of the functions or variables. Typing **:VIntSearchGrepCursor n l** or **:VIntSearchCtagsCursor n l** will give search results in Quickfix. Typing **:VIntSearchPrintStack** will show the search stack.
 
 ## Search Path / Tag Commands
 
@@ -70,9 +70,15 @@ An option to determine the *search path*. Default:'rc'
 - 'c' : *Search path* is the current working dir.
 
 ## Search Commands
+<!--
+**:VIntSearchCtags** [keyword], **:VSctags** [keyword]  
 
-All following commands search the *search path* recursively, except ~Local commands. Search results are updated in Quickfix.
+**:VIntSearchGrep** [keyword] [options], **:VSgrep** [keyword] [options]  
 
+**:VIntSearchCFGrep** [keyword] [options], **:VScfgrep** [keyword] [options]  
+
+
+-->
 **:VIntSearchListCursorGrep**  
 **:VIntSearchListCursorCtags**  
 Search for a word under the cursor by grep or ctags.
