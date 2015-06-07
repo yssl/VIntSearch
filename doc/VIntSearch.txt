@@ -18,8 +18,10 @@ Contents                                                 *VIntSearch-contents*
 ==============================================================================
 1. Introduction                                             *VIntSearch-intro*
 
-|VIntSearch| is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search (by ctags) and text search (by grep).
-Search results are given in the quickfix window and a user can conviniently move to previous or next search results via the integrated search stack.
+|VIntSearch| is a vim plugin providing an integrated interface across various 
+types of searches. It currently supports symbol search (by ctags) and text search (by grep).
+Search results are given in the quickfix window and a user can conviniently Move
+to previous or next search results via the integrated search stack.
 VIntSearch means Vim Integrated Search.
 
 ## Features
@@ -40,7 +42,8 @@ VIntSearch means Vim Integrated Search.
 ==============================================================================
 2. Getting Started                                 *VIntSearch-gettingstarted*
 
-1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first: `sudo apt-get install exuberant-ctags`.
+1. You need Exuberant Ctags to fully use this plugin. If you don't have it,
+   please install it first: `sudo apt-get install exuberant-ctags`.
 
 2. Install this plugin.
 
@@ -59,7 +62,7 @@ VIntSearch means Vim Integrated Search.
 
 6. Move the cursor to one of the functions or variables. 
    Typing |:VIntSearchGrepCursor| n l or |:VIntSearchCtagsCursor| n l will 
-   give search results in Quickfix. 
+   give search results in the quickfix window. 
    Typing |:VIntSearchPrintStack| will show the search stack.
 
 ==============================================================================
