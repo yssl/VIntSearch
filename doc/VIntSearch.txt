@@ -89,11 +89,11 @@ Search for [keyword] by ctags.
 Search for [keyword] by grep with [grep_options]. [keyword] can be double-quoted and the argument order can be changed.  
 For example:
 ```
-:VIntSearchGrep tags
-:VIntSearchGrep "let tags"
-:VIntSearchGrep tags -i
-:VIntSearchGrep -i tags
-:VIntSearchGrep "let tags" -i
+:VSgrep tags
+:VSgrep "let tags"
+:VSgrep tags -i
+:VSgrep -i tags
+:VSgrep "let tags" -i
 ```
 (See ```man grep``` for more details about [grep_options])
 
