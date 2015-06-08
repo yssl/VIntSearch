@@ -74,7 +74,16 @@ An option to determine the *search path*. Default:'rc'
 Search for [keyword] by ctags.
 
 **:VIntSearchGrep** [keyword] [grep_options], **:VSgrep** [keyword] [grep_options]  
-Search for [keyword] by grep with [grep_options]. (See ```man grep``` for more details about [grep_options])
+Search for [keyword] by grep with [grep_options]. [keyword] can be double-quoted and the argument order can be changed.  
+For example:
+```
+:VIntSearchGrep tags
+:VIntSearchGrep "let tags"
+:VIntSearchGrep tags -i
+:VIntSearchGrep -i tags
+:VIntSearchGrep "let tags" -i
+```
+(See ```man grep``` for more details about [grep_options])
 
 **:VIntSearchCFGrep** [keyword] [grep_options], **:VScfgrep** [keyword] [grep_options]  
 Search for [keyword] by grep with [grep_options] in the current file.
