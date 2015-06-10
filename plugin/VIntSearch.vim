@@ -83,12 +83,17 @@ command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRaw(<f-args>,'ctag
 
 " You can put grep options into <f-args>
 " ex)	:Vsgrep -i tags
+" 		:Vsgrep tags -i
 " 		:Vsgrep -i "let tags"
+" 		:Vsgrep "let tags" -i
 command! -complete=tag -nargs=1 VIntSearchGrep call VIntSearch#SearchRaw(<f-args>,'grep')
 command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRaw(<f-args>,'grep')
 
 command! -complete=tag -nargs=1 VIntSearchCFGrep call VIntSearch#SearchRaw(<f-args>,'cfgrep')
 command! -complete=tag -nargs=1 VScfgrep call VIntSearch#SearchRaw(<f-args>,'cfgrep')
+
+command! -complete=tag -nargs=1 VIntSearchFind call VIntSearch#SearchRaw(<f-args>,'find')
+command! -complete=tag -nargs=1 VSfind call VIntSearch#SearchRaw(<f-args>,'find')
 
 """""""""""""""""
 " search commands with cursor
@@ -96,6 +101,7 @@ command! -complete=tag -nargs=1 VScfgrep call VIntSearch#SearchRaw(<f-args>,'cfg
 command! -complete=tag -nargs=* VIntSearchCtagsCursor call VIntSearch#SearchCursor('ctags',<f-args>)
 command! -complete=tag -nargs=* VIntSearchGrepCursor call VIntSearch#SearchCursor('grep',<f-args>)
 command! -complete=tag -nargs=* VIntSearchCFGrepCursor call VIntSearch#SearchCursor('cfgrep',<f-args>)
+command! -complete=tag -nargs=* VIntSearchFindCursor call VIntSearch#SearchCursor('find',<f-args>)
 
 """""""""""""""""
 " stack commands
@@ -125,11 +131,11 @@ command! VIntSearchJumpCursorGrep call VIntSearch#SearchDep('VIntSearchJumpCurso
 command! VIntSearchListCursorCtags call VIntSearch#SearchDep('VIntSearchListCursorCtags', expand('<cword>'),'ctags','',0,0,1,1)
 command! VIntSearchListCursorGrep call VIntSearch#SearchDep('VIntSearchListCursorGrep', expand('<cword>'),'grep','-wF',0,0,1,1)
 
-command! VIntSearchJumpSelectionCtags call VIntSearch#SearchDep('VIntSearchJumpSelectionCtags', s:get_visual_selection(),'ctags','',0,1,0,1)
-command! VIntSearchJumpSelectionGrep call VIntSearch#SearchDep('VIntSearchJumpSelectionGrep', s:get_visual_selection(),'grep','-F',1,1,0,1)
+command! VIntSearchJumpSelectionCtags call VIntSearch#SearchDep('VIntSearchJumpSelectionCtags', s:get_visual_selection_dep(),'ctags','',0,1,0,1)
+command! VIntSearchJumpSelectionGrep call VIntSearch#SearchDep('VIntSearchJumpSelectionGrep', s:get_visual_selection_dep(),'grep','-F',1,1,0,1)
 
-command! VIntSearchListSelectionCtags call VIntSearch#SearchDep('VIntSearchListSelectionCtags', s:get_visual_selection(),'ctags','',0,0,1,1)
-command! VIntSearchListSelectionGrep call VIntSearch#SearchDep('VIntSearchListSelectionGrep', s:get_visual_selection(),'grep','-F',1,0,1,1)
+command! VIntSearchListSelectionCtags call VIntSearch#SearchDep('VIntSearchListSelectionCtags', s:get_visual_selection_dep(),'ctags','',0,0,1,1)
+command! VIntSearchListSelectionGrep call VIntSearch#SearchDep('VIntSearchListSelectionGrep', s:get_visual_selection_dep(),'grep','-F',1,0,1,1)
 
 command! -complete=tag -nargs=1 VIntSearchListTypeCtags call VIntSearch#SearchRawDep('VIntSearchListTypeCtags', <f-args>,'ctags',0,1,1)
 
@@ -139,7 +145,7 @@ command! -complete=tag -nargs=1 VIntSearchListTypeCtags call VIntSearch#SearchRa
 command! -complete=tag -nargs=1 VIntSearchListTypeGrep call VIntSearch#SearchRawDep('VIntSearchListTypeGrep', <f-args>,'grep',0,1,1)
 
 command! VIntSearchListCursorGrepLocal call VIntSearch#SearchDep('VIntSearchListCursorGrepLocal', expand('<cword>'),'grep','-wF',0,0,1,1,expand('%:p'))
-command! VIntSearchListSelectionGrepLocal call VIntSearch#SearchDep('VIntSearchListSelectionGrepLocal', s:get_visual_selection(),'grep','-F',1,0,1,1,expand('%:p'))
+command! VIntSearchListSelectionGrepLocal call VIntSearch#SearchDep('VIntSearchListSelectionGrepLocal', s:get_visual_selection_dep(),'grep','-F',1,0,1,1,expand('%:p'))
 
 command! -complete=tag -nargs=1 VIntSearchListTypeGrepLocal call VIntSearch#SearchRawDep('VIntSearchListTypeGrepLocal', <f-args>,'grep',0,1,1,expand('%:p'))
 
@@ -147,7 +153,7 @@ command! -complete=tag -nargs=1 VIntSearchListTypeGrepLocal call VIntSearch#Sear
 " utility function
 
 " thanks for xolox!
-function! s:get_visual_selection()
+function! s:get_visual_selection_dep()
 	" Why is this not a built-in Vim script function?!
 	let [lnum1, col1] = getpos("'<")[1:2]
 	let [lnum2, col2] = getpos("'>")[1:2]
