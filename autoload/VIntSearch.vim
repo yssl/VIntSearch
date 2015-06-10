@@ -68,6 +68,10 @@ function! VIntSearch#SearchCursor(cmd, vimmode, action)
 		return
 	endif
 
+	if a:cmd==#'find'
+		let keyword = '*'.keyword.'*'
+	endif
+
 	if a:action==#'j'
 		let jump_to_firstitem = 1
 		let open_result_win = 0
@@ -93,6 +97,8 @@ function! s:Search(keyword, cmd, options, jump_to_firstitem, open_result_win)
 		let qflist = s:GetGrepQFList(real_keyword, a:options, 1)
 	elseif a:cmd==#'cfgrep'
 		let qflist = s:GetGrepQFList(real_keyword, a:options, 1, expand('%:p'))
+	elseif a:cmd==#'find'
+		let qflist = s:GetFindQFList(real_keyword, a:options)
 	else
 		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
 		return
@@ -370,10 +376,12 @@ function! s:MakeFindOpt()
 		if i<len(g::vintsearch_search_exclude_patterns)-1 
 				\or (i==len(g::vintsearch_search_exclude_patterns)-1 and len(g:vintsearch_search_include_patterns)>0)
 			let findopt = findopt." -o "
+		endif
 	endfor
 	for i in range(len(g:vintsearch_search_include_patterns))
 		let pattern = g:vintsearch_search_include_patterns[i]
-		let findopt = findopt."-ipath \'".pattern."\' -print"
+		"let findopt = findopt."-ipath \'".pattern."\' -print"
+		let findopt = findopt."-ipath \'".pattern."\'"
 		if i<len(g:vintsearch_search_include_patterns)-1
 			let findopt = findopt." -o "
 		endif
@@ -570,6 +578,48 @@ function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 	return qflist
 endfunction
 
+function! s:GetFindQFList(keyword, options)
+	let prevdir = getcwd()
+	let searchpath = s:GetSearchPath(g:vintsearch_searchpathmode)
+	if searchpath==#''
+		return
+	endif 
+	execute 'cd' searchpath
+
+	let findopt = s:MakeFindOpt()
+	let keyword_option = '-path'
+	if a:options =~ '-i'
+		let keyword_option = '-ipath'
+	endif
+
+	" update later with find . and grep
+	" http://stackoverflow.com/questions/13073731/linux-find-on-multiple-patterns
+	let pathListStr = system("find \\( ".findopt." \\) -a ".keyword_option." ".a:keyword)
+	let pathList = split(pathListStr, '\n')
+
+	execute 'cd' prevdir
+
+	let qflist = []
+	for path in pathList
+		" getqflist()
+		"[{'lnum': 124, 'bufnr': 59, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': -1,
+		"'type': '', 'pattern': '', 'text': 'FindTags generateClassificationBind()
+		"'},
+		"{'lnum': 193, 'bufnr': 59, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': -1,
+		"'type': '', 'pattern': '', 'text': ' generateClassificationBind()
+		"'}]
+
+		let qfitem = {
+		  \ 'filename': path,
+		  \ 'lnum': 0, 
+		  \ 'text': '',
+		  \ }
+		call add(qflist, qfitem)
+	endfor
+
+	return qflist
+endfunction
+
 " ctags list to quickfix
 "http://andrewradev.com/2011/06/08/vim-and-ctags/
 "http://andrewradev.com/2011/10/15/vim-and-ctags-finding-tag-definitions/
@@ -687,6 +737,21 @@ EOF
 	return qflist
 endfunction
 
+"""""""""""""""""""""""""""""""""""""""""""""
+" utility function
+
+" thanks for xolox!
+function! s:get_visual_selection()
+	" Why is this not a built-in Vim script function?!
+	let [lnum1, col1] = getpos("'<")[1:2]
+	let [lnum2, col2] = getpos("'>")[1:2]
+	let lines = getline(lnum1, lnum2)
+	let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
+	let lines[0] = lines[0][col1 - 1:]
+	let str =  join(lines, "\n")
+	let str = substitute(str, '"', '\\"', 'g')
+	return str
+endfunction
 
 """""""""""""""""
 " deprecated search commands
