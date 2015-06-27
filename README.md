@@ -165,6 +165,9 @@ vnoremap g] :<C-u>VIntSearchCtagsCursor v l<CR>
 vnoremap g[ :<C-u>VIntSearchGrepCursor v l<CR><CR>
 vnoremap g{ :<C-u>VIntSearchCFGrepCursor v l<CR><CR>
 vnoremap g\ :<C-u>VIntSearchFindCursor v l<CR><CR>
+
+call s:nnoreicmap('','<F8>',':VScnext<CR>')
+call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
 ```
 
 I've define the function `s:nnoreicmap()` to map for normal, insert and command-line modes simultaneously, and installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) plugin to use alt-key mappings. `<A-T>` means alt+shift+t.
