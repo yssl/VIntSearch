@@ -1,6 +1,6 @@
 # VIntSearch
 
-VIntSearch is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search (by ctags) and text search (by grep).
+VIntSearch is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search (by ctags), text search (by grep), and file search (by find).
 Search results are given in the quickfix window and a user can conviniently move to previous or next search results via the integrated search stack.
 VIntSearch means Vim Integrated Search.
 
@@ -88,6 +88,13 @@ For example:
 **:VIntSearchCFGrep** [keyword] [grep_options], **:VScfgrep** [keyword] [grep_options]  
 Search for [keyword] by grep with [grep_options] in the current file.
 
+**:VIntSearchFind** [keyword], **:VSfind** [keyword]  
+Search for [keyword] by find (file search). Curently works with -path options of find command.  
+For example,
+```
+:VSfind *test-class.cpp
+```
+
 **:VIntSearchCtagsCursor** [vimmode] [action]  
 Search for *keyword* under the cursor by ctags.
 
@@ -104,6 +111,9 @@ Search for *keyword* under the cursor by grep.
 
 **:VIntSearchCFGrepCursor** [vimmode] [action]  
 Search for *keyword* under the cursor by grep in the current file.
+
+**:VIntSearchFindCursor** [vimmode] [action]  
+Search for *keyword* under the cursor by find (file search).
 
 ## Stack Commands
 
@@ -142,21 +152,19 @@ function! s:nnoreicmap(option, shortcut, command)
 endfunction
 
 " VIntSearch
-call s:nnoreicmap('','<A-t>',':VIntSearchMoveBackward<CR>')
-call s:nnoreicmap('','<A-T>',':VIntSearchMoveForward<CR>')
+call s:nnoreicmap('','<A-3>',':VIntSearchMoveBackward<CR>')
+call s:nnoreicmap('','<A-4>',':VIntSearchMoveForward<CR>')
 
 call s:nnoreicmap('','<A-]>',':VIntSearchCtagsCursor n j<CR>')
 call s:nnoreicmap('','g]',':VIntSearchCtagsCursor n l<CR>')
-call s:nnoreicmap('','g\',':VIntSearchGrepCursor n l<CR><CR>')
+call s:nnoreicmap('','g[',':VIntSearchGrepCursor n l<CR><CR>')
+call s:nnoreicmap('','g{',':VIntSearchCFGrepCursor n l<CR><CR>')
+call s:nnoreicmap('','g\',':VIntSearchFindCursor n l<CR><CR>')
 vnoremap <A-]> :<C-u>VIntSearchCtagsCursor v j<CR>
 vnoremap g] :<C-u>VIntSearchCtagsCursor v l<CR>
-vnoremap g\ :<C-u>VIntSearchGrepCursor v l<CR><CR>
-
-call s:nnoreicmap('','g\|',':VIntSearchCFGrepCursor n l<CR><CR>')
-vnoremap g\| :<C-u>VIntSearchCFGrepCursor v l<CR><CR>
-
-call s:nnoreicmap('','<F8>',':VScnext<CR>')
-call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
+vnoremap g[ :<C-u>VIntSearchGrepCursor v l<CR><CR>
+vnoremap g{ :<C-u>VIntSearchCFGrepCursor v l<CR><CR>
+vnoremap g\ :<C-u>VIntSearchFindCursor v l<CR><CR>
 ```
 
 I've define the function `s:nnoreicmap()` to map for normal, insert and command-line modes simultaneously, and installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) plugin to use alt-key mappings. `<A-T>` means alt+shift+t.
