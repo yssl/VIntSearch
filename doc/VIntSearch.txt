@@ -301,6 +301,12 @@ to use alt-key mappings.
 ==============================================================================
 8. Changelog                                            *VIntSearch-changelog*
 
+1.2.2                       2015/07/09
+    - Add hightlight option for search result (g:vintsearch_highlight_group)
+1.2.1                       2015/06/10
+    - Add 'find' type cmd (VIntSearchFind)
+    - Fix script error in s:MakeFindOpt()
+    - Move s:get_visual_selection() to autoload vim script
 1.2.0                       2015/06/07
     - Fix find option bug related to grep search
     - Rename & refactor all commands and whole code.
