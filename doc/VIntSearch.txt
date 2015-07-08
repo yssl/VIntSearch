@@ -243,6 +243,22 @@ Default: >
 	let g:vintsearch_enable_default_quickfix_enter = 1
 <
 
+*g:vintsearch_highlight_group*
+The search keyword in the search results in Quickfix window is highlighted with 
+this highlight group. You can check available groups by |:hi| or 
+:so $VIMRUNTIME/syntax/hitest.vim.
+VIntSearch highlights the keyword by highlight group name instead of setting 
+color value to provide well-matched highlight with your current color scheme.
+If you want to use custom highlight color, you can add a new highlight group and specify it.
+(See |highlight| for more information).
+Default: >
+	let g:vintsearch_highlight_group = 'Title'
+<
+If you don't want to use keyword highlighting, just set the option as:
+>
+	let g:vintsearch_highlight_group = ''
+<
+
 ==============================================================================
 7. Key Mappings                                       *VIntSearch-keymappings*
 
