@@ -45,6 +45,10 @@ if !exists('g:vintsearch_enable_default_quickfix_enter')
 	let g:vintsearch_enable_default_quickfix_enter = 1
 endif
 
+if !exists('g:vintsearch_highlight_group')
+	let g:vintsearch_highlight_group = 'Title'
+endif
+
 "" autocmd
 augroup VIntSearchAutoCmds
 	autocmd!
