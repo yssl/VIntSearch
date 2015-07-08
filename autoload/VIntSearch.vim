@@ -529,6 +529,10 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 		call s:SetToCurStackLevel(a:keyword, a:cmd.optionstr, expand('%'), line('.'), getline(line('.')), a:qflist)
 		call s:UncheckJumpAfterSearch()
 		call s:ManipulateQFWindow(a:jump_to_firstitem, a:open_result_win, g:vintsearch_qfsplitcmd, a:use_quickfix)
+
+		if g:vintsearch_highlight_group !=# ''
+			exec ':match '.g:vintsearch_highlight_group.' /'.a:keyword.'/'
+		endif
 	endif
 
 	redraw
@@ -864,5 +868,4 @@ function! VIntSearch#SearchRawDep(cmdname, keyword_and_options, cmd, jump_to_fir
 	echohl Title
 	echom 'VIntSearch: '.a:cmdname.' is deprecated. Please use '.newname.' instead.'
 	echohl None
-endfunction 
-
+endfunction
