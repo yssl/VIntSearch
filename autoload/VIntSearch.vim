@@ -373,8 +373,8 @@ function! s:MakeFindOpt()
 	for i in range(len(g:vintsearch_search_exclude_patterns))
 		let pattern = g:vintsearch_search_exclude_patterns[i]
 		let findopt = findopt."-ipath \'".pattern."\' -prune"
-		if i<len(g::vintsearch_search_exclude_patterns)-1 
-				\or (i==len(g::vintsearch_search_exclude_patterns)-1 and len(g:vintsearch_search_include_patterns)>0)
+		if i<len(g:vintsearch_search_exclude_patterns)-1
+				\ || (i==len(g:vintsearch_search_exclude_patterns)-1 && len(g:vintsearch_search_include_patterns)>0)
 			let findopt = findopt." -o "
 		endif
 	endfor
