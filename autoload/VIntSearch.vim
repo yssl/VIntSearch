@@ -370,19 +370,19 @@ endfunction
 
 function! s:MakeFindOpt()
 	let findopt = ""
-	for i in range(len(g:vintsearch_search_exclude_patterns))
-		let pattern = g:vintsearch_search_exclude_patterns[i]
+	for i in range(len(g:vintsearch_excludepatterns))
+		let pattern = g:vintsearch_excludepatterns[i]
 		let findopt = findopt."-ipath \'".pattern."\' -prune"
-		if i<len(g:vintsearch_search_exclude_patterns)-1
-				\ || (i==len(g:vintsearch_search_exclude_patterns)-1 && len(g:vintsearch_search_include_patterns)>0)
+		if i<len(g:vintsearch_excludepatterns)-1
+				\ || (i==len(g:vintsearch_excludepatterns)-1 && len(g:vintsearch_includepatterns)>0)
 			let findopt = findopt." -o "
 		endif
 	endfor
-	for i in range(len(g:vintsearch_search_include_patterns))
-		let pattern = g:vintsearch_search_include_patterns[i]
+	for i in range(len(g:vintsearch_includepatterns))
+		let pattern = g:vintsearch_includepatterns[i]
 		"let findopt = findopt."-ipath \'".pattern."\' -print"
 		let findopt = findopt."-ipath \'".pattern."\'"
-		if i<len(g:vintsearch_search_include_patterns)-1
+		if i<len(g:vintsearch_includepatterns)-1
 			let findopt = findopt." -o "
 		endif
 	endfor
@@ -409,16 +409,16 @@ fun! s:CombineGrepPatterns(patterns)
 endfun
 
 function! s:MakeGrepOpt()
-	let includeStr = s:CombineGrepPatterns(g:vintsearch_search_include_patterns)
-	let excludeStr = s:CombineGrepPatterns(g:vintsearch_search_exclude_patterns)
+	let includeStr = s:CombineGrepPatterns(g:vintsearch_includepatterns)
+	let excludeStr = s:CombineGrepPatterns(g:vintsearch_excludepatterns)
 	let grepopt = "--include=".includeStr." --exclude=".excludeStr." --exclude-dir=".excludeStr
 	return grepopt
 endfunction
 
 function! s:MakeFindStrOpt()
 	let findstropt = ""
-	for i in range(len(g:vintsearch_search_include_patterns))
-		let pattern = g:vintsearch_search_include_patterns[i]
+	for i in range(len(g:vintsearch_includepatterns))
+		let pattern = g:vintsearch_includepatterns[i]
 		let findstropt = findstropt.pattern
 		if i<len(g:vintsearch_codeexts)-1
 			let findstropt = findstropt." "
@@ -537,9 +537,13 @@ function! s:DoFinishingWork(qflist, keyword, cmd, options, jump_to_firstitem, op
 
 	redraw
 	if exists('g:vintsearch_codeexts')
-		echo 'Notice: g:vintsearch_codeexts is deprecated. 
-			\Please use g:vintsearch_search_include_patterns instead. 
-			\See :help VIntSearch-options for more details.'
+		echom 'VIntSearch: g:vintsearch_codeexts is deprecated. Please use g:vintsearch_includepatterns instead.'
+	endif
+	if exists('g:vintsearch_search_include_patterns')
+		echom 'VIntSearch: g:vintsearch_search_include_patterns is deprecated. Please use g:vintsearch_includepatterns instead.'
+	endif
+	if exists('g:vintsearch_search_exclude_patterns')
+		echom 'VIntSearch: g:vintsearch_search_exclude_patterns is deprecated. Please use g:vintsearch_excludepatterns instead.'
 	endif
 
 	echo message
