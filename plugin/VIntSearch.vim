@@ -28,13 +28,13 @@ endif
 if !exists('g:vintsearch_repodirs')
 	let g:vintsearch_repodirs = ['.git', '.hg', '.svn', '.cvs', '.bzr']
 endif
-if !exists('g:vintsearch_search_include_patterns')
-	let g:vintsearch_search_include_patterns =
+if !exists('g:vintsearch_includepatterns')
+	let g:vintsearch_includepatterns =
 		\ ['*.c','*.cpp','*.h','*.hpp','*.inl','*.py','*.lua','*.vim','*.js',
 		\'*.md','*.txt','*.tex']
 endif
-if !exists('g:vintsearch_search_exclude_patterns')
-	let g:vintsearch_search_exclude_patterns =
+if !exists('g:vintsearch_excludepatterns')
+	let g:vintsearch_excludepatterns =
 		\ []
 endif
 if !exists('g:vintsearch_qfsplitcmd')
@@ -47,6 +47,14 @@ endif
 
 if !exists('g:vintsearch_highlight_group')
 	let g:vintsearch_highlight_group = 'Title'
+endif
+
+"" deprecated global variables
+if exists('g:vintsearch_search_include_patterns')
+	let g:vintsearch_includepatterns = g:vintsearch_search_include_patterns
+endif
+if exists('g:vintsearch_search_exclude_patterns')
+	let g:vintsearch_excludepatterns = g:vintsearch_search_exclude_patterns
 endif
 
 "" autocmd
