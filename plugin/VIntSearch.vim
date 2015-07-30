@@ -98,27 +98,33 @@ command! VSbtag call VIntSearch#BuildTag()
 """""""""""""""""
 " search commands
 
-" :VIntSearch text vint -i
-" :VIntSearch text "call VInt"
-
 " :VStext -i tags
 " :VStext tags -i
 " :VStext -i "let tags"
 " :VStext "let tags" -i
 
+" :VIntSearch text vint -i
+" :VIntSearch text "call VInt"
+
 " :VIntSearchCmd text grep vint -i
 " :VIntSearchCmd text grep "call VInt"
 
-command! -complete=tag -nargs=* VIntSearchCursor call VIntSearch#SearchCursorDefault(<f-args>)
-command! -complete=tag -nargs=1 VIntSearch call VIntSearch#SearchRawDefaultParse(<f-args>)
+" :VIntSearchCursor symbol n j
+" :VIntSearchCursor text n l
+
+" :VIntSearchCursor symbol ctags n j
+" :VIntSearchCursor text grep n l
 
 command! -complete=tag -nargs=1 VSsymbol call VIntSearch#SearchRawDefault('symbol', <f-args>)
 command! -complete=tag -nargs=1 VStext call VIntSearch#SearchRawDefault('text', <f-args>)
 command! -complete=tag -nargs=1 VSfile call VIntSearch#SearchRawDefault('file', <f-args>)
 command! -complete=tag -nargs=1 VScftext call VIntSearch#SearchRawDefault('cftext', <f-args>)
 
-command! -complete=tag -nargs=* VIntSearchCursorCmd call VIntSearch#SearchCursorWithCmd(<f-args>)
+command! -complete=tag -nargs=1 VIntSearch call VIntSearch#SearchRawDefaultParse(<f-args>)
+command! -complete=tag -nargs=* VIntSearchCursor call VIntSearch#SearchCursorDefault(<f-args>)
+
 command! -complete=tag -nargs=1 VIntSearchCmd call VIntSearch#SearchRawWithCmdParse(<f-args>)
+command! -complete=tag -nargs=* VIntSearchCursorCmd call VIntSearch#SearchCursorWithCmd(<f-args>)
 
 """""""""""""""""
 " deprecated search commands
