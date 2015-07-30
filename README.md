@@ -50,8 +50,7 @@ If your vim doesn't support python, one of the easiest solutions would be instal
 ## Search Types / Search Commands
 
 VIntSearch supports symbol search, text search, and file search.
-Currently, available search commands for each type of search are as follows
-(will be added):
+Currently, available search commands for each type of search are as follows:
 
 - Symbol search
 	- ctags
@@ -110,6 +109,7 @@ For example,
 **:VScftext** [keyword] [options]  
 Search text for [keyword] with [options] in the current file.
 
+--------------------
 **:VIntSearch** [search type] [keyword] [options]  
 A search command taking a search type as an argument.
 
@@ -126,6 +126,7 @@ A search command taking a search type and a search command as arguments. For exa
 ```:VIntSearchCmd text grep "this is"``` is same to ```:VStext "this is"```
 with ```grep``` as the default text search command.
 
+--------------------
 **:VIntSearchCursor** [search type] [vimmode] [action]  
 Search for *keyword* under the cursor with a specified [search type].
 
