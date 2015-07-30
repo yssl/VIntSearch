@@ -1,26 +1,26 @@
 # VIntSearch
 
-VIntSearch is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search (by ctags), text search (by grep), and file search (by find).
-Search results are given in the quickfix window and a user can conviniently move to previous or next search results via the integrated search stack.
+VIntSearch is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search, text search, and file search.
+Search results are given in the quickfix window and a user can conviniently move forward / backward through the integrated search history.
 VIntSearch means Vim Integrated Search.
 
 ## Features
 
 - Quickfix-listed search results for all types of searches
-- Integrated search stack containing search history for all types of searches (similar to vim's tag stack, but more general one)
+- Integrated search stack containing all types of search history (similar to vim's tag stack, but more general one)
 - Unified search path for all search types
 - Stacking not only search keywords and their position, but also search results in the quickfix
-- Search keyword can be from a word under the cursor, visually selected text, or any string you type.
+- Search keyword can be a word under the cursor, visually selected text, or any string you type.
 
 ## Screenshots
 
-- Integrated search stack
+- Search stack
 ![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
 
-- Search results by ctags
+- Symbol search
 ![byctags](https://cloud.githubusercontent.com/assets/5915359/4852495/903a342a-607c-11e4-8b01-a4dde78d9492.png)
 
-- Search results by grep
+- Text search
 ![bygrep](https://cloud.githubusercontent.com/assets/5915359/4852496/907e4ea8-607c-11e4-9c50-e25a8770aad8.png)
 
 ## Installation
@@ -43,20 +43,35 @@ If your vim doesn't support python, one of the easiest solutions would be instal
 1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first: ```sudo apt-get install exuberant-ctags```.
 2. Install this plugin.
 3. Open one of your source files with vim.
-4. Build a tag file by typing **:VIntSearchBuildTag**. The tag file will be created in the nearest ancestor dir that contains a repository dir such as ```.git```, or in the current working dir if the source file is not managed by any version control system. (Type ```:help g:vintsearch_searchpathmode``` for more detail) 
-5. Note that your ```set tags=...``` setting should have ```./tags;,tags;``` to use the generated tag file. (The name of the tag file can be changed by setting ```g:vintsearch_tagfilename```)
-6. Move the cursor to one of the functions or variables. Typing **:VIntSearchGrepCursor n l** or **:VIntSearchCtagsCursor n l** will give search results in the quickfix window. Typing **:VIntSearchPrintStack** will show the search stack.
+4. Build a tag file by typing **:VIntSearchBuildSymbolDB**. The tag file will be created in the nearest ancestor dir that contains a repository dir such as ```.git```, or in the current working dir if the source file is not managed by any version control system (You can change the behavior by ```g:vintsearch_searchpathmode```). 
+5. Note that your ```set tags=...``` setting should have ```./tags;,tags;``` to use the generated tag file (The name of the tag file is set by```g:vintsearch_tagfilename```).
+6. Move the cursor to one of the functions or variables. Typing **:VIntSearchCursor symbol n l** or **:VIntSearchCursor text n l** will give search results in the quickfix window. Typing **:VIntSearchPrintStack** will show the search stack.
+
+## Search Types / Search Commands
+
+VIntSearch supports symbol search, text search, and file search.
+Currently, available search commands for each type of search are as follows
+(will be added):
+
+- Symbol search
+	- ctags
+- Text search
+	- grep
+- File search
+	- find
+
+You can set the default commands for search types via ```g:vintsearch_symbol_defaultcmd```, ```g:vintsearch_text_defaultcmd```, and ```g:vintsearch_file_defaultcmd```.
 
 ## Search Path / Tag Commands
 
-The *search path* is a directory 1) that is recursively searched by grep, 2) that is the root of the entire source directory tree for which a tag file is generated, and 3) where the tag file is located.
+The *search path* is a directory 1) that is recursively searched by grep, 2) that is the root of the entire source directory tree for which a symbol db file is generated, and 3) where the symbol db file is located.
 It is determined by **g:vintsearch_searchpathmode**.
 
 **:VIntSearchPrintPath**, **:VSpath**    
 Print the current *search path*.
 
-**:VIntSearchBuildTag**, **:VSbtag**    
-Build a tag file for the *search path*.
+**:VIntSearchBuildSymbolDB**, **:VSbuild**    
+Build a symbol db file for the *search path*.
 
 **g:vintsearch_searchpathmode**    
 An option to determine the *search path*. Default:'rc'
@@ -70,33 +85,49 @@ An option to determine the *search path*. Default:'rc'
 
 ## Search Commands
 
-**:VIntSearchCtags** [keyword], **:VSctags** [keyword]  
-Search for [keyword] by ctags.
+**:VSsymbol** [keyword]  
+Search symbol for [keyword] \(by default using ctags).
 
-**:VIntSearchGrep** [keyword] [grep_options], **:VSgrep** [keyword] [grep_options]  
-Search for [keyword] by grep with [grep_options]. [keyword] can be double-quoted and the argument order can be changed.  
+**:VStext** [keyword] [options]  
+Search text for [keyword] with [options] \(by default using grep, [option] is grep option). [keyword] can be double-quoted and the argument order can be changed.  
 For example:
 ```
-:VSgrep tags
-:VSgrep "let tags"
-:VSgrep tags -i
-:VSgrep -i tags
-:VSgrep "let tags" -i
+:VStext tags
+:VStext "let tags"
+:VStext tags -i
+:VStext -i tags
+:VStext "let tags" -i
 ```
-(See ```man grep``` for more details about [grep_options])
+(See ```man grep``` for more details about [options])
 
-**:VIntSearchCFGrep** [keyword] [grep_options], **:VScfgrep** [keyword] [grep_options]  
-Search for [keyword] by grep with [grep_options] in the current file.
-
-**:VIntSearchFind** [keyword], **:VSfind** [keyword]  
-Search for [keyword] by find (file search). Curently works with -path options of find command.  
+**:VSfile** [keyword] [options]  
+Search file for [keyword] with [options] \(by default using find). Curently only works with -path options of find command.  
 For example,
 ```
 :VSfind *test-class.cpp
 ```
 
-**:VIntSearchCtagsCursor** [vimmode] [action]  
-Search for *keyword* under the cursor by ctags.
+**:VScftext** [keyword] [options]  
+Search text for [keyword] with [options] in the current file.
+
+**:VIntSearch** [search type] [keyword] [options]  
+A search command taking a search type as an argument.
+
+[search type] can be one of:
+- 'symbol'
+- 'text'
+- 'file'
+
+For example,
+```:VIntSearch text "this is"``` is same to ```:VStext "this is"```.
+
+**:VIntSearchCmd** [search type] [search command] [keyword] [options]  
+A search command taking a search type and a search command as arguments. For example,
+```:VIntSearchCmd text grep "this is"``` is same to ```:VStext "this is"```
+with ```grep``` as the default text search command.
+
+**:VIntSearchCursor** [search type] [vimmode] [action]  
+Search for *keyword* under the cursor with a specified [search type].
 
 [vimmode] can be one of:  
 - 'n' : Use this if vim is in *normal mode*. Then *keyword* is the word under the cursor.  
@@ -106,14 +137,9 @@ Search for *keyword* under the cursor by ctags.
 - 'l' : List search result in the quickfix window and open the quickfix window.
 - 'j' : Jump to the first search result. The quickfix window is also updated but not opened.
 
-**:VIntSearchGrepCursor** [vimmode] [action]  
-Search for *keyword* under the cursor by grep.
-
-**:VIntSearchCFGrepCursor** [vimmode] [action]  
-Search for *keyword* under the cursor by grep in the current file.
-
-**:VIntSearchFindCursor** [vimmode] [action]  
-Search for *keyword* under the cursor by find (file search).
+**:VIntSearchCursorCmd** [search type] [search command] [vimmode] [action]  
+Search for *keyword* under the cursor with a specified [search type] and a
+[search command].
 
 ## Stack Commands
 
@@ -155,16 +181,16 @@ endfunction
 call s:nnoreicmap('','<A-3>',':VIntSearchMoveBackward<CR>')
 call s:nnoreicmap('','<A-4>',':VIntSearchMoveForward<CR>')
 
-call s:nnoreicmap('','<A-]>',':VIntSearchCtagsCursor n j<CR>')
-call s:nnoreicmap('','g]',':VIntSearchCtagsCursor n l<CR>')
-call s:nnoreicmap('','g[',':VIntSearchGrepCursor n l<CR><CR>')
-call s:nnoreicmap('','g{',':VIntSearchCFGrepCursor n l<CR><CR>')
-call s:nnoreicmap('','g\',':VIntSearchFindCursor n l<CR><CR>')
-vnoremap <A-]> :<C-u>VIntSearchCtagsCursor v j<CR>
-vnoremap g] :<C-u>VIntSearchCtagsCursor v l<CR>
-vnoremap g[ :<C-u>VIntSearchGrepCursor v l<CR><CR>
-vnoremap g{ :<C-u>VIntSearchCFGrepCursor v l<CR><CR>
-vnoremap g\ :<C-u>VIntSearchFindCursor v l<CR><CR>
+call s:nnoreicmap('','<A-]>',':VIntSearchCursor symbol n j<CR>')
+call s:nnoreicmap('','g]',':VIntSearchCursor symbol n l<CR>')
+call s:nnoreicmap('','g[',':VIntSearchCursor text n l<CR><CR>')
+call s:nnoreicmap('','g{',':VIntSearchCursor cftext n l<CR><CR>')
+call s:nnoreicmap('','g\',':VIntSearchCursor file n l<CR><CR>')
+vnoremap <A-]> :<C-u>VIntSearchCursor symbol v j<CR>
+vnoremap g] :<C-u>VIntSearchCursor symbol v l<CR>
+vnoremap g[ :<C-u>VIntSearchCursor text v l<CR><CR>
+vnoremap g{ :<C-u>VIntSearchCursor cftext v l<CR><CR>
+vnoremap g\ :<C-u>VIntSearchCursor file v l<CR><CR>
 
 call s:nnoreicmap('','<F8>',':VScnext<CR>')
 call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
