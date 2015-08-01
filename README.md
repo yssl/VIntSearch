@@ -50,7 +50,7 @@ If your vim doesn't support python, one of the easiest solutions would be instal
 5. Note that your ```set tags=...``` setting should have ```./tags;,tags;``` to use the generated tag file (The name of the tag file is set by```g:vintsearch_tagfilename```).
 6. Move the cursor to one of the functions or variables. Typing **:VIntSearchCursor symbol n l** or **:VIntSearchCursor text n l** will give search results in the quickfix window. Typing **:VIntSearchPrintStack** will show the search stack.
 
-## Search Types / Search Commands
+## Search Types / Commands
 
 VIntSearch supports symbol search, text search, and file search.
 Currently, available search commands for each type of search are as follows:

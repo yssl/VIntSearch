@@ -496,9 +496,6 @@ function! s:DoFinishingWork(qflist, keyword, searchtype, searchcmd, options, jum
 	endif
 
 	redraw
-	if exists('g:vintsearch_codeexts')
-		echom 'VIntSearch: g:vintsearch_codeexts is deprecated. Please use g:vintsearch_includepatterns instead.'
-	endif
 	if exists('g:vintsearch_search_include_patterns')
 		echom 'VIntSearch: g:vintsearch_search_include_patterns is deprecated. Please use g:vintsearch_includepatterns instead.'
 	endif

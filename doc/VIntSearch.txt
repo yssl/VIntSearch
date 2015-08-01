@@ -8,21 +8,22 @@ Contents                                                 *VIntSearch-contents*
 
          1. Introduction ......................... |VIntSearch-intro|
          2. Getting Started ...................... |VIntSearch-gettingstarted|
-         3. Search Path .......................... |VIntSearch-searchpath|
-         4. Search Commands ...................... |VIntSearch-searchcommands|
-         5. Stack Commands ....................... |VIntSearch-stackcommands|
-         6. Options .............................. |VIntSearch-options|
-         7. Key Mappings ......................... |VIntSearch-keymappings|
-         8. Changelog ............................ |VIntSearch-changelog|
+         3. Search Types / Commands .............. |VIntSearch-searchtypes|
+         4. Search Path / Tag Commands ........... |VIntSearch-searchpathtagcommands|
+         5. Search Commands ...................... |VIntSearch-searchcommands|
+         6. Stack Commands ....................... |VIntSearch-stackcommands|
+         7. Options .............................. |VIntSearch-options|
+         8. Key Mappings ......................... |VIntSearch-keymappings|
+         9. Deprecated Commands & Options ........ |VIntSearch-deprecated|
+        10. Changelog ............................ |VIntSearch-changelog|
 
 ==============================================================================
 1. Introduction                                             *VIntSearch-intro*
 
-|VIntSearch| is a vim plugin providing an integrated interface across various 
-types of searches. It currently supports symbol search (by ctags), text search 
-(by grep), and file search (by find).
-Search results are given in the quickfix window and a user can conviniently Move
-to previous or next search results via the integrated search stack.
+|VIntSearch| is a vim plugin providing an integrated interface across various
+types of searches. It currently supports symbol search, text search, and file search.
+Search results are given in the quickfix window and a user can conviniently 
+move forward / backward through the integrated search history.
 VIntSearch means Vim Integrated Search.
 
 ## Features
@@ -50,24 +51,40 @@ VIntSearch means Vim Integrated Search.
 
 3. Open one of your source files with vim.
 
-4. Build a tag file by typing |:VIntSearchBuildTag|. The tag file will be c
-   reated in the nearest ancestor dir of the source file that contains 
+4. Build a tag file by typing |:VIntSearchBuildSymbolDB|. The tag file will be 
+   created in the nearest ancestor dir of the source file that contains 
    a repository dir such as `.git`,
    or in the current working dir if the source file is not managed by any 
    version control system. 
-   (Type `:help g:vintsearch_searchpathmode` for more detail) 
+   (You can change this behavior via `g:vintsearch_searchpathmode`)
 
 5. Note that your `set tags=...` setting should have `./tags;,tags;` to use 
    the generated tag file. 
    (The name of the tag file can be changed by setting |g:vintsearch_tagfilename|)
 
 6. Move the cursor to one of the functions or variables. 
-   Typing |:VIntSearchGrepCursor| n l or |:VIntSearchCtagsCursor| n l will 
+   Typing |:VIntSearchCursor| symbol n l or |:VIntSearchCursor| text n l will 
    give search results in the quickfix window. 
    Typing |:VIntSearchPrintStack| will show the search stack.
 
 ==============================================================================
-3. Search Path / Tag Commands               *VIntSearch-searchpathtagcommands*
+3. Search Types / Commands                            *VIntSearch-searchtypes*
+
+VIntSearch supports symbol search, text search, and file search.
+Currently, available search commands for each type of search are as follows:
+
+- Symbol search
+	- ctags
+- Text search
+	- grep
+- File search
+	- find
+
+You can set the default commands for search types via `g:vintsearch_symbol_defaultcmd`,
+`g:vintsearch_text_defaultcmd`, and `g:vintsearch_file_defaultcmd`.
+
+==============================================================================
+4. Search Path / Tag Commands               *VIntSearch-searchpathtagcommands*
 
 The search path is a directory 1) that is recursively searched by grep, 
 2) that is the root of the entire source directory tree for which a tag file is generated,
@@ -77,11 +94,270 @@ It is determined by |g:vintsearch_searchpathmode|.
 *:VIntSearchPrintPath*, *:VSpath*    
 Print current search path.
 
-*:VIntSearchBuildTag*, *:VSbtag*   
-Build a tag file for the search path.
+*:VIntSearchBuildSymbolDB*, *:VSbuild*   
+Build a symbol db file for the search path.
 
 ==============================================================================
-4. Search Commands                                 *VIntSearch-searchcommands*
+5. Search Commands                                 *VIntSearch-searchcommands*
+
+*:VSsymbol* [keyword]  
+Search symbol for [keyword] (by default using ctags).
+
+*:VStext* [keyword] [options]  
+Search text for [keyword] with [options] (by default using grep, [option] is grep option).
+[keyword] can be double-quoted and the argument order can be changed.  
+
+For example:
+```
+:VStext tags
+:VStext "let tags"
+:VStext tags -i
+:VStext -i tags
+:VStext "let tags" -i
+```
+(See ```man grep``` for more details about [options])
+
+*:VSfile* [keyword] [options]  
+Search file for [keyword] with [options] (by default using find).
+Curently only works with -path options of find command.  
+
+For example,
+```
+:VSfind *test-class.cpp
+```
+
+*:VScftext* [keyword] [options]  
+Search text for [keyword] with [options] in the current file.
+
+--------------------
+*:VIntSearch* [search type] [keyword] [options]  
+A search command taking a search type as an argument.
+
+[search type] can be one of:
+- symbol
+- text
+- file
+- cftext
+
+For example,
+`:VIntSearch text "this is"` is same to `:VStext "this is"`.
+
+*:VIntSearchCmd* [search type] [search command] [keyword] [options]  
+A search command taking a search type and a search command as arguments.
+For example,
+`:VIntSearchCmd text grep "this is"` is same to `:VStext "this is"`
+with `grep` as the default text search command.
+
+--------------------
+*:VIntSearchCursor* [search type] [vimmode] [action]  
+Search for keyword under the cursor with a specified [search type].
+
+[vimmode] can be one of:  
+- 'n' : Use this if vim is in normal mode. Then keyword is the word under the cursor.  
+- 'v' : Use this if vim is in visual mode. Then keyword is the visually selected text.
+
+[action] can be one of:  
+- 'l' : List search result in the quickfix window and open the quickfix window.
+- 'j' : Jump to the first search result. The quickfix window is also updated but not opened.
+
+*:VIntSearchCursorCmd* [search type] [search command] [vimmode] [action]  
+Search for keyword under the cursor with a specified [search type] and a
+[search command].
+
+==============================================================================
+6. Stack Commands                                   *VIntSearch-stackcommands*
+
+Search stack contains your search history - search keywords you jumped to,
+from which file, and search results in the quickfix also.
+You can browse your source code more easily by moving forward and backward 
+in the search stack.
+
+*:VIntSearchPrintStack*, *:VSstack*  
+Print current search stack.
+
+*:VIntSearchMoveBackward*, *:VSbwd*  
+Move backward in the search stack.
+
+*:VIntSearchMoveForward*, *:VSfwd*  
+Move forward in the search stack.
+
+*:VIntSearchClearStack*, *:VSclear*  
+Clear the search stack.
+
+*:VScc*  
+*:VScnext*  
+*:VScprev*  
+Replacement of vim's |:cc|, |:cnext|, and |:cprev| commands.
+Jumping to a new quickFix item should be done ONLY using these commands. 
+If not, the jump will not be reflected in VIntSearch's search stack . 
+- If you're using any key mapings for |:cnext| or |:cprev|, you can just replace them 
+with |:VScnext| and |:VScprev|. 
+- When you `Enter` or `Double-click on a quickfix item, VIntSearch will automatically 
+call |:VScc| instead of vim's |:cc| command.
+
+You can disable this VIntSearch's default `Enter` behavior 
+using |g:vintsearch_enable_default_quickfix_enter|.
+
+|:VScc| also can be used in other plugins that override vim's |:cc| command,
+such as [QFEnter](http://www.vim.org/scripts/script.php?script_id=4778).
+(For example, you can register |:VScc| as QFEnter's "cc" command by adding
+`let g:qfenter_cc_cmd = 'VScc ##'` in your .vimrc.)
+
+==============================================================================
+7. Options                                                *VIntSearch-options*
+
+*g:vintsearch_searchpathmode*
+A option to determine the search path.
+
+- rc : Search path is the nearest ancestor dir of the current file that contains 
+       a repository dir. 
+       If there is no repository dir, search path is the current workig dir.
+
+- rf : Search path is the nearest ancestor dir of the current file that contains 
+       a repository dir. 
+       If there is no repository dir, search path is the current file dir.
+
+- c : Search path is the current working dir.
+
+Default: >
+	let g:vintsearch_searchpathmode = 'rc'
+<
+
+*g:vintsearch_tagfilename*
+A name of tag file generated by |:VIntSearchBuildTag|.
+Default: >
+	let g:vintsearch_tagfilename = 'tags'
+<
+
+*g:vintsearch_repodirs*
+Names of repository directories VIntSearch recognized.
+Default: >
+	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']
+<
+
+*g:vintsearch_includepatterns*
+File patterns to specified files being searched.
+The symbol db file generated by |:VIntSearchBuildSymbolDB| will only contain files 
+including these patterns in their paths.
+|:VStext| commands will search files only including these patterns in
+their names.
+Default: >
+	let g:vintsearch_includepatterns =
+		\ ['*.c','*.cpp','*.h','*.hpp','*.inl','*.py','*.lua','*.vim','*.js',
+		\'*.md','*.txt','*.tex']
+<
+
+*g:vintsearch_excludepatterns*
+File patterns to specified files not being searched.
+The symbol db file generated by |:VIntSearchBuildSymbolDB| will only contain files 
+excluding these patterns in their paths.
+|:VStext| commands will search files only excluding these patterns in
+their names and paths.
+If a file matches patterns in both |g:vintsearch_includepatterns| and
+*g:vintsearch_excludepatterns*, it will be excluded from search results.
+Default: >
+	let g:vintsearch_search_exclude_patterns =
+		\ []
+<
+
+*g:vintsearch_qfsplitcmd*
+Quickfix window positioning commands when showing results from search commands. 
+See |opening-window| for more details.
+Default: >
+	let g:vintsearch_qfsplitcmd = 'botright'
+<
+
+*g:vintsearch_enable_default_quickfix_enter*
+You can enable / disable VIntSearch's default `Enter` behavior - calling 
+|:VScc| when `Enter' or 'Double-click' is invoked in the quickFix window.
+This is useful when you use other plugins that also override `Enter' or
+'Double-click' behavior of the quickFix, 
+such as [QFEnter](http://www.vim.org/scripts/script.php?script_id=4778).
+(For example, if you want use `Enter` and `Double-click` behavior of QFEnter,
+you have to disable this option.)
+Default: >
+	let g:vintsearch_enable_default_quickfix_enter = 1
+<
+
+*g:vintsearch_highlight_group*
+The search keyword in the search results in Quickfix window is highlighted with 
+this highlight group. You can check available groups by |:hi| or 
+:so $VIMRUNTIME/syntax/hitest.vim.
+VIntSearch highlights the keyword by highlight group name instead of setting 
+color value to provide well-matched highlight with your current color scheme.
+If you want to use custom highlight color, you can add a new highlight group and specify it.
+(See |highlight| for more information).
+Default: >
+	let g:vintsearch_highlight_group = 'Title'
+<
+If you don't want to use keyword highlighting, just set the option as:
+>
+	let g:vintsearch_highlight_group = ''
+<
+
+*g:vintsearch_symbol_defaultcmd*
+Default search command for symbol search.
+Default: >
+	let g:vintsearch_symbol_defaultcmd = 'ctags'
+<
+
+*g:vintsearch_text_defaultcmd*
+Default search command for text search.
+Default: >
+	let g:vintsearch_text_defaultcmd = 'grep'
+<
+
+*g:vintsearch_file_defaultcmd*
+Default search command for file search.
+Default: >
+	let g:vintsearch_file_defaultcmd = 'find'
+<
+
+==============================================================================
+8. Key Mappings                                       *VIntSearch-keymappings*
+
+VIntSearch does not provide default key mappings to keep your key mappings clean.
+Instead, I suggest convenient one what I'm using now.
+You can add them to your .vimrc and modify them as you want.
+
+```
+function! s:nnoreicmap(option, shortcut, command)
+    execute 'nnoremap '.a:option.' '.a:shortcut.' '.a:command
+    execute 'imap '.a:option.' '.a:shortcut.' <Esc>'.a:shortcut
+    execute 'cmap '.a:option.' '.a:shortcut.' <Esc>'.a:shortcut
+endfunction
+
+" VIntSearch
+call s:nnoreicmap('','<A-3>',':VIntSearchMoveBackward<CR>')
+call s:nnoreicmap('','<A-4>',':VIntSearchMoveForward<CR>')
+
+call s:nnoreicmap('','<A-]>',':VIntSearchCursor symbol n j<CR>')
+call s:nnoreicmap('','g]',':VIntSearchCursor symbol n l<CR>')
+call s:nnoreicmap('','g[',':VIntSearchCursor text n l<CR><CR>')
+call s:nnoreicmap('','g{',':VIntSearchCursor cftext n l<CR><CR>')
+call s:nnoreicmap('','g\',':VIntSearchCursor file n l<CR><CR>')
+vnoremap <A-]> :<C-u>VIntSearchCursor symbol v j<CR>
+vnoremap g] :<C-u>VIntSearchCursor symbol v l<CR>
+vnoremap g[ :<C-u>VIntSearchCursor text v l<CR><CR>
+vnoremap g{ :<C-u>VIntSearchCursor cftext v l<CR><CR>
+vnoremap g\ :<C-u>VIntSearchCursor file v l<CR><CR>
+
+call s:nnoreicmap('','<F8>',':VScnext<CR>')
+call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
+```
+
+`s:nnoreicmap()` is a function to register mappings for normal, insert and 
+command-line modes simultaneously. I installed ![vim-fixkey]
+(https://github.com/drmikehenry/vim-fixkey) to use alt-key mappings.
+
+==============================================================================
+9. Deprecated Commands & Options                       *VIntSearch-deprecated*
+
+Those commands are deprecated since version 1.3.0 and are supposed to be removed
+in version 1.4.0.
+
+*:VIntSearchBuildTag*, *:VSbtag*   
+Build a tag file for the search path.
 
 *:VIntSearchCtags* [keyword], *:VSctags* [keyword]  
 Search for [keyword] by ctags.
@@ -125,79 +401,8 @@ Search for keyword under the cursor by grep.
 *:VIntSearchCFGrepCursor* [vimmode] [action]  
 Search for keyword under the cursor by grep in the current file.
 
-+**:VIntSearchFindCursor** [vimmode] [action]  
-+Search for *keyword* under the cursor by find (file search).
-+
-==============================================================================
-5. Stack Commands                                   *VIntSearch-stackcommands*
-
-Search stack contains your search history - search keywords you jumped to,
-from which file, and search results in the quickfix also.
-You can browse your source code more easily by moving forward and backward 
-in the search stack.
-
-*:VIntSearchPrintStack*, *:VSstack*  
-Print current search stack.
-
-*:VIntSearchMoveBackward*, *:VSbwd*  
-Move backward in the search stack.
-
-*:VIntSearchMoveForward*, *:VSfwd*  
-Move forward in the search stack.
-
-*:VIntSearchClearStack*, *:VSclear*  
-Clear the search stack.
-
-*:VScc*  
-*:VScnext*  
-*:VScprev*  
-Replacement of vim's |:cc|, |:cnext|, and |:cprev| commands.
-Jumping to a new quickFix item should be done ONLY using these commands. 
-If not, the jump will not be reflected in VIntSearch's search stack . 
-- If you're using any key mapings for |:cnext| or |:cprev|, you can just replace them 
-with |:VScnext| and |:VScprev|. 
-- When you `Enter` or `Double-click on a quickfix item, VIntSearch will automatically 
-call |:VScc| instead of vim's |:cc| command.
-
-You can disable this VIntSearch's default `Enter` behavior 
-using |g:vintsearch_enable_default_quickfix_enter|.
-
-|:VScc| also can be used in other plugins that override vim's |:cc| command,
-such as [QFEnter](http://www.vim.org/scripts/script.php?script_id=4778).
-(For example, you can register |:VScc| as QFEnter's "cc" command by adding
-`let g:qfenter_cc_cmd = 'VScc ##'` in your .vimrc.)
-
-==============================================================================
-6. Options                                                *VIntSearch-options*
-
-*g:vintsearch_searchpathmode*
-A option to determine the search path.
-
-- rc : Search path is the nearest ancestor dir of the current file that contains 
-       a repository dir. 
-       If there is no repository dir, search path is the current workig dir.
-
-- rf : Search path is the nearest ancestor dir of the current file that contains 
-       a repository dir. 
-       If there is no repository dir, search path is the current file dir.
-
-- c : Search path is the current working dir.
-
-Default: >
-	let g:vintsearch_searchpathmode = 'rc'
-<
-
-*g:vintsearch_tagfilename*
-A name of tag file generated by |:VIntSearchBuildTag|.
-Default: >
-	let g:vintsearch_tagfilename = 'tags'
-<
-
-*g:vintsearch_repodirs*
-Names of repository directories VIntSearch recognized.
-Default: >
-	let g:vintsearch_repodirs = ['.git', '.hg', '.svn']
-<
+**:VIntSearchFindCursor** [vimmode] [action]  
+Search for *keyword* under the cursor by find (file search).
 
 *g:vintsearch_search_include_patterns*
 File patterns to specified files being searched.
@@ -224,82 +429,8 @@ Default: >
 		\ []
 <
 
-*g:vintsearch_qfsplitcmd*
-Quickfix window positioning commands when showing results from search commands. 
-See |opening-window| for more details.
-Default: >
-	let g:vintsearch_qfsplitcmd = 'botright'
-<
-
-*g:vintsearch_enable_default_quickfix_enter*
-You can enable / disable VIntSearch's default `Enter` behavior - calling 
-|:VScc| when `Enter' or 'Double-click' is invoked in the quickFix window.
-This is useful when you use other plugins that also override `Enter' or
-'Double-click' behavior of the quickFix, 
-such as [QFEnter](http://www.vim.org/scripts/script.php?script_id=4778).
-(For example, if you want use `Enter` and `Double-click` behavior of QFEnter,
-you have to disable this option.)
-Default: >
-	let g:vintsearch_enable_default_quickfix_enter = 1
-<
-
-*g:vintsearch_highlight_group*
-The search keyword in the search results in Quickfix window is highlighted with 
-this highlight group. You can check available groups by |:hi| or 
-:so $VIMRUNTIME/syntax/hitest.vim.
-VIntSearch highlights the keyword by highlight group name instead of setting 
-color value to provide well-matched highlight with your current color scheme.
-If you want to use custom highlight color, you can add a new highlight group and specify it.
-(See |highlight| for more information).
-Default: >
-	let g:vintsearch_highlight_group = 'Title'
-<
-If you don't want to use keyword highlighting, just set the option as:
->
-	let g:vintsearch_highlight_group = ''
-<
-
 ==============================================================================
-7. Key Mappings                                       *VIntSearch-keymappings*
-
-VIntSearch does not provide default key mappings to keep your key mappings clean.
-Instead, I suggest convenient one what I'm using now.
-You can add them to your .vimrc and modify them as you want.
-
-```
-function! s:nnoreicmap(option, shortcut, command)
-    execute 'nnoremap '.a:option.' '.a:shortcut.' '.a:command
-    execute 'imap '.a:option.' '.a:shortcut.' <Esc>'.a:shortcut
-    execute 'cmap '.a:option.' '.a:shortcut.' <Esc>'.a:shortcut
-endfunction
-
-" VIntSearch
-call s:nnoreicmap('','<A-3>',':VIntSearchMoveBackward<CR>')
-call s:nnoreicmap('','<A-4>',':VIntSearchMoveForward<CR>')
-
-call s:nnoreicmap('','<A-]>',':VIntSearchCtagsCursor n j<CR>')
-call s:nnoreicmap('','g]',':VIntSearchCtagsCursor n l<CR>')
-call s:nnoreicmap('','g[',':VIntSearchGrepCursor n l<CR><CR>')
-call s:nnoreicmap('','g{',':VIntSearchCFGrepCursor n l<CR><CR>')
-call s:nnoreicmap('','g\',':VIntSearchFindCursor n l<CR><CR>')
-vnoremap <A-]> :<C-u>VIntSearchCtagsCursor v j<CR>
-vnoremap g] :<C-u>VIntSearchCtagsCursor v l<CR>
-vnoremap g[ :<C-u>VIntSearchGrepCursor v l<CR><CR>
-vnoremap g{ :<C-u>VIntSearchCFGrepCursor v l<CR><CR>
-vnoremap g\ :<C-u>VIntSearchFindCursor v l<CR><CR>
-
-call s:nnoreicmap('','<F8>',':VScnext<CR>')
-call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
-```
-
-I've define the function `s:nnoreicmap()` to map for normal, insert and 
-command-line modes simultaneously, 
-and installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) plugin 
-to use alt-key mappings. 
-`<A-T>` means alt+shift+t.
-
-==============================================================================
-8. Changelog                                            *VIntSearch-changelog*
+10. Changelog                                            *VIntSearch-changelog*
 
 1.2.2                       2015/07/09
     - Add hightlight option for search result (g:vintsearch_highlight_group)
