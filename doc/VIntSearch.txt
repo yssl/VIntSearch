@@ -401,7 +401,7 @@ Search for keyword under the cursor by grep.
 *:VIntSearchCFGrepCursor* [vimmode] [action]  
 Search for keyword under the cursor by grep in the current file.
 
-**:VIntSearchFindCursor** [vimmode] [action]  
+*:VIntSearchFindCursor* [vimmode] [action]  
 Search for *keyword* under the cursor by find (file search).
 
 *g:vintsearch_search_include_patterns*
@@ -432,6 +432,23 @@ Default: >
 ==============================================================================
 10. Changelog                                            *VIntSearch-changelog*
 
+1.3.0                       2015/08/02
+    - Bug fix related to :vintsearch_search_exclude_patterns
+    - Change names of include/exclude pattern options 
+    - Refactor all search commands to be more extensible
+    - Rename VIntSearchBuildTag to VIntSearchBuildSymbolDB 
+    - Following deprecated commands & options will be removed in version 1.4.0
+      - :VIntSearchBuildTag, :VSbtag   
+      - :VIntSearchCtags, :VSctags   
+      - :VIntSearchGrep, :VSgrep
+      - :VIntSearchCFGrep, :VScfgrep
+      - :VIntSearchFind, :VSfind   
+      - :VIntSearchCtagsCursor
+      - :VIntSearchGrepCursor
+      - :VIntSearchCFGrepCursor
+      - :VIntSearchFindCursor
+      - g:vintsearch_search_include_patterns
+      - g:vintsearch_search_exclude_patterns
 1.2.2                       2015/07/09
     - Add hightlight option for search result (g:vintsearch_highlight_group)
 1.2.1                       2015/06/10
