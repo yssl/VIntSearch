@@ -4,7 +4,7 @@
 " License:      MIT License
 
 if exists("g:loaded_vintsearch") || &cp
-	"finish
+	finish
 endif
 let g:loaded_vintsearch	= 1
 let s:keepcpo           = &cpo
@@ -92,8 +92,8 @@ endfunction
 command! VIntSearchPrintPath call VIntSearch#PrintSearchPath()
 command! VSpath call VIntSearch#PrintSearchPath()
 
-command! VIntSearchBuildTag call VIntSearch#BuildTag()
-command! VSbtag call VIntSearch#BuildTag()
+command! VIntSearchBuildSymbolDB call VIntSearch#BuildSymbolDB()
+command! VSbuild call VIntSearch#BuildSymbolDB()
 
 """""""""""""""""
 " search commands
@@ -127,7 +127,26 @@ command! -complete=tag -nargs=1 VIntSearchCmd call VIntSearch#SearchRawWithCmdPa
 command! -complete=tag -nargs=* VIntSearchCursorCmd call VIntSearch#SearchCursorWithCmd(<f-args>)
 
 """""""""""""""""
-" deprecated search commands
+" stack commands
+
+command! VIntSearchMoveBackward call VIntSearch#MoveBackward(1)
+command! VSbwd call VIntSearch#MoveBackward(1)
+
+command! VIntSearchMoveForward call VIntSearch#MoveForward(1)
+command! VSfwd call VIntSearch#MoveForward(1)
+
+command! VIntSearchClearStack call VIntSearch#ClearStack()
+command! VSclear call VIntSearch#ClearStack()
+
+command! VIntSearchPrintStack call VIntSearch#PrintStack()
+command! VSstack call VIntSearch#PrintStack()
+
+command! -nargs=1 VScc call VIntSearch#Cc(<args>, 1)
+command! VScnext call VIntSearch#Cnext(1)
+command! VScprev call VIntSearch#Cprev(1)
+
+"""""""""""""""""
+" deprecated - will be removed in version 1.4.0
 
 command! -complete=tag -nargs=1 VIntSearchCtags call VIntSearch#SearchRawDep(<f-args>,'ctags')
 command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRawDep(<f-args>,'ctags')
@@ -146,32 +165,13 @@ command! -complete=tag -nargs=1 VScfgrep call VIntSearch#SearchRawDep(<f-args>,'
 command! -complete=tag -nargs=1 VIntSearchFind call VIntSearch#SearchRawDep(<f-args>,'find')
 command! -complete=tag -nargs=1 VSfind call VIntSearch#SearchRawDep(<f-args>,'find')
 
-"""""""""""""""""
-" deprecated search commands with cursor
-
 command! -complete=tag -nargs=* VIntSearchCtagsCursor call VIntSearch#SearchCursorDep('ctags',<f-args>)
 command! -complete=tag -nargs=* VIntSearchGrepCursor call VIntSearch#SearchCursorDep('grep',<f-args>)
 command! -complete=tag -nargs=* VIntSearchCFGrepCursor call VIntSearch#SearchCursorDep('cfgrep',<f-args>)
 command! -complete=tag -nargs=* VIntSearchFindCursor call VIntSearch#SearchCursorDep('find',<f-args>)
 
-"""""""""""""""""
-" stack commands
-
-command! VIntSearchMoveBackward call VIntSearch#MoveBackward(1)
-command! VSbwd call VIntSearch#MoveBackward(1)
-
-command! VIntSearchMoveForward call VIntSearch#MoveForward(1)
-command! VSfwd call VIntSearch#MoveForward(1)
-
-command! VIntSearchClearStack call VIntSearch#ClearStack()
-command! VSclear call VIntSearch#ClearStack()
-
-command! VIntSearchPrintStack call VIntSearch#PrintStack()
-command! VSstack call VIntSearch#PrintStack()
-
-command! -nargs=1 VScc call VIntSearch#Cc(<args>, 1)
-command! VScnext call VIntSearch#Cnext(1)
-command! VScprev call VIntSearch#Cprev(1)
+command! VIntSearchBuildTag call VIntSearch#BuildTag()
+command! VSbtag call VIntSearch#BuildTag()
 
 """""""""""""""""""""""""""""""""""""""""""""
 let &cpo= s:keepcpo

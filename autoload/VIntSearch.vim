@@ -16,7 +16,7 @@ function! VIntSearch#Cprev(use_quickfix)
 	call s:Cprev(a:use_quickfix)
 endfunction
 
-function! VIntSearch#BuildTag()
+function! VIntSearch#BuildSymbolDB()
 	call s:BuildTag()
 endfunction
 
@@ -919,3 +919,9 @@ function! s:DoFinishingWorkDep(qflist, keyword, cmd, options, jump_to_firstitem,
 
 	echo message
 endfunction
+
+function! VIntSearch#BuildTag()
+	call s:BuildTag()
+	echom 'VIntSearch: :VIntSearchBuildTag is deprecated. Please use :VIntSearchBuildSymbolDB instead.'
+endfunction
+
