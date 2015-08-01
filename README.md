@@ -2,7 +2,7 @@
 
 VIntSearch is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search, text search, and file search.
 Search results are given in the quickfix window and a user can conviniently move forward / backward through the integrated search history.
-VIntSearch means Vim Integrated Search.
+VIntSearch means **V**im **Int**egrated **Search**.
 
 ## Features
 
@@ -10,18 +10,21 @@ VIntSearch means Vim Integrated Search.
 - Integrated search stack containing all types of search history (similar to vim's tag stack, but more general one)
 - Unified search path for all search types
 - Stacking not only search keywords and their position, but also search results in the quickfix
-- Search keyword can be a word under the cursor, visually selected text, or any string you type.
+- Search keyword can be a word under the cursor, visually selected text, or any string you type
 
 ## Screenshots
 
-- Search stack
-![stack](https://cloud.githubusercontent.com/assets/5915359/4852497/9085b67a-607c-11e4-8300-1928ecb5d850.png)
-
 - Symbol search
-![byctags](https://cloud.githubusercontent.com/assets/5915359/4852495/903a342a-607c-11e4-8b01-a4dde78d9492.png)
+![symbol-search](https://cloud.githubusercontent.com/assets/5915359/9022502/5c6329fe-38b2-11e5-8d36-78cbf380bb3a.png)
 
 - Text search
-![bygrep](https://cloud.githubusercontent.com/assets/5915359/4852496/907e4ea8-607c-11e4-9c50-e25a8770aad8.png)
+![text-search](https://cloud.githubusercontent.com/assets/5915359/9022494/468a46e4-38b2-11e5-93f9-5830e9c351da.png)
+
+- File search
+![file-search](https://cloud.githubusercontent.com/assets/5915359/9022503/63e29bf6-38b2-11e5-9379-c40285ac3fd1.png)
+
+- Search stack
+![search-stack](https://cloud.githubusercontent.com/assets/5915359/9022504/6f103236-38b2-11e5-8e27-2506e8e88f4c.png)
 
 ## Installation
 
@@ -43,7 +46,7 @@ If your vim doesn't support python, one of the easiest solutions would be instal
 1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first: ```sudo apt-get install exuberant-ctags```.
 2. Install this plugin.
 3. Open one of your source files with vim.
-4. Build a tag file by typing **:VIntSearchBuildSymbolDB**. The tag file will be created in the nearest ancestor dir that contains a repository dir such as ```.git```, or in the current working dir if the source file is not managed by any version control system (You can change the behavior by ```g:vintsearch_searchpathmode```). 
+4. Build a tag file by typing **:VIntSearchBuildSymbolDB**. The tag file will be created in the nearest ancestor dir that contains a repository dir such as ```.git```, or in the current working dir if the source file is not managed by any version control system (You can change this behavior via ```g:vintsearch_searchpathmode```). 
 5. Note that your ```set tags=...``` setting should have ```./tags;,tags;``` to use the generated tag file (The name of the tag file is set by```g:vintsearch_tagfilename```).
 6. Move the cursor to one of the functions or variables. Typing **:VIntSearchCursor symbol n l** or **:VIntSearchCursor text n l** will give search results in the quickfix window. Typing **:VIntSearchPrintStack** will show the search stack.
 
@@ -89,22 +92,9 @@ Search symbol for [keyword] \(by default using ctags).
 
 **:VStext** [keyword] [options]  
 Search text for [keyword] with [options] \(by default using grep, [option] is grep option). [keyword] can be double-quoted and the argument order can be changed.  
-For example:
-```
-:VStext tags
-:VStext "let tags"
-:VStext tags -i
-:VStext -i tags
-:VStext "let tags" -i
-```
-(See ```man grep``` for more details about [options])
 
 **:VSfile** [keyword] [options]  
 Search file for [keyword] with [options] \(by default using find). Curently only works with -path options of find command.  
-For example,
-```
-:VSfind *test-class.cpp
-```
 
 **:VScftext** [keyword] [options]  
 Search text for [keyword] with [options] in the current file.
@@ -114,9 +104,10 @@ Search text for [keyword] with [options] in the current file.
 A search command taking a search type as an argument.
 
 [search type] can be one of:
-- 'symbol'
-- 'text'
-- 'file'
+- symbol
+- text
+- file
+- cftext
 
 For example,
 ```:VIntSearch text "this is"``` is same to ```:VStext "this is"```.
@@ -197,4 +188,4 @@ call s:nnoreicmap('','<F8>',':VScnext<CR>')
 call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
 ```
 
-I've define the function `s:nnoreicmap()` to map for normal, insert and command-line modes simultaneously, and installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) plugin to use alt-key mappings. `<A-T>` means alt+shift+t.
+`s:nnoreicmap()` is a function to register mappings for normal, insert and command-line modes simultaneously. I installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) to use alt-key mappings.
