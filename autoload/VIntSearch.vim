@@ -332,27 +332,118 @@ for r in range(len(propMat)):
 EOF
 endfunction
 
-function! s:MakeFindOpt()
+""""""""""""""""""""""""""""""""""""""""""""
+" find examples
+
+"# exclude *.h or *impl* and include *layer*
+
+"find -path *.h -prune -o -path *impl* -prune -o -path *layer* -print
+
+
+"# exclude *.h or *impl* and include *.h or *layer*
+"# : same result with 
+"# exclude *.h or *impl* and include *layer*
+"# because *.h has already been excluded
+
+"find -path *.h -prune -o -path *impl* -prune -o -path *.h -print -o -path *layer* -print
+
+
+"# exclude *.h or *impl* and include *.cpp or *layer*
+
+"find -path *.h -prune -o -path *impl* -prune -o -path *.cpp -print -o -path *layer* -print
+
+
+"# exclude *.h or *impl* and include *.cpp AND *layer*
+
+"find -path *.h -prune -o -path *impl* -prune -o -path *.cpp -a -path *layer* -print
+"find -path *.h -prune -o -path *impl* -prune -o \( -path *.cpp \) -a -path *layer* -print
+
+
+"# exclude *.h or *impl*, include ( *.h or *.cpp ) AND *layer*
+"# : same result with 
+"# exclude *.h or *impl* and include *.cpp AND *layer*
+"# because *.h has already been excluded
+
+"find -path *.h -prune -o -path *impl* -prune -o \( -path *.h -o -path *.cpp \) -a -path *layer* -print
+
+
+"# exclude *.h or *impl*, include ( *.html or *.cpp ) AND *layer*
+
+"find -path *.h -prune -o -path *impl* -prune -o \( -path *.html -o -path *.cpp \) -a -path *layer* -print
+
+
+"# exclude *.h or *impl* AND *layer*
+
+"find -path *.h -prune -o -path *impl* -prune -a -path *layer* -print
+""""""""""""""""""""""""""""""""""""""""""""
+
+func! s:GetFindOptionForExclude(excludePattern)
 	let findopt = ""
-	for i in range(len(g:vintsearch_excludepatterns))
-		let pattern = g:vintsearch_excludepatterns[i]
-		let findopt = findopt."-ipath \'".pattern."\' -prune"
-		if i<len(g:vintsearch_excludepatterns)-1
-				\ || (i==len(g:vintsearch_excludepatterns)-1 && len(g:vintsearch_includepatterns)>0)
+	for i in range(len(a:excludePattern))
+		let pattern = a:excludePattern[i]
+		let findopt = findopt."-path \'".pattern."\' -prune"
+		if i<len(a:excludePattern)-1
 			let findopt = findopt." -o "
 		endif
 	endfor
+	return findopt
+endfunc
+
+func! s:MakeFindOptionAllOr()
+	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
+	if len(g:vintsearch_includepatterns) > 0
+		let findopt = findopt." -o "
+	endif
 	for i in range(len(g:vintsearch_includepatterns))
 		let pattern = g:vintsearch_includepatterns[i]
-		"let findopt = findopt."-ipath \'".pattern."\' -print"
-		let findopt = findopt."-ipath \'".pattern."\'"
+		let findopt = findopt."-path \'".pattern."\' -print"
 		if i<len(g:vintsearch_includepatterns)-1
 			let findopt = findopt." -o "
 		endif
 	endfor
-	"echo findopt
 	return findopt
-endfunction
+endfunc
+
+func! s:MakeFindOptionLastAndWith(keyword)
+	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
+	if len(g:vintsearch_includepatterns) > 0
+		let findopt = findopt." -o \\( "
+	endif
+	for i in range(len(g:vintsearch_includepatterns))
+		let pattern = g:vintsearch_includepatterns[i]
+		let findopt = findopt."-path \'".pattern."\'"
+		if i<len(g:vintsearch_includepatterns)-1
+			let findopt = findopt." -o "
+		endif
+	endfor
+	if len(g:vintsearch_includepatterns) > 0
+		let findopt = findopt." \\) "
+	endif
+	let findopt = findopt." -a -path ".a:keyword." -print"
+	return findopt
+endfunc
+
+"function! s:MakeFindOpt()
+	"let findopt = ""
+	"for i in range(len(g:vintsearch_excludepatterns))
+		"let pattern = g:vintsearch_excludepatterns[i]
+		"let findopt = findopt."-ipath \'".pattern."\' -prune"
+		"if i<len(g:vintsearch_excludepatterns)-1
+				"\ || (i==len(g:vintsearch_excludepatterns)-1 && len(g:vintsearch_includepatterns)>0)
+			"let findopt = findopt." -o "
+		"endif
+	"endfor
+	"for i in range(len(g:vintsearch_includepatterns))
+		"let pattern = g:vintsearch_includepatterns[i]
+		""let findopt = findopt."-ipath \'".pattern."\' -print"
+		"let findopt = findopt."-ipath \'".pattern."\'"
+		"if i<len(g:vintsearch_includepatterns)-1
+			"let findopt = findopt." -o "
+		"endif
+	"endfor
+	""echo findopt
+	"return findopt
+"endfunction
 
 fun! s:CombineGrepPatterns(patterns)
 	let combStr = ""
@@ -372,14 +463,14 @@ fun! s:CombineGrepPatterns(patterns)
 	return combStr
 endfun
 
-function! s:MakeGrepOpt()
+function! s:MakeGrepOption()
 	let includeStr = s:CombineGrepPatterns(g:vintsearch_includepatterns)
 	let excludeStr = s:CombineGrepPatterns(g:vintsearch_excludepatterns)
 	let grepopt = "--include=".includeStr." --exclude=".excludeStr." --exclude-dir=".excludeStr
 	return grepopt
 endfunction
 
-function! s:MakeFindStrOpt()
+function! s:MakeFindStrOption()
 	let findstropt = ""
 	for i in range(len(g:vintsearch_includepatterns))
 		let pattern = g:vintsearch_includepatterns[i]
@@ -447,7 +538,8 @@ function! s:PrintSearchPath()
 endfunction
 
 function! s:BuildTag()
-	let findopt = s:MakeFindOpt()
+	"let findopt = s:MakeFindOpt()
+	let findopt = s:MakeFindOptionAllOr()
 	"echo findopt
 	"return
 	
@@ -522,13 +614,13 @@ function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 
 	"grep! prevents grep from opening first result
 	if has('win32')		|"findstr in windows
-		let findstropt = s:MakeFindStrOpt()
+		let findstropt = s:MakeFindStrOption()
 		exec "\:".grepcmd."! /s ".a:keyword." ".findstropt
 	else	|"grep in unix
 		if a:0 > 0
 			exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
 		else
-			let grepopt = s:MakeGrepOpt()
+			let grepopt = s:MakeGrepOption()
 			exec "\:".grepcmd."! -r ".grepopt." ".a:options." -e ".a:keyword." *"
 		endif
 	endif
@@ -551,15 +643,17 @@ function! s:GetFindQFList(keyword, options)
 	endif 
 	execute 'cd' searchpath
 
-	let findopt = s:MakeFindOpt()
-	let keyword_option = '-path'
-	if a:options =~ '-i'
-		let keyword_option = '-ipath'
-	endif
+	let findopt = s:MakeFindOptionLastAndWith(a:keyword)
+	"let findopt = s:MakeFindOpt()
+	"let keyword_option = '-path'
+	"if a:options =~ '-i'
+		"let keyword_option = '-ipath'
+	"endif
 
 	" update later with find . and grep
 	" http://stackoverflow.com/questions/13073731/linux-find-on-multiple-patterns
-	let pathListStr = system("find \\( ".findopt." \\) -a ".keyword_option." ".a:keyword)
+	"let pathListStr = system("find \\( ".findopt." \\) -a ".keyword_option." ".a:keyword)
+	let pathListStr = system("find ".findopt)
 	let pathList = split(pathListStr, '\n')
 
 	execute 'cd' prevdir
