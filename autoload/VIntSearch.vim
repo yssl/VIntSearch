@@ -32,6 +32,19 @@ function! VIntSearch#ClearStack()
 	call s:ClearStack()
 endfunction
 
+" script variable
+if !exists('s:searchstack')
+	let s:searchstack = []
+endif
+if !exists('s:stacklevel')
+	let s:stacklevel = 0
+endif
+if !exists('s:jump_after_search')
+	let s:jump_after_search = 0
+endif
+
+"""""""""""""""""""""""""""""""""""""""""
+" main search function
 function! s:Search(searchtype, searchcmd, keyword, options, jump_to_firstitem, open_result_win)
 	if a:searchcmd==#'default'
 		if a:searchtype==#'symbol'
@@ -71,6 +84,115 @@ function! s:Search(searchtype, searchcmd, keyword, options, jump_to_firstitem, o
 	call s:DoFinishingWork(qflist, search_keyword, a:searchtype, searchcmd, a:options, a:jump_to_firstitem, a:open_result_win, 1)
 endfunction
 
+"""""""""""""""""""""""""""""""""""""""""
+" two major of search functions using s:Search()
+" SearchCursor(): search keyword is the word under the cursor (provided by expand('<cword>'))
+" SearchRaw(): search keyword is given by user (via keyword_and_options)
+"
+" searchtype: 'symbol' or 'text' or 'file' or 'cftext'
+" searchcmd: for example, 'grep' for 'text' type
+
+" keyword is give by expand('<cword>')
+" options are determined by vimmode
+" jump_to_firstitem & open_result_win are determined by action
+"
+" vimmode: 'n'(normal mode), 'v'(visual selection mode)
+" action: 'j'(jump), 'l'(list)
+fun! VIntSearch#SearchCursor(searchtype, searchcmd, vimmode, action)
+	if a:vimmode==#'n'
+		let keyword = expand('<cword>')
+		let options = '-wF'
+	elseif a:vimmode==#'v'
+		let keyword = '"'.s:get_visual_selection().'"'
+		let options = '-F'
+	else
+		echo 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
+		return
+	endif
+
+	if a:action==#'j'
+		let jump_to_firstitem = 1
+		let open_result_win = 0
+	elseif a:action==#'l'
+		let jump_to_firstitem = 0
+		let open_result_win = 1
+	else
+		echo 'VIntSearch: '.a:action.': Unsupported action.'
+		return
+	endif
+
+	call s:Search(a:searchtype, a:searchcmd, keyword, options, jump_to_firstitem, open_result_win)
+endfun
+
+" keyword is given by user (via keyword_and_options)
+" options are give by user (via keyword_and_options)
+" jump_to_firstitem & open_result_win are fixed (jump_to_firstitem=0, open_result_win=1)
+"
+" keyword_and_options: a string having both keyword and options (e.g., "filePath -i")
+fun! VIntSearch#SearchRaw(searchtype, searchcmd, keyword_and_options)
+	let dblquota_indices = []
+	for i in range(len(a:keyword_and_options))
+		if a:keyword_and_options[i]==#'"'
+			if i>0 && a:keyword_and_options[i-1]==#'\'
+			else
+				call add(dblquota_indices, i)
+			endif
+		endif
+	endfor
+
+	if len(dblquota_indices)==0
+		let [keyword, options] = s:SplitKeywordOptions(a:keyword_and_options)
+	elseif len(dblquota_indices)==2
+		let keyword = a:keyword_and_options[dblquota_indices[0]:dblquota_indices[1]]
+		if dblquota_indices[0]==0
+			let options_raw = a:keyword_and_options[dblquota_indices[1]+1:]
+		else
+			let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
+		endif
+		let [non, options] = s:SplitKeywordOptions(options_raw)
+	else
+		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
+		return
+	endif
+
+	call s:Search(a:searchtype, a:searchcmd, keyword, options, 0, 1)
+endfun 
+
+"""""""""""""""""""""""""""""""""""""""""
+" search functions using VIntSearch#SearchCursor()
+
+" just call VIntSearch#SearchCursor() with type 'default'
+fun! VIntSearch#SearchCursorDefault(searchtype, vimmode, action)
+	call VIntSearch#SearchCursor(a:searchtype, 'default', a:vimmode, a:action)
+endfun
+
+"""""""""""""""""""""""""""""""""""""""""
+" search functions using VIntSearch#SearchRaw()
+
+" VIntSearch#SearchRawDefault('text', 'filePath -i)
+fun! VIntSearch#SearchRawDefault(searchtype, keyword_and_options)
+	call VIntSearch#SearchRaw(a:searchtype, 'default', a:keyword_and_options)
+endfun
+
+" VIntSearch#SearchRawDefaultParse('text filePath -i)
+fun! VIntSearch#SearchRawDefaultParse(type_and_keyword_and_options)
+	let splited = split(a:type_and_keyword_and_options)
+	let searchtype = splited[0]
+	let keyword_and_options = join(splited[1:])
+	call VIntSearch#SearchRaw(searchtype, 'default', keyword_and_options)
+endfun
+
+" VIntSearch#SearchRawWithCmdParse('text grep filePath -i)
+fun! VIntSearch#SearchRawWithCmdParse(type_and_cmd_and_keyword_and_options)
+	let splited = split(a:type_and_cmd_and_keyword_and_options)
+	let searchtype = splited[0]
+	let searchcmd = splited[1]
+	let keyword_and_options = join(splited[2:])
+	call VIntSearch#SearchRaw(searchtype, searchcmd, keyword_and_options)
+endfun
+
+"""""""""""""""""""""""""""""""""""""""""
+" utility function used by VIntSearch#SearchRaw() to split keyword and option
 function! s:SplitKeywordOptions(keyword_and_options)
 	let space_tokens = split(a:keyword_and_options)
 	let keyword = ''
@@ -88,6 +210,8 @@ function! s:SplitKeywordOptions(keyword_and_options)
 	return [keyword, options]
 endfunction
 
+"""""""""""""""""""""""""""""""""""""""""
+
 function! VIntSearch#MoveBackward(use_quickfix)
 	call s:MoveBackward(a:use_quickfix)
 endfunction
@@ -95,17 +219,6 @@ endfunction
 function! VIntSearch#MoveForward(use_quickfix)
 	call s:MoveForward(a:use_quickfix)
 endfunction
-
-"" script variable
-if !exists('s:searchstack')
-	let s:searchstack = []
-endif
-if !exists('s:stacklevel')
-	let s:stacklevel = 0
-endif
-if !exists('s:jump_after_search')
-	let s:jump_after_search = 0
-endif
 
 "" functions
 function! s:Cc(linenum, use_quickfix)
@@ -616,8 +729,16 @@ function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 	if has('win32')		|"findstr in windows
 		let findstropt = s:MakeFindStrOption()
 		exec "\:".grepcmd."! /s ".a:keyword." ".findstropt
+
+		"if a:0 > 0	|"findstr in a file (filepath: a:1)
+			"exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
+		"else
+			"let grepopt = s:MakeGrepOption()
+			"exec "\:".grepcmd."! -r ".grepopt." ".a:options." -e ".a:keyword." *"
+		"endif
+
 	else	|"grep in unix
-		if a:0 > 0
+		if a:0 > 0	|"grep in a file (filepath: a:1)
 			exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
 		else
 			let grepopt = s:MakeGrepOption()
@@ -796,87 +917,7 @@ EOF
 	return qflist
 endfunction
 
-fun! VIntSearch#SearchCursorDefault(searchtype, vimmode, action)
-	call VIntSearch#SearchCursor(a:searchtype, 'default', a:vimmode, a:action)
-endfun
 
-" searchtype: 'symbol' or 'text' or 'file' or 'cftext'
-" searchcmd: for example, 'grep' for 'text' type
-" vimmode: 'n'(normal mode), 'v'(visual selection mode)
-" action: 'j'(jump), 'l'(list)
-fun! VIntSearch#SearchCursor(searchtype, searchcmd, vimmode, action)
-	if a:vimmode==#'n'
-		let keyword = expand('<cword>')
-		let options = '-wF'
-	elseif a:vimmode==#'v'
-		let keyword = '"'.s:get_visual_selection().'"'
-		let options = '-F'
-	else
-		echo 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
-		return
-	endif
-
-	if a:action==#'j'
-		let jump_to_firstitem = 1
-		let open_result_win = 0
-	elseif a:action==#'l'
-		let jump_to_firstitem = 0
-		let open_result_win = 1
-	else
-		echo 'VIntSearch: '.a:action.': Unsupported action.'
-		return
-	endif
-
-	call s:Search(a:searchtype, a:searchcmd, keyword, options, jump_to_firstitem, open_result_win)
-endfun
-
-fun! VIntSearch#SearchRawDefaultParse(type_and_keyword_and_options)
-	let splited = split(a:type_and_keyword_and_options)
-	let searchtype = splited[0]
-	let keyword_and_options = join(splited[1:])
-	call VIntSearch#SearchRaw(searchtype, 'default', keyword_and_options)
-endfun
-
-fun! VIntSearch#SearchRawWithCmdParse(type_and_cmd_and_keyword_and_options)
-	let splited = split(a:type_and_cmd_and_keyword_and_options)
-	let searchtype = splited[0]
-	let searchcmd = splited[1]
-	let keyword_and_options = join(splited[2:])
-	call VIntSearch#SearchRaw(searchtype, searchcmd, keyword_and_options)
-endfun
-
-fun! VIntSearch#SearchRawDefault(searchtype, keyword_and_options)
-	call VIntSearch#SearchRaw(a:searchtype, 'default', a:keyword_and_options)
-endfun
-
-fun! VIntSearch#SearchRaw(searchtype, searchcmd, keyword_and_options)
-	let dblquota_indices = []
-	for i in range(len(a:keyword_and_options))
-		if a:keyword_and_options[i]==#'"'
-			if i>0 && a:keyword_and_options[i-1]==#'\'
-			else
-				call add(dblquota_indices, i)
-			endif
-		endif
-	endfor
-
-	if len(dblquota_indices)==0
-		let [keyword, options] = s:SplitKeywordOptions(a:keyword_and_options)
-	elseif len(dblquota_indices)==2
-		let keyword = a:keyword_and_options[dblquota_indices[0]:dblquota_indices[1]]
-		if dblquota_indices[0]==0
-			let options_raw = a:keyword_and_options[dblquota_indices[1]+1:]
-		else
-			let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
-		endif
-		let [non, options] = s:SplitKeywordOptions(options_raw)
-	else
-		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
-		return
-	endif
-
-	call s:Search(a:searchtype, a:searchcmd, keyword, options, 0, 1)
-endfun 
 
 """""""""""""""""""""""""""""""""""""""""""""
 " utility function

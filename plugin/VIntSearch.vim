@@ -79,13 +79,6 @@ function! DefaultQuickFixEnter()
 	execute 'silent! :VScc '.lnumqf
 endfunction
 
-"" commands 
-
-" Useful grep options
-" -w, --word-regexp
-" -F, --fixed-strings
-" -i, --ignore-case
-
 """""""""""""""""
 " search path / tag commands
 
@@ -97,6 +90,11 @@ command! VSbuild call VIntSearch#BuildSymbolDB()
 
 """""""""""""""""
 " search commands
+
+" Useful grep options
+" -w, --word-regexp
+" -F, --fixed-strings
+" -i, --ignore-case
 
 " :VStext -i tags
 " :VStext tags -i
