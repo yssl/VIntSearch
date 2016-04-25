@@ -110,8 +110,8 @@ command! VSbuild call VIntSearch#BuildSymbolDB()
 " :VIntSearchCursor symbol n j
 " :VIntSearchCursor text n l
 
-" :VIntSearchCursor symbol ctags n j
-" :VIntSearchCursor text grep n l
+" :VIntSearchCursorCmd symbol ctags n j
+" :VIntSearchCursorCmd text grep n l
 
 command! -complete=tag -nargs=1 VSsymbol call VIntSearch#SearchRawDefault('symbol', <f-args>)
 command! -complete=tag -nargs=1 VStext call VIntSearch#SearchRawDefault('text', <f-args>)

@@ -161,9 +161,14 @@ endfun
 """""""""""""""""""""""""""""""""""""""""
 " search functions using VIntSearch#SearchCursor()
 
-" just call VIntSearch#SearchCursor() with type 'default'
+" just call VIntSearch#SearchCursor() with searchcmd 'default'
 fun! VIntSearch#SearchCursorDefault(searchtype, vimmode, action)
 	call VIntSearch#SearchCursor(a:searchtype, 'default', a:vimmode, a:action)
+endfun
+
+" just call VIntSearch#SearchCursor()
+fun! VIntSearch#SearchCursorWithCmd(searchtype, searchcmd, vimmode, action)
+	call VIntSearch#SearchCursor(a:searchtype, a:searchcmd, a:vimmode, a:action)
 endfun
 
 """""""""""""""""""""""""""""""""""""""""
