@@ -563,42 +563,47 @@ endfunc
 	"return findopt
 "endfunction
 
-fun! s:CombineGrepPatterns(patterns)
+"" old version of CombineGrepPatterns() and MakeGrepPatternOption()
+"" use unix shell wildcard {}, which is not suppored by windows cmd.
+"fun! s:CombineGrepPatterns(patterns)
+	"let combStr = ""
+	"if len(a:patterns)==1
+		"let combStr = combStr.a:patterns[0]
+	"else
+		"let combStr = combStr."{"
+		"for i in range(len(a:patterns))
+			"let pattern = a:patterns[i]
+			"let combStr = combStr.pattern
+			"if i<len(a:patterns)-1
+				"let combStr = combStr.","
+			"endif
+		"endfor
+		"let combStr = combStr."}"
+	"endif
+	"return combStr
+"endfun
+
+"function! s:MakeGrepPatternOption()
+	"let includeStr = s:CombineGrepPatterns(g:vintsearch_includepatterns)
+	"let excludeStr = s:CombineGrepPatterns(g:vintsearch_excludepatterns)
+	"let grepopt = "--include=".includeStr." --exclude=".excludeStr." --exclude-dir=".excludeStr
+	"return grepopt
+"endfunction
+
+fun! s:CombineGrepPatterns(optionName, patterns)
 	let combStr = ""
-	if len(a:patterns)==1
-		let combStr = combStr.a:patterns[0]
-	else
-		let combStr = combStr."{"
-		for i in range(len(a:patterns))
-			let pattern = a:patterns[i]
-			let combStr = combStr.pattern
-			if i<len(a:patterns)-1
-				let combStr = combStr.","
-			endif
-		endfor
-		let combStr = combStr."}"
-	endif
+	for i in range(len(a:patterns))
+		let combStr = combStr.a:optionName.a:patterns[i]." "
+	endfor
 	return combStr
 endfun
 
-function! s:MakeGrepOption()
-	let includeStr = s:CombineGrepPatterns(g:vintsearch_includepatterns)
-	let excludeStr = s:CombineGrepPatterns(g:vintsearch_excludepatterns)
-	let grepopt = "--include=".includeStr." --exclude=".excludeStr." --exclude-dir=".excludeStr
-	return grepopt
-endfunction
-
-function! s:MakeFindStrOption()
-	let findstropt = ""
-	for i in range(len(g:vintsearch_includepatterns))
-		let pattern = g:vintsearch_includepatterns[i]
-		let findstropt = findstropt.pattern
-		if i<len(g:vintsearch_codeexts)-1
-			let findstropt = findstropt." "
-		endif
-	endfor
-	"echo findstropt
-	return findstropt
+function! s:MakeGrepPatternOption()
+	let includeStr = s:CombineGrepPatterns("--include=", g:vintsearch_includepatterns)
+	let excludeStr = s:CombineGrepPatterns("--exclude=", g:vintsearch_excludepatterns)
+	let excludeDirStr = s:CombineGrepPatterns("--exclude-dir=", g:vintsearch_excludepatterns)
+	let patterOpt = includeStr.excludeStr.excludeStr
+	return patterOpt
 endfunction
 
 function! s:GetRepoDirFrom(filepath)
@@ -731,24 +736,11 @@ function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 	endif
 
 	"grep! prevents grep from opening first result
-	if has('win32')		|"findstr in windows
-		let findstropt = s:MakeFindStrOption()
-		exec "\:".grepcmd."! /s ".a:keyword." ".findstropt
-
-		"if a:0 > 0	|"findstr in a file (filepath: a:1)
-			"exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
-		"else
-			"let grepopt = s:MakeGrepOption()
-			"exec "\:".grepcmd."! -r ".grepopt." ".a:options." -e ".a:keyword." *"
-		"endif
-
-	else	|"grep in unix
-		if a:0 > 0	|"grep in a file (filepath: a:1)
-			exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
-		else
-			let grepopt = s:MakeGrepOption()
-			exec "\:".grepcmd."! -r ".grepopt." ".a:options." -e ".a:keyword." *"
-		endif
+	if a:0 > 0	|"grep in a file (filepath: a:1)
+		exec "\:".grepcmd."! ".a:options." -e ".a:keyword." ".a:1
+	else
+		let patternopt = s:MakeGrepPatternOption()
+		exec "\:".grepcmd."! -r ".patternopt." ".a:options." -e ".a:keyword." *"
 	endif
 
 	execute 'cd' prevdir

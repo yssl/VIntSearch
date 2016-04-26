@@ -50,6 +50,9 @@ endif
 if !exists('g:vintsearch_symbol_defaultcmd')
 	let g:vintsearch_symbol_defaultcmd = 'ctags'
 endif
+" On Windows, please install GnuWin Grep for Windows (http://gnuwin32.sourceforge.net/packages/grep.htm)
+" and change grepprg in your _vimrc as follows:
+"     set grepprg=grep\ -n
 if !exists('g:vintsearch_text_defaultcmd')
 	let g:vintsearch_text_defaultcmd = 'grep'
 endif
