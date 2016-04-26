@@ -158,6 +158,14 @@ If not, the jump will not be reflected in VIntSearch's search stack.
 - If you're using any key mapings for ```:cnext``` or ```:cprev```, you can just replace them with **:VScnext** and **:VScprev**. 
 - When you press ```Enter``` or ```Double-click``` on a quickfix item, VIntSearch will automatically call **:VScc** instead of vim's ```:cc``` command.
 
+## Tips for Windows Users
+On Windows, please install [GnuWin Grep for Windows](http://gnuwin32.sourceforge.net/packages/grep.htm)
+and change grepprg in your _vimrc as follows:
+```
+set grepprg=grep\ -n
+```
+Then VIntSearch text search works correctly on Windows machines.
+
 ## Key Mappings
 
 VIntSearch does not provide default key mappings to keep your key mappings clean. Instead, I suggest convenient one what I'm using now. You can add them to your .vimrc and modify them as you want.
