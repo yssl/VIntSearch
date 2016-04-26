@@ -14,7 +14,7 @@ Contents                                                 *VIntSearch-contents*
          6. Stack Commands ....................... |VIntSearch-stackcommands|
          7. Options .............................. |VIntSearch-options|
          8. Key Mappings ......................... |VIntSearch-keymappings|
-         9. Tips for Windows Users ............... |VIntSearch-windows|
+         9. Notes for Windows Users .............. |VIntSearch-windows|
         10. Deprecated Commands & Options ........ |VIntSearch-deprecated|
         11. Changelog ............................ |VIntSearch-changelog|
 
@@ -347,15 +347,28 @@ command-line modes simultaneously. I installed ![vim-fixkey]
 (https://github.com/drmikehenry/vim-fixkey) to use alt-key mappings.
 
 ==============================================================================
-9. Tips for Windows Users                                 *VIntSearch-windows*
+9. Notes for Windows Users                                *VIntSearch-windows*
 
-On Windows, please install [GnuWin Grep for Windows]
+VIntSearch works correctly in Windows with following prerequisites:
+
+- For text search,  
+Please install [GnuWin Grep for Windows]
 (http://gnuwin32.sourceforge.net/packages/grep.htm)
+and add install location 
+(e.g., C:\Program Files (x86)\GnuWin32\bin) to system path,
 and change grepprg in your _vimrc as follows:
->
-	set grepprg=grep\ -n
-<
-Then VIntSearch text search works correctly on Windows machines.
+```
+set grepprg=grep\ -n
+```
+
+- For file search,  
+Please download [UnxUtils](https://sourceforge.net/projects/unxutils/)
+and extract it to a specific location, 
+and change g:vintsearch_findcmd_path in your _vimrc to the 
+downloaded find.exe location. For example:
+```
+let g:vintsearch_findcmd_path = 'C:\Program Files (x86)\UnxUtils\usr\local\wbin\find.exe'
+```
 
 ==============================================================================
 10. Deprecated Commands & Options                      *VIntSearch-deprecated*

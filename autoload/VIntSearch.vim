@@ -451,7 +451,7 @@ EOF
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""
-" find examples
+" find examples (on Linux)
 
 "# exclude *.h or *impl* and include *layer*
 
@@ -522,46 +522,39 @@ func! s:MakeFindOptionAllOr()
 	return findopt
 endfunc
 
+" linux find and UnxUtils find understand options in slightly different ways.
 func! s:MakeFindOptionLastAndWith(keyword)
 	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
 	if len(g:vintsearch_includepatterns) > 0
-		let findopt = findopt." -o \\( "
+		if has('win32')
+			let findopt = findopt." ^( "
+		else
+			let findopt = findopt." -o \\( "
+		endif
 	endif
 	for i in range(len(g:vintsearch_includepatterns))
 		let pattern = g:vintsearch_includepatterns[i]
-		let findopt = findopt."-path \'".pattern."\'"
+
+		if has('win32')
+			let findopt = findopt."-path ".pattern.""
+		else
+			let findopt = findopt."-path \'".pattern."\'"
+		endif
+
 		if i<len(g:vintsearch_includepatterns)-1
 			let findopt = findopt." -o "
 		endif
 	endfor
 	if len(g:vintsearch_includepatterns) > 0
-		let findopt = findopt." \\) "
+		if has('win32')
+			let findopt = findopt." ^) "
+		else
+			let findopt = findopt." \\) "
+		endif
 	endif
 	let findopt = findopt." -a -path ".a:keyword." -print"
 	return findopt
 endfunc
-
-"function! s:MakeFindOpt()
-	"let findopt = ""
-	"for i in range(len(g:vintsearch_excludepatterns))
-		"let pattern = g:vintsearch_excludepatterns[i]
-		"let findopt = findopt."-ipath \'".pattern."\' -prune"
-		"if i<len(g:vintsearch_excludepatterns)-1
-				"\ || (i==len(g:vintsearch_excludepatterns)-1 && len(g:vintsearch_includepatterns)>0)
-			"let findopt = findopt." -o "
-		"endif
-	"endfor
-	"for i in range(len(g:vintsearch_includepatterns))
-		"let pattern = g:vintsearch_includepatterns[i]
-		""let findopt = findopt."-ipath \'".pattern."\' -print"
-		"let findopt = findopt."-ipath \'".pattern."\'"
-		"if i<len(g:vintsearch_includepatterns)-1
-			"let findopt = findopt." -o "
-		"endif
-	"endfor
-	""echo findopt
-	"return findopt
-"endfunction
 
 "" old version of CombineGrepPatterns() and MakeGrepPatternOption()
 "" use unix shell wildcard {}, which is not suppored by windows cmd.
@@ -661,10 +654,7 @@ function! s:PrintSearchPath()
 endfunction
 
 function! s:BuildTag()
-	"let findopt = s:MakeFindOpt()
 	let findopt = s:MakeFindOptionAllOr()
-	"echo findopt
-	"return
 	
 	let tagfilename = g:vintsearch_tagfilename
 	
@@ -762,16 +752,18 @@ function! s:GetFindQFList(keyword, options)
 	execute 'cd' searchpath
 
 	let findopt = s:MakeFindOptionLastAndWith(a:keyword)
-	"let findopt = s:MakeFindOpt()
+
 	"let keyword_option = '-path'
 	"if a:options =~ '-i'
 		"let keyword_option = '-ipath'
 	"endif
 
-	" update later with find . and grep
+	" todo: use find . and grep (find all files paths and search keyword & include & exclude via grep)
 	" http://stackoverflow.com/questions/13073731/linux-find-on-multiple-patterns
-	"let pathListStr = system("find \\( ".findopt." \\) -a ".keyword_option." ".a:keyword)
-	let pathListStr = system("find ".findopt)
+
+	let findcmdopt ='"'.g:vintsearch_findcmd_path.'"'.findopt
+	"echoerr findcmdopt
+	let pathListStr = system(findcmdopt)
 	let pathList = split(pathListStr, '\n')
 
 	execute 'cd' prevdir

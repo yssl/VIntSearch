@@ -50,14 +50,26 @@ endif
 if !exists('g:vintsearch_symbol_defaultcmd')
 	let g:vintsearch_symbol_defaultcmd = 'ctags'
 endif
-" On Windows, please install GnuWin Grep for Windows (http://gnuwin32.sourceforge.net/packages/grep.htm)
+
+" In Windows, please install GnuWin Grep for Windows to use text search with grep
+" (http://gnuwin32.sourceforge.net/packages/grep.htm)
 " and change grepprg in your _vimrc as follows:
 "     set grepprg=grep\ -n
 if !exists('g:vintsearch_text_defaultcmd')
 	let g:vintsearch_text_defaultcmd = 'grep'
 endif
+
 if !exists('g:vintsearch_file_defaultcmd')
 	let g:vintsearch_file_defaultcmd = 'find'
+endif
+
+" In Windows, please download UnxUtils and extract it to a specific location
+" to use file search with find (https://sourceforge.net/projects/unxutils/),
+" and change g:vintsearch_findcmd_path in your _vimrc to the downloaded find.exe location.
+" For example,
+"    let g:vintsearch_findcmd_path = 'C:\Program Files (x86)\UnxUtils\usr\local\wbin\find.exe'
+if !exists('g:vintsearch_findcmd_path')
+	let g:vintsearch_findcmd_path = 'find'
 endif
 
 "" deprecated global variables

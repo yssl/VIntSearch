@@ -158,13 +158,24 @@ If not, the jump will not be reflected in VIntSearch's search stack.
 - If you're using any key mapings for ```:cnext``` or ```:cprev```, you can just replace them with **:VScnext** and **:VScprev**. 
 - When you press ```Enter``` or ```Double-click``` on a quickfix item, VIntSearch will automatically call **:VScc** instead of vim's ```:cc``` command.
 
-## Tips for Windows Users
-On Windows, please install [GnuWin Grep for Windows](http://gnuwin32.sourceforge.net/packages/grep.htm)
+## Notes for Windows Users
+VIntSearch works correctly in Windows with following prerequisites:
+
+- For text search,  
+Please install [GnuWin Grep for Windows](http://gnuwin32.sourceforge.net/packages/grep.htm)
+and add install location (e.g., C:\Program Files (x86)\GnuWin32\bin) to system path,
 and change grepprg in your _vimrc as follows:
 ```
 set grepprg=grep\ -n
 ```
-Then VIntSearch text search works correctly on Windows machines.
+
+- For file search,  
+Please download [UnxUtils](https://sourceforge.net/projects/unxutils/) and extract it to a specific location, 
+and change g:vintsearch_findcmd_path in your _vimrc to the downloaded find.exe location. For example:
+```
+let g:vintsearch_findcmd_path = 'C:\Program Files (x86)\UnxUtils\usr\local\wbin\find.exe'
+```
+
 
 ## Key Mappings
 
@@ -180,6 +191,7 @@ endfunction
 " VIntSearch
 if has('win32')
 	set grepprg=grep\ -n
+	let g:vintsearch_findcmd_path = 'C:\Program Files (x86)\UnxUtils\usr\local\wbin\find.exe'
 endif
 "let g:vintsearch_enable_default_quickfix_enter = 0
 call s:nnoreicmap('','<A-3>',':VIntSearchMoveBackward<CR>')
