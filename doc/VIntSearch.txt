@@ -14,8 +14,9 @@ Contents                                                 *VIntSearch-contents*
          6. Stack Commands ....................... |VIntSearch-stackcommands|
          7. Options .............................. |VIntSearch-options|
          8. Key Mappings ......................... |VIntSearch-keymappings|
-         9. Deprecated Commands & Options ........ |VIntSearch-deprecated|
-        10. Changelog ............................ |VIntSearch-changelog|
+         9. Tips for Windows Users ............... |VIntSearch-windows|
+        10. Deprecated Commands & Options ........ |VIntSearch-deprecated|
+        11. Changelog ............................ |VIntSearch-changelog|
 
 ==============================================================================
 1. Introduction                                             *VIntSearch-intro*
@@ -346,7 +347,18 @@ command-line modes simultaneously. I installed ![vim-fixkey]
 (https://github.com/drmikehenry/vim-fixkey) to use alt-key mappings.
 
 ==============================================================================
-9. Deprecated Commands & Options                       *VIntSearch-deprecated*
+9. Tips for Windows Users                                 *VIntSearch-windows*
+
+On Windows, please install [GnuWin Grep for Windows]
+(http://gnuwin32.sourceforge.net/packages/grep.htm)
+and change grepprg in your _vimrc as follows:
+>
+	set grepprg=grep\ -n
+<
+Then VIntSearch text search works correctly on Windows machines.
+
+==============================================================================
+10. Deprecated Commands & Options                      *VIntSearch-deprecated*
 
 Those commands are deprecated since version 1.3.0 and are supposed to be removed
 in version 1.4.0.
@@ -425,7 +437,7 @@ Default: >
 <
 
 ==============================================================================
-10. Changelog                                            *VIntSearch-changelog*
+11. Changelog                                           *VIntSearch-changelog*
 
 1.3.1                       2015/10/30
     - Bug fix for find option used by VSfile & VSbuild
