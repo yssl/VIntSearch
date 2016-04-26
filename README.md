@@ -178,14 +178,18 @@ function! s:nnoreicmap(option, shortcut, command)
 endfunction
 
 " VIntSearch
+if has('win32')
+	set grepprg=grep\ -n
+endif
+"let g:vintsearch_enable_default_quickfix_enter = 0
 call s:nnoreicmap('','<A-3>',':VIntSearchMoveBackward<CR>')
 call s:nnoreicmap('','<A-4>',':VIntSearchMoveForward<CR>')
 
 call s:nnoreicmap('','<A-]>',':VIntSearchCursor symbol n j<CR>')
-call s:nnoreicmap('','g]',':VIntSearchCursor symbol n l<CR>')
-call s:nnoreicmap('','g[',':VIntSearchCursor text n l<CR><CR>')
-call s:nnoreicmap('','g{',':VIntSearchCursor cftext n l<CR><CR>')
-call s:nnoreicmap('','g\',':VIntSearchCursor file n l<CR><CR>')
+nnoremap g] :VIntSearchCursor symbol n l<CR>
+nnoremap g[ :VIntSearchCursor text n l<CR><CR>
+nnoremap g{ :VIntSearchCursor cftext n l<CR><CR>
+nnoremap g\ :VIntSearchCursor file n l<CR><CR>
 vnoremap <A-]> :<C-u>VIntSearchCursor symbol v j<CR>
 vnoremap g] :<C-u>VIntSearchCursor symbol v l<CR>
 vnoremap g[ :<C-u>VIntSearchCursor text v l<CR><CR>
