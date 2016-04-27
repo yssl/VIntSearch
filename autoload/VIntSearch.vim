@@ -1,4 +1,4 @@
-" File:         plugin/VIntSearch.vim
+" File:         autoload/VIntSearch.vim
 " Description:  "One should be able to jump between all kinds of search results".
 " Author:       yssl <http://github.com/yssl>
 " License:      MIT License
@@ -509,11 +509,11 @@ endfunc
 
 func! s:MakeFindOptionAllOr()
 	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
-	if len(g:vintsearch_includepatterns) > 0
-		if !has('win32')
-			let findopt = findopt." -o "
-		endif
-	endif
+	"if len(g:vintsearch_includepatterns) > 0
+		"if !has('win32')
+			"let findopt = findopt." -o "
+		"endif
+	"endif
 	for i in range(len(g:vintsearch_includepatterns))
 		let pattern = g:vintsearch_includepatterns[i]
 		let findopt = findopt."-path \"".pattern."\" -print"
@@ -531,7 +531,8 @@ func! s:MakeFindOptionLastAndWith(keyword)
 		if has('win32')
 			let findopt = findopt." ^( "
 		else
-			let findopt = findopt." -o \\( "
+			"let findopt = findopt." -o \\( "
+			let findopt = findopt." \\( "
 		endif
 	endif
 	for i in range(len(g:vintsearch_includepatterns))
