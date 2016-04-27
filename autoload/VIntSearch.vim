@@ -499,7 +499,7 @@ func! s:GetFindOptionForExclude(excludePattern)
 	let findopt = ""
 	for i in range(len(a:excludePattern))
 		let pattern = a:excludePattern[i]
-		let findopt = findopt."-path \'".pattern."\' -prune"
+		let findopt = findopt."-path \"".pattern."\" -prune"
 		if i<len(a:excludePattern)-1
 			let findopt = findopt." -o "
 		endif
@@ -510,11 +510,13 @@ endfunc
 func! s:MakeFindOptionAllOr()
 	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
 	if len(g:vintsearch_includepatterns) > 0
-		let findopt = findopt." -o "
+		if !has('win32')
+			let findopt = findopt." -o "
+		endif
 	endif
 	for i in range(len(g:vintsearch_includepatterns))
 		let pattern = g:vintsearch_includepatterns[i]
-		let findopt = findopt."-path \'".pattern."\' -print"
+		let findopt = findopt."-path \"".pattern."\" -print"
 		if i<len(g:vintsearch_includepatterns)-1
 			let findopt = findopt." -o "
 		endif
@@ -534,12 +536,7 @@ func! s:MakeFindOptionLastAndWith(keyword)
 	endif
 	for i in range(len(g:vintsearch_includepatterns))
 		let pattern = g:vintsearch_includepatterns[i]
-
-		if has('win32')
-			let findopt = findopt."-path ".pattern.""
-		else
-			let findopt = findopt."-path \'".pattern."\'"
-		endif
+		let findopt = findopt."-path \"".pattern."\""
 
 		if i<len(g:vintsearch_includepatterns)-1
 			let findopt = findopt." -o "
@@ -665,7 +662,15 @@ function! s:BuildTag()
 	endif 
 	execute 'cd' searchpath
 
-	execute ":!find ".findopt.">tf.tmp ; ctags --c++-kinds=+p -f ".tagfilename." -L tf.tmp --fields=+n ; rm tf.tmp"
+	"execute ":!find ".findopt.">tf.tmp ; ctags --c++-kinds=+p -f ".tagfilename." -L tf.tmp --fields=+n ; rm tf.tmp"
+
+	let findcmdopt ='"'.g:vintsearch_findcmd_path.'" '.findopt
+
+	let pathListStr = system(findcmdopt)
+	let pathList = split(pathListStr, '\n')
+	call writefile(pathList, "tf.tmp")
+	execute ":silent !ctags --c++-kinds=+p -f ".tagfilename." -L tf.tmp --fields=+n"
+	call delete("tf.tmp")
 	
 	execute 'cd' prevdir
 	
@@ -761,7 +766,7 @@ function! s:GetFindQFList(keyword, options)
 	" todo: use find . and grep (find all files paths and search keyword & include & exclude via grep)
 	" http://stackoverflow.com/questions/13073731/linux-find-on-multiple-patterns
 
-	let findcmdopt ='"'.g:vintsearch_findcmd_path.'"'.findopt
+	let findcmdopt ='"'.g:vintsearch_findcmd_path.'" '.findopt
 	"echoerr findcmdopt
 	let pathListStr = system(findcmdopt)
 	let pathList = split(pathListStr, '\n')
