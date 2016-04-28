@@ -678,7 +678,12 @@ function! s:BuildTag()
 	execute 'cd' prevdir
 	
 	redraw
-	echom "VIntSearch: The tag file for all source files under \'".searchpath."\' has been created: ".searchpath."/".tagfilename
+
+	if !filereadable(searchpath.'/'.g:vintsearch_tagfilename)
+		echom "VIntSearch: The tag file is NOT created. Please install Exuberant Ctags first."
+	else
+		echom "VIntSearch: The tag file for all source files under \'".searchpath."\' has been created: ".searchpath."/".tagfilename
+	endif
 endfunction
 
 function! s:DoFinishingWork(qflist, keyword, searchtype, searchcmd, options, jump_to_firstitem, open_result_win, use_quickfix)
