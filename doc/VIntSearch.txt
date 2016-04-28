@@ -467,7 +467,7 @@ Default: >
     - Support MS Windows
     - Improve handling exceptional cases
     - Add VIntSearch#SearchCursorWithCmd()
-    - Delete deprecated features from 1.3.0.
+    - Delete deprecated features from 1.3.0
 1.3.1                       2015/10/30
     - Bug fix for find option used by VSfile & VSbuild
 1.3.0                       2015/08/02
