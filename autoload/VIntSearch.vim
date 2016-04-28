@@ -77,11 +77,13 @@ function! s:Search(searchtype, searchcmd, keyword, options, jump_to_firstitem, o
 	elseif searchcmd==#'find'
 		let qflist = s:GetFindQFList(real_keyword, a:options)
 	else
-		echo 'VIntSearch: '.searchcmd.': Unsupported command.'
+		echom 'VIntSearch: '.searchcmd.': Unsupported command.'
 		return
 	endif
 
-	call s:DoFinishingWork(qflist, search_keyword, a:searchtype, searchcmd, a:options, a:jump_to_firstitem, a:open_result_win, 1)
+	if qflist!=[0]
+		call s:DoFinishingWork(qflist, search_keyword, a:searchtype, searchcmd, a:options, a:jump_to_firstitem, a:open_result_win, 1)
+	endif
 endfunction
 
 """""""""""""""""""""""""""""""""""""""""
@@ -106,7 +108,7 @@ fun! VIntSearch#SearchCursor(searchtype, searchcmd, vimmode, action)
 		let keyword = '"'.s:get_visual_selection().'"'
 		let options = '-F'
 	else
-		echo 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
+		echom 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
 		return
 	endif
 
@@ -117,7 +119,7 @@ fun! VIntSearch#SearchCursor(searchtype, searchcmd, vimmode, action)
 		let jump_to_firstitem = 0
 		let open_result_win = 1
 	else
-		echo 'VIntSearch: '.a:action.': Unsupported action.'
+		echom 'VIntSearch: '.a:action.': Unsupported action.'
 		return
 	endif
 
@@ -151,7 +153,7 @@ fun! VIntSearch#SearchRaw(searchtype, searchcmd, keyword_and_options)
 		endif
 		let [non, options] = s:SplitKeywordOptions(options_raw)
 	else
-		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
+		echom 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
 		return
 	endif
 
@@ -243,7 +245,7 @@ function! s:Cnext(use_quickfix)
 			exec 'lnext'
 		endif
 	catch E553
-		echo 'VIntSearch: Cnext: No more items'
+		echom 'VIntSearch: Cnext: No more items'
 	endtry
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
@@ -256,7 +258,7 @@ function! s:Cprev(use_quickfix)
 			execute 'lprev'
 		endif
 	catch E553
-		echo 'VIntSearch: Cprev: No more items'
+		echom 'VIntSearch: Cprev: No more items'
 	endtry
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
@@ -310,7 +312,7 @@ endfunction
 
 function! s:MoveForward(use_quickfix)
 	if len(s:searchstack)==0
-		echo 'VIntSearch: MoveForward: Search stack is empty.'
+		echom 'VIntSearch: MoveForward: Search stack is empty.'
 		return
 	endif
 
@@ -334,12 +336,12 @@ function! s:MoveForward(use_quickfix)
 
 	call s:UncheckJumpAfterSearch()
 	redraw
-	echo 'VIntSearch: MoveForward: Stack level is now: '.(s:stacklevel+1)
+	echom 'VIntSearch: MoveForward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
 function! s:MoveBackward(use_quickfix)
 	if len(s:searchstack)==0
-		echo 'VIntSearch: MoveBackward: Search stack is empty.'
+		echom 'VIntSearch: MoveBackward: Search stack is empty.'
 		return
 	endif
 
@@ -363,14 +365,14 @@ function! s:MoveBackward(use_quickfix)
 
 	call s:UncheckJumpAfterSearch()
 	redraw
-	echo 'VIntSearch: MoveBackward: Stack level is now: '.(s:stacklevel+1)
+	echom 'VIntSearch: MoveBackward: Stack level is now: '.(s:stacklevel+1)
 endfunction
 
 function! s:ClearStack()
 	unlet s:searchstack
 	let s:searchstack = []
 	let s:stacklevel = 0
-	echo 'VIntSearch: Search stack is cleared.'
+	echom 'VIntSearch: Search stack is cleared.'
 endfunction
 
 function! s:PrintStack()
@@ -642,13 +644,13 @@ function! s:GetSearchPath(mode)
 		let searchpath = getcwd()
 		return searchpath
 	else
-		echo "VIntSearch: unknown search path mode \'".a:mode."\'"
+		echom "VIntSearch: unknown search path mode \'".a:mode."\'"
 		return ''
 	endif
 endfunction
 
 function! s:PrintSearchPath()
-	echo 'VIntSearch: Search path is: '.s:GetSearchPath(g:vintsearch_searchpathmode)
+	echom 'VIntSearch: Search path is: '.s:GetSearchPath(g:vintsearch_searchpathmode)
 endfunction
 
 function! s:BuildTag()
@@ -676,7 +678,7 @@ function! s:BuildTag()
 	execute 'cd' prevdir
 	
 	redraw
-	echo "VIntSearch: The tag file for all source files under \'".searchpath."\' has been created: ".searchpath."/".tagfilename
+	echom "VIntSearch: The tag file for all source files under \'".searchpath."\' has been created: ".searchpath."/".tagfilename
 endfunction
 
 function! s:DoFinishingWork(qflist, keyword, searchtype, searchcmd, options, jump_to_firstitem, open_result_win, use_quickfix)
@@ -714,14 +716,14 @@ function! s:DoFinishingWork(qflist, keyword, searchtype, searchcmd, options, jum
 		echom 'VIntSearch: g:vintsearch_search_exclude_patterns is deprecated. Please use g:vintsearch_excludepatterns instead.'
 	endif
 
-	echo message
+	echom message
 endfunction
 
 function! s:GetGrepQFList(keyword, options, use_quickfix, ...)
 	let prevdir = getcwd()
 	let searchpath = s:GetSearchPath(g:vintsearch_searchpathmode)
 	if searchpath==#''
-		return
+		return [0]
 	endif 
 	execute 'cd' searchpath
 
@@ -753,7 +755,7 @@ function! s:GetFindQFList(keyword, options)
 	let prevdir = getcwd()
 	let searchpath = s:GetSearchPath(g:vintsearch_searchpathmode)
 	if searchpath==#''
-		return
+		return [0]
 	endif 
 	execute 'cd' searchpath
 
@@ -799,6 +801,16 @@ endfunction
 "http://andrewradev.com/2011/06/08/vim-and-ctags/
 "http://andrewradev.com/2011/10/15/vim-and-ctags-finding-tag-definitions/
 function! s:GetCtagsQFList(keyword)
+	let searchpath = s:GetSearchPath(g:vintsearch_searchpathmode)
+	if searchpath==#''
+		return [0]
+	endif 
+
+	if !filereadable(searchpath.'/'.g:vintsearch_tagfilename)
+		echom 'VIntSearch: No tag file in search path '.searchpath.'. Please run :VIntSearchBuildSymbolDB or :VSbuild and try again.'
+		return [0]
+	endif
+
 	if 1
 		""""""""""""""""""""""""""""""""
 		" using taglist()
@@ -951,7 +963,7 @@ function! VIntSearch#SearchRawDep(keyword_and_options, cmd)
 		let options_raw = a:keyword_and_options[:dblquota_indices[0]-1].a:keyword_and_options[dblquota_indices[1]+1:]
 		let [non, options] = s:SplitKeywordOptions(options_raw)
 	else
-		echo 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
+		echom 'VIntSearch: Only two quotation marks are allowed: '.a:keyword_and_options
 		return
 	endif
 
@@ -970,7 +982,7 @@ function! VIntSearch#SearchCursorDep(cmd, vimmode, action)
 		let keyword = '"'.s:get_visual_selection().'"'
 		let options = '-F'
 	else
-		echo 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
+		echom 'VIntSearch: '.a:vimmode.': Unsupported vim mode.'
 		return
 	endif
 
@@ -985,7 +997,7 @@ function! VIntSearch#SearchCursorDep(cmd, vimmode, action)
 		let jump_to_firstitem = 0
 		let open_result_win = 1
 	else
-		echo 'VIntSearch: '.a:action.': Unsupported action.'
+		echom 'VIntSearch: '.a:action.': Unsupported action.'
 		return
 	endif
 
@@ -1006,7 +1018,7 @@ function! s:SearchDep(keyword, cmd, options, jump_to_firstitem, open_result_win)
 	elseif a:cmd==#'find'
 		let qflist = s:GetFindQFList(real_keyword, a:options)
 	else
-		echo 'VIntSearch: '.a:cmd.': Unsupported command.'
+		echom 'VIntSearch: '.a:cmd.': Unsupported command.'
 		return
 	endif
 
@@ -1047,7 +1059,7 @@ function! s:DoFinishingWorkDep(qflist, keyword, cmd, options, jump_to_firstitem,
 	redraw
 	echom 'VIntSearch: Old style command (e.g., VSctags, etc) is used. Please use new style commands (e.g., VSsymbol, etc) instead.'
 
-	echo message
+	echom message
 endfunction
 
 function! VIntSearch#BuildTag()
