@@ -72,14 +72,6 @@ if !exists('g:vintsearch_findcmd_path')
 	let g:vintsearch_findcmd_path = 'find'
 endif
 
-"" deprecated global variables
-if exists('g:vintsearch_search_include_patterns')
-	let g:vintsearch_includepatterns = g:vintsearch_search_include_patterns
-endif
-if exists('g:vintsearch_search_exclude_patterns')
-	let g:vintsearch_excludepatterns = g:vintsearch_search_exclude_patterns
-endif
-
 "" autocmd
 augroup VIntSearchAutoCmds
 	autocmd!
@@ -157,34 +149,6 @@ command! VSstack call VIntSearch#PrintStack()
 command! -nargs=1 VScc call VIntSearch#Cc(<args>, 1)
 command! VScnext call VIntSearch#Cnext(1)
 command! VScprev call VIntSearch#Cprev(1)
-
-"""""""""""""""""
-" deprecated - will be removed in version 1.4.0
-
-command! -complete=tag -nargs=1 VIntSearchCtags call VIntSearch#SearchRawDep(<f-args>,'ctags')
-command! -complete=tag -nargs=1 VSctags call VIntSearch#SearchRawDep(<f-args>,'ctags')
-
-" You can put grep options into <f-args>
-" ex)	:Vsgrep -i tags
-" 		:Vsgrep tags -i
-" 		:Vsgrep -i "let tags"
-" 		:Vsgrep "let tags" -i
-command! -complete=tag -nargs=1 VIntSearchGrep call VIntSearch#SearchRawDep(<f-args>,'grep')
-command! -complete=tag -nargs=1 VSgrep call VIntSearch#SearchRawDep(<f-args>,'grep')
-
-command! -complete=tag -nargs=1 VIntSearchCFGrep call VIntSearch#SearchRawDep(<f-args>,'cfgrep')
-command! -complete=tag -nargs=1 VScfgrep call VIntSearch#SearchRawDep(<f-args>,'cfgrep')
-
-command! -complete=tag -nargs=1 VIntSearchFind call VIntSearch#SearchRawDep(<f-args>,'find')
-command! -complete=tag -nargs=1 VSfind call VIntSearch#SearchRawDep(<f-args>,'find')
-
-command! -complete=tag -nargs=* VIntSearchCtagsCursor call VIntSearch#SearchCursorDep('ctags',<f-args>)
-command! -complete=tag -nargs=* VIntSearchGrepCursor call VIntSearch#SearchCursorDep('grep',<f-args>)
-command! -complete=tag -nargs=* VIntSearchCFGrepCursor call VIntSearch#SearchCursorDep('cfgrep',<f-args>)
-command! -complete=tag -nargs=* VIntSearchFindCursor call VIntSearch#SearchCursorDep('find',<f-args>)
-
-command! VIntSearchBuildTag call VIntSearch#BuildTag()
-command! VSbtag call VIntSearch#BuildTag()
 
 """""""""""""""""""""""""""""""""""""""""""""
 let &cpo= s:keepcpo
