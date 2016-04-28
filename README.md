@@ -45,7 +45,7 @@ This plugin requires a version of vim with python support. You can check your vi
 
 1. You need Exuberant Ctags to fully use this plugin. If you don't have it, please install it first: 
 	- Linux: ```sudo apt-get install exuberant-ctags```.
-	- Windows: Download source & binary for windows from http://ctags.sourceforge.net/ and extract ctags.exe to one of the system path directory.
+	- Windows: Download source & binary for windows from http://ctags.sourceforge.net/ and extract ctags.exe to one of the system path directories.
 2. Install this plugin.
 3. Open one of your source files with vim.
 4. Build a tag file by typing **:VIntSearchBuildSymbolDB**. The tag file will be created in the nearest ancestor dir that contains a repository dir such as ```.git```, or in the current working dir if the source file is not managed by any version control system (You can change this behavior via ```g:vintsearch_searchpathmode```). 
