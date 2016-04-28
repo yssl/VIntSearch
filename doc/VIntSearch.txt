@@ -57,7 +57,7 @@ would be installing a more featured version of vim by `sudo apt-get install vim-
    If you don't have it, please install it first: 
    - Linux: ```sudo apt-get install exuberant-ctags```.
    - Windows: Download source & binary for windows from http://ctags.sourceforge.net/
-     and extract ctags.exe to one of the system path directory.
+     and extract ctags.exe to one of the system path directories.
 
 2. Install this plugin.
 
