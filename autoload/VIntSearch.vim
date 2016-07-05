@@ -8,12 +8,12 @@ function! VIntSearch#Cc(linenum, use_quickfix)
 	call s:Cc(a:linenum, a:use_quickfix)
 endfunction
 
-function! VIntSearch#Cnext(use_quickfix)
-	call s:Cnext(a:use_quickfix)
+function! VIntSearch#Cnext(wrap_around, use_quickfix)
+	call s:Cnext(a:wrap_around, a:use_quickfix)
 endfunction
 
-function! VIntSearch#Cprev(use_quickfix)
-	call s:Cprev(a:use_quickfix)
+function! VIntSearch#Cprev(wrap_around, use_quickfix)
+	call s:Cprev(a:wrap_around, a:use_quickfix)
 endfunction
 
 function! VIntSearch#BuildSymbolDB()
@@ -237,7 +237,7 @@ function! s:Cc(linenum, use_quickfix)
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
-function! s:Cnext(use_quickfix)
+function! s:Cnext(wrap_around, use_quickfix)
 	try
 		if a:use_quickfix
 			exec 'cnext'
@@ -245,12 +245,16 @@ function! s:Cnext(use_quickfix)
 			exec 'lnext'
 		endif
 	catch E553
-		echom 'VIntSearch: Cnext: No more items'
+		if a:wrap_around
+			exec 'cfirst'
+		else
+			echom 'VIntSearch: Cnext: No more items'
+		endif
 	endtry
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction
 
-function! s:Cprev(use_quickfix)
+function! s:Cprev(wrap_around, use_quickfix)
 	try
 		if a:use_quickfix
 			execute 'cprev'
@@ -258,7 +262,11 @@ function! s:Cprev(use_quickfix)
 			execute 'lprev'
 		endif
 	catch E553
-		echom 'VIntSearch: Cprev: No more items'
+		if a:wrap_around
+			exec 'clast'
+		else
+			echom 'VIntSearch: Cprev: No more items'
+		endif
 	endtry
 	call s:CheckJumpAfterSearch(a:use_quickfix)
 endfunction

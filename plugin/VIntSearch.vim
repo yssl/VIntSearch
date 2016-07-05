@@ -147,8 +147,10 @@ command! VIntSearchPrintStack call VIntSearch#PrintStack()
 command! VSstack call VIntSearch#PrintStack()
 
 command! -nargs=1 VScc call VIntSearch#Cc(<args>, 1)
-command! VScnext call VIntSearch#Cnext(1)
-command! VScprev call VIntSearch#Cprev(1)
+command! VScnext call VIntSearch#Cnext(0, 1)
+command! VScprev call VIntSearch#Cprev(0, 1)
+command! VScnextc call VIntSearch#Cnext(1, 1)
+command! VScprevc call VIntSearch#Cprev(1, 1)
 
 """""""""""""""""""""""""""""""""""""""""""""
 let &cpo= s:keepcpo

@@ -14,16 +14,16 @@ VIntSearch means **V**im **Int**egrated **Search**.
 
 ## Screenshots
 
-- Symbol search
+- Symbol search  
 ![symbol-search](https://cloud.githubusercontent.com/assets/5915359/9022502/5c6329fe-38b2-11e5-8d36-78cbf380bb3a.png)
 
-- Text search
+- Text search  
 ![text-search](https://cloud.githubusercontent.com/assets/5915359/9022494/468a46e4-38b2-11e5-93f9-5830e9c351da.png)
 
-- File search
+- File search  
 ![file-search](https://cloud.githubusercontent.com/assets/5915359/9022503/63e29bf6-38b2-11e5-9379-c40285ac3fd1.png)
 
-- Search stack
+- Search stack  
 ![search-stack](https://cloud.githubusercontent.com/assets/5915359/9022504/6f103236-38b2-11e5-8e27-2506e8e88f4c.png)
 
 ## Installation
@@ -154,18 +154,21 @@ Clear the *search stack*.
 **:VScc**  
 **:VScnext**  
 **:VScprev**  
+**:VScnextc**  
+**:VScprevc**  
 Replacement of vim's ```:cc```, ```:cnext```, and ```:cprev```.
 Jumping to a new quickFix item should be done ONLY using these commands. 
 If not, the jump will not be reflected in VIntSearch's search stack. 
 - If you're using any key mapings for ```:cnext``` or ```:cprev```, you can just replace them with **:VScnext** and **:VScprev**. 
 - When you press ```Enter``` or ```Double-click``` on a quickfix item, VIntSearch will automatically call **:VScc** instead of vim's ```:cc``` command.
+- **:VScnextc** and **:VScprevc** are cyclic version of **:VScnext** and **:VScprev**. **:VScnextc** jumps to the first item when it is called at the end of the list, and **:VScprevc** jumps to the last item when it is called at the beginning of the list.
 
 ## Notes for Windows Users
 VIntSearch works correctly in Windows with following prerequisites:
 
 - For text search,  
 Please install [GnuWin Grep for Windows](http://gnuwin32.sourceforge.net/packages/grep.htm)
-and add install location (e.g., C:\Program Files (x86)\GnuWin32\bin) to system path,
+and add install location (e.g., C:\Program Files (x86)\GnuWin32\bin) to the system path,
 and change grepprg in your _vimrc as follows:
 ```
 set grepprg=grep\ -n
@@ -210,8 +213,8 @@ vnoremap g[ :<C-u>VIntSearchCursor text v l<CR><CR>
 vnoremap g{ :<C-u>VIntSearchCursor cftext v l<CR><CR>
 vnoremap g\ :<C-u>VIntSearchCursor file v l<CR><CR>
 
-call s:nnoreicmap('','<F8>',':VScnext<CR>')
-call s:nnoreicmap('','<S-F8>',':VScprev<CR>')
+call s:nnoreicmap('','<F8>',':VScnextc<CR>')
+call s:nnoreicmap('','<S-F8>',':VScprevc<CR>')
 ```
 
 `s:nnoreicmap()` is a function to register mappings for normal, insert and command-line modes simultaneously. I installed ![vim-fixkey](https://github.com/drmikehenry/vim-fixkey) to use alt-key mappings.
