@@ -1,5 +1,7 @@
 # VIntSearch
 
+*Currently, this plugin only supports the vim compiled with python 2 support (+python).*
+
 VIntSearch is a vim plugin providing an integrated interface across various types of searches. It currently supports symbol search, text search, and file search.
 Search results are given in the quickfix window and a user can conviniently move forward / backward through the integrated search history.
 VIntSearch means **V**im **Int**egrated **Search**.
@@ -38,7 +40,7 @@ VIntSearch means **V**im **Int**egrated **Search**.
     - Download this plugin and extract it in `~/.vim/`
 
 This plugin requires a version of vim with python support. You can check your vim with `:echo has('python')`.
-- Linux: If your vim doesn't support python, one of the easiest solutions would be installing a more featured version of vim by `sudo apt-get install vim-gtk`.
+- Linux: If your vim doesn't support python, one of the easiest solutions would be installing a more featured version of vim by `sudo apt-get install vim-gtk-py2`.
 - Windows: gvim for Windows is already equipped with python support.
 
 ## Getting Started
