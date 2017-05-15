@@ -517,8 +517,10 @@ func! s:GetFindOptionForExclude(excludePattern)
 	return findopt
 endfunc
 
+"# exclude *.h or *impl* and include *.cpp or *layer*
 func! s:MakeFindOptionAllOr()
 	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
+	let findopt = findopt." "
 	"if len(g:vintsearch_includepatterns) > 0
 		"if !has('win32')
 			"let findopt = findopt." -o "
@@ -534,6 +536,7 @@ func! s:MakeFindOptionAllOr()
 	return findopt
 endfunc
 
+"# exclude *.h or *impl*, include ( *.html or *.cpp ) AND *layer*
 " linux find and UnxUtils find understand options in slightly different ways.
 func! s:MakeFindOptionLastAndWith(keyword)
 	let findopt = s:GetFindOptionForExclude(g:vintsearch_excludepatterns)
