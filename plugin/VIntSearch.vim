@@ -12,6 +12,14 @@ set cpo&vim
  
 """""""""""""""""""""""""""""""""""""""""""""
 
+" vim version checking
+if !has('python3') && !has('python')
+	echohl WarningMsg
+	echomsg 'VIntSearch unavailable: requires vim with Python support'
+	echohl None
+	finish
+endif
+
 "" global variables
 if !exists('g:vintsearch_searchpathmode')
 	" search path is the root dir of grep search path tree or the dir where tags

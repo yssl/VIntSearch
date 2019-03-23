@@ -3,6 +3,17 @@
 " Author:       yssl <http://github.com/yssl>
 " License:      MIT License
 
+" Support for Python3 and Python2
+" from https://github.com/Valloric/YouCompleteMe
+function! s:UsingPython3()
+	if has('python3')
+		return 1
+	endif
+	return 0
+endfunction
+let s:using_python3 = s:UsingPython3()
+let s:pythonX_until_EOF = s:using_python3 ? "python3 << EOF" : "python << EOF"
+
 " wrappers
 function! VIntSearch#Cc(linenum, use_quickfix)
 	call s:Cc(a:linenum, a:use_quickfix)
@@ -384,14 +395,14 @@ function! s:ClearStack()
 endfunction
 
 function! s:PrintStack()
-python << EOF
+exec s:pythonX_until_EOF
 import vim
 def ltrunc(s, width, prefix=''):
-    if width >= len(s): prefix = ''
-    return prefix+s[-width+len(prefix):]
+	if width >= len(s): prefix = ''
+	return prefix+s[-width+len(prefix):]
 def rtrunc(s, width, postfix=''):
-    if width >= len(s): postfix = ''
-    return s[:width-len(postfix)]+postfix
+	if width >= len(s): postfix = ''
+	return s[:width-len(postfix)]+postfix
 def toWidthColMat(rowMat):
 	colMat = [[None]*len(rowMat) for c in range(len(rowMat[0]))]
 	for r in range(len(rowMat)):
@@ -413,7 +424,7 @@ for i in range(len(searchstack)+1):
 		ss = searchstack[i]
 		propMat.append([mark, str(i+1), ss['keyword'], ss['type'],\
 						ss['file'], ss['line'], \
-	   					ss['text'].lstrip().replace('\t',' ')]) 
+						ss['text'].lstrip().replace('\t',' ')]) 
 	else:
 		propMat.append([mark,'','','','','','']) 
 
@@ -614,7 +625,7 @@ function! s:GetRepoDirFrom(filepath)
 	if a:filepath==#''
 		return ''
 	endif
-python << EOF
+exec s:pythonX_until_EOF
 repodirs = vim.eval('g:vintsearch_repodirs')
 filepath = vim.eval('a:filepath')
 dir = os.path.dirname(filepath)
@@ -626,7 +637,7 @@ while True:
 			exist = True
 			break
 	if exist:
-	   break	
+		break	
 
 	prevdir = dir
 	dir = os.path.dirname(dir)
@@ -850,7 +861,7 @@ function! s:GetCtagsQFList(keyword)
 		redir END
 		let tags = []
 
-python << EOF
+exec s:pythonX_until_EOF
 	import vim
 
 	def splitTaglineByIndexes(tagline, indexes):
