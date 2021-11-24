@@ -617,8 +617,8 @@ function! s:MakeGrepPatternOption()
 	let includeStr = s:CombineGrepPatterns("--include=", g:vintsearch_includepatterns)
 	let excludeStr = s:CombineGrepPatterns("--exclude=", g:vintsearch_excludepatterns)
 	let excludeDirStr = s:CombineGrepPatterns("--exclude-dir=", g:vintsearch_excludepatterns)
-	let patterOpt = includeStr.excludeStr.excludeStr
-	return patterOpt
+	let patternOpt = includeStr.excludeStr.excludeDirStr
+	return patternOpt
 endfunction
 
 function! s:GetRepoDirFrom(filepath)
